@@ -33,28 +33,28 @@ const FONT = "'Pretendard', -apple-system, sans-serif";
 const TYPES = {
   keeper: {
     key:"keeper", emoji:"🛡️", name:"오징어 지킴이형", tagline:"내 사람은 내가 지킨다, 독점욕 만렙", color: PALETTE.coral,
-    desc:"한번 마음 준 사람은 끝까지 책임지는 타입이에요. 겉으로는 무뚝뚝해 보여도 상대가 힘들 때 가장 먼저 달려오고, 말보다 행동으로 증명하는 스타일이죠. 단, 한번 믿었다가 배신당하면 절대 잊지 않아요.",
+    desc:"한번 마음 준 사람은 끝까지 책임지는 타입이에요. 겉으로는 무뚝뚝해 보여도 상대가 힘들 때 가장 먼저 달려오고, 말보다 행동으로 증명하는 스타일이죠. 좋아하면 그 사람의 생일은 물론 좋아하는 음식, 싫어하는 것까지 자연스럽게 다 기억해요. 그런데 한 가지 함정이 있어요. 내가 준 만큼 상대가 돌려주지 않을 때, 말은 안 하지만 속으로 조용히 쌓이고 쌓이다 어느 순간 한꺼번에 터지는 타입이에요. 주변 사람들은 '별로 감정 없어 보이는데 갑자기 왜 이러지?' 싶겠지만, 사실 그 전부터 이미 마음에 금이 가 있던 거예요. 한번 믿었다가 배신당하면 절대, 진짜 절대 잊지 않아요.",
     traits:["상대의 모든 일정을 자연스럽게 파악하고 있음", "좋아하면 먼저 연락은 못 해도 답장은 번개처럼", "연락 두절 2시간이면 이미 스토리 세 번 확인"],
     trap:"상대를 너무 붙잡으려다 오히려 숨막히게 만들 수 있어요. '내가 다 해줄게'가 때로는 상대의 자유를 빼앗는 말이 될 수 있거든요.",
     match:"쿨한 척 고수형 — 밀당을 즐기면서도 결국 곁에 머물러주는 타입이라 지킴이형의 진심을 가장 잘 받아줘요.",
   },
   hunter: {
     key:"hunter", emoji:"🎯", name:"직진 사냥꾼형", tagline:"좋으면 바로 들이대는 돌격대장", color: PALETTE.amber,
-    desc:"마음이 움직이면 3초 안에 행동하는 타입이에요. 눈치 보고 재다가 타이밍 놓치는 걸 제일 싫어하죠. '고백했다가 어색해지면 어떡하지?' 이런 고민은 남의 얘기예요. 솔직하고 당당한 매력으로 상대를 단번에 사로잡아요.",
+    desc:"마음이 움직이면 3초 안에 행동하는 타입이에요. 눈치 보고 재다가 타이밍 놓치는 걸 제일 싫어하죠. '고백했다가 어색해지면 어떡하지?' 이런 고민은 솔직히 별로 안 해요. 좋으면 그날 연락처 물어보고, 다음 날 바로 밥 먹자고 하는 스타일이에요. 덕분에 주변에 늘 누군가 생기고, 솔직한 매력 때문에 먼저 관심 받는 경우도 많아요. 다만, 시작은 누구보다 뜨겁지만 관계가 익숙해지는 순간 예전의 그 설렘이 슬쩍 사라지는 경험... 한 번쯤 해봤을 거예요. 불꽃같은 시작만큼 그 온도를 유지하는 법이 사실 제일 어려운 숙제예요.",
     traits:["좋아하면 그날 바로 연락처 물어봄", "데이트 코스 이미 세 가지 옵션 준비해놓고 물어봄", "애인 SNS 좋아요는 전부 내가 제일 먼저"],
     trap:"너무 빠른 속도에 상대가 부담을 느낄 수 있어요. 내 페이스에 맞춰 달려가다가 상대는 아직 출발선에 있는 상황이 생기기도 해요.",
     match:"그랜마에라형 — 느긋하고 안정적인 타입이라 직진형의 에너지를 오히려 편하게 받아줘요.",
   },
   cool: {
     key:"cool", emoji:"🧊", name:"쿨한 척 고수형", tagline:"겉은 시크, 속은 활활", color: PALETTE.green,
-    desc:"관심 없는 척이 제일 자연스러운 타입이에요. 상대방 스토리는 다 봤는데 본 척도 안 하고, 먼저 연락하고 싶어도 '내가 왜?' 하고 참아버리죠. 근데 실상은 누구보다 신경 많이 쓰고, 그 사람 말 한마디가 하루 종일 머릿속을 맴돌아요.",
+    desc:"관심 없는 척이 제일 자연스러운 타입이에요. 상대 스토리는 다 봤는데 본 척도 안 하고, 먼저 연락하고 싶어도 '내가 왜?' 하고 참아버리죠. 근데 실상은 누구보다 신경 많이 쓰고, 그 사람 말 한마디가 하루 종일 머릿속을 맴돌아요. 카톡 읽고 바로 답장하면 왠지 질 것 같아서 1시간은 참는데, 사실 그 1시간 동안 뭐라고 보낼지만 계속 고민하는 게 함정이에요. 표현을 잘 안 해서 오해받기 쉽고, 상대방이 먼저 포기해버리는 경우도 종종 있어요. 근데 마음 주기로 한번 결심하면, 그 사람만 보는 진짜 진심파라는 것도 알아줬으면 해요.",
     traits:["카톡 읽고 1시간 뒤 답장 (사실 30분 동안 뭐라고 보낼지 고민함)", "좋아하는 사람 앞에서 더 무뚝뚝해짐", "먼저 고백한 적은 없지만 고백받은 적은 꽤 있음"],
     trap:"밀당이 너무 길어지면 상대가 '나한테 관심 없구나'하고 포기해버려요. 시크함이 매력이지만 결정적인 순간엔 표현이 필요해요.",
     match:"오징어 지킴이형 — 눈치 빠르고 끝까지 기다려주는 타입이라 쿨한 척 고수형의 속마음을 가장 잘 읽어줘요.",
   },
   grandma: {
     key:"grandma", emoji:"🧶", name:"그랜마에라형", tagline:"연애보다 내 평화가 우선", color: PALETTE.greenDeep,
-    desc:"연애가 설레는 건 맞는데, 그보다 내 일상이 더 소중한 타입이에요. 데이트도 좋지만 혼자 보내는 주말이 없으면 뭔가 허전하고, 매일 연락하는 것보다 각자의 시간을 잘 지켜주는 관계가 이상적이죠. 억지로 감정 소모하는 연애는 딱 질색이에요.",
+    desc:"연애가 설레는 건 맞는데, 솔직히 그보다 내 일상이 더 소중한 타입이에요. 데이트도 좋지만 혼자 보내는 주말이 없으면 뭔가 허전하고, 매일 연락하는 것보다 각자 시간을 지켜주는 관계가 훨씬 이상적이죠. 감정 기복 심한 사람이랑 있으면 내 체력이 먼저 방전돼요. 그래서 처음 만났을 때 '쿨하다'는 말 많이 들었을 거예요. 사실 쿨한 게 아니라 소중한 에너지를 함부로 안 쓰는 거예요. 한번 마음 열면 그 누구보다 편안하고 따뜻한 사람인데, 그 문을 열게 만드는 사람이 많지 않은 것도 사실이에요.",
     traits:["연애 중에도 혼자만의 시간은 꼭 챙김", "연락 빈도보다 만났을 때 질이 중요", "감정 기복 심한 사람과 있으면 체력 방전"],
     trap:"너무 편안함만 추구하다 보면 설렘이 사라져도 모르고 지나칠 수 있어요. 가끔은 불편함을 감수하고 표현하는 연습도 필요해요.",
     match:"직진 사냥꾼형 — 알아서 다 이끌어주는 타입이라 그랜마에라형이 에너지 소모 없이 편하게 연애할 수 있어요.",
@@ -204,11 +204,11 @@ function Field({ label, optional, children }) {
     </div>
   );
 }
-function PrefillRow({ k, v }) {
+function PrefillRow({ k, v, dark, accent }) {
   return (
     <div style={S.prefillRow}>
-      <span style={{ color:T.sub }}>{k}</span>
-      <span style={{ color:T.ink }}>{v} <span style={{ color:T.green }}>✓</span></span>
+      <span style={{ color: dark ? "rgba(255,255,255,.45)" : T.sub }}>{k}</span>
+      <span style={{ color: dark ? "rgba(255,255,255,.85)" : T.ink }}>{v} <span style={{ color: accent || T.green }}>✓</span></span>
     </div>
   );
 }
@@ -231,8 +231,8 @@ function Intro({ user, setUser, onStart }) {
   return (
     <div className="fade-in" style={{ background:"#0E0816", minHeight:"100vh" }}>
       {/* 히어로 이미지 영역 */}
-      <div style={{ position:"relative", width:"100%", height:"62vw", maxHeight:380, overflow:"hidden" }}>
-        <img src="images/intro-hero.png" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }}/>
+      <div style={{ position:"relative", width:"100%", height:"85vw", maxHeight:480, overflow:"hidden" }}>
+        <img src="images/intro-hero.png" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 25%" }}/>
         {/* 상단 그라데이션 오버레이 */}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, rgba(14,8,22,.3) 0%, rgba(14,8,22,0) 40%, rgba(14,8,22,.85) 80%, #0E0816 100%)" }}/>
         {/* 브랜드 + 카피 */}
@@ -360,46 +360,46 @@ function Result({ type, user, onApply }) {
         <img src={imgSrc} alt={type.name} style={{ width:"100%", maxWidth:320, display:"block", margin:"0 auto", borderRadius:16 }} onError={e=>{ e.target.style.display="none"; }}/>
       </div>
 
-      <div style={S.pad}>
+      <div style={{ ...S.pad, background:c.bg }}>
         {/* 설명 */}
-        <p style={{ fontSize:15, color:T.ink, lineHeight:1.75, marginBottom:20 }}>{type.desc}</p>
+        <p style={{ fontSize:15, color:"rgba(255,255,255,.85)", lineHeight:1.85, marginBottom:20 }}>{type.desc}</p>
 
         {/* 특징 카드 */}
-        <div style={{ background:"#F7F3EE", borderRadius:14, padding:"16px 18px", marginBottom:16 }}>
-          <div style={{ fontSize:12, fontWeight:700, color:c.chip, letterSpacing:"1px", marginBottom:12 }}>이런 거 공감되지 않아요?</div>
+        <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:14, padding:"16px 18px", marginBottom:16 }}>
+          <div style={{ fontSize:12, fontWeight:700, color:c.accent, letterSpacing:"1px", marginBottom:12 }}>이런 거 공감되지 않아요?</div>
           {type.traits.map((t,i) => (
             <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:i<type.traits.length-1?10:0 }}>
-              <span style={{ fontSize:14, marginTop:1 }}>✓</span>
-              <span style={{ fontSize:13.5, color:T.ink, lineHeight:1.6 }}>{t}</span>
+              <span style={{ fontSize:14, marginTop:1, color:c.accent }}>✓</span>
+              <span style={{ fontSize:13.5, color:"rgba(255,255,255,.8)", lineHeight:1.6 }}>{t}</span>
             </div>
           ))}
         </div>
 
         {/* 잠긴 섹션 */}
-        <div style={S.lockWrap}>
-          <div style={S.lockBlur}>
-            <p style={S.lockLine}>⚠️ {user.name||"당신"}님이 빠지기 쉬운 연애 함정</p>
-            <p style={{ ...S.lockLine, marginTop:6 }}>💞 {user.name||"당신"}님과 환상의 궁합 유형</p>
-            <p style={{ ...S.lockLine, marginTop:6 }}>🗓️ 올해 인연이 들어오는 시기</p>
+        <div style={{ ...S.lockWrap, marginBottom:16 }}>
+          <div style={{ ...S.lockBlur, background:"rgba(255,255,255,.06)" }}>
+            <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)" }}>⚠️ {user.name||"당신"}님이 빠지기 쉬운 연애 함정</p>
+            <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>💞 {user.name||"당신"}님과 환상의 궁합 유형</p>
+            <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>🗓️ 올해 인연이 들어오는 시기</p>
           </div>
-          <div style={S.lockOverlay}><span style={S.lockBadge}>🔒 전체 결과 잠김</span></div>
+          <div style={S.lockOverlay}><span style={{ ...S.lockBadge, background:"rgba(0,0,0,.4)", color:c.accent, border:`1px solid ${c.accent}` }}>🔒 전체 결과 잠김</span></div>
         </div>
 
         {/* 프로모 */}
-        <div style={S.promo}>
-          <div style={S.promoTitle}>{user.name||"당신"}님 같은 '{type.name.replace("형","")}'이<br/>가장 잘 맞는 모임이 열려요</div>
-          <div style={S.promoRow}><span>👥</span> 같은 유형 78%가 이미 신청했어요</div>
-          <div style={{ ...S.promoRow, color:T.coralDeep }}><span>⏰</span> 이번 주 모임 · 마감까지 3자리</div>
+        <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, padding:18, marginBottom:16 }}>
+          <div style={{ fontSize:14.5, fontWeight:700, color:"#fff", lineHeight:1.5 }}>{user.name||"당신"}님 같은 '{type.name.replace("형","")}'이<br/>가장 잘 맞는 모임이 열려요</div>
+          <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:9, fontSize:12.5, color:c.accent }}><span>👥</span> 같은 유형 78%가 이미 신청했어요</div>
+          <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:6, fontSize:12.5, color:"rgba(255,255,255,.6)" }}><span>⏰</span> 이번 주 모임 · 마감까지 3자리</div>
         </div>
 
-        <div style={S.prefill}>
-          <div style={S.prefillLabel}>입력하신 정보로 바로 신청돼요</div>
-          <PrefillRow k="이름" v={user.name||"—"}/>
-          <PrefillRow k="연락처" v={maskPhone(user.phone)}/>
-          <PrefillRow k="관심" v={user.interest}/>
+        <div style={{ marginBottom:16, padding:"14px 16px", border:"1.5px dashed rgba(255,255,255,.15)", borderRadius:12 }}>
+          <div style={{ fontSize:11.5, color:"rgba(255,255,255,.35)", marginBottom:8 }}>입력하신 정보로 바로 신청돼요</div>
+          <PrefillRow k="이름" v={user.name||"—"} dark accent={c.accent}/>
+          <PrefillRow k="연락처" v={maskPhone(user.phone)} dark accent={c.accent}/>
+          <PrefillRow k="관심" v={user.interest} dark accent={c.accent}/>
         </div>
-        <button onClick={onApply} style={S.cta}>3초 만에 소모임 신청 완료</button>
-        <p style={S.fineprint}>신청하면 잠긴 전체 결과도 함께 보내드려요</p>
+        <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none" }}>3초 만에 소모임 신청 완료</button>
+        <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>신청하면 잠긴 전체 결과도 함께 보내드려요</p>
       </div>
     </div>
   );
