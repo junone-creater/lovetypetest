@@ -604,7 +604,7 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
       first: result.first.name, second: result.second.name, third: result.third.name,
       phone: applyInfo.phone, location: applyInfo.location, concern: applyInfo.concern
     });
-    fetch(`${SHEET_URL}?${params}`, { mode: "no-cors" }).catch(()=>{});
+    new Image().src = `${SHEET_URL}?${params}`;
     onDone();
   };
   const inputStyle = { ...S.input, background:"rgba(255,255,255,.1)", border:`1.5px solid ${c.accent}44`, color:"#fff", borderRadius:14, fontSize:16, padding:"16px 18px" };
