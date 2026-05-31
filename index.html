@@ -650,33 +650,12 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
                 : step===2 ? applyInfo.location.trim().length>=2
                 : applyInfo.concern.trim().length>=5;
   const sendToSheet = () => {
-    const data = {
-      name: user.name, age: user.age, gender: user.gender,
-      first: result.first.name, second: result.second.name, third: result.third.name,
-      phone: applyInfo.phone, location: applyInfo.location, concern: applyInfo.concern
-    };
-    try {
-      const iframe = document.createElement('iframe');
-      iframe.name = 'sheet_iframe';
-      iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute;';
-      document.body.appendChild(iframe);
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = SHEET_URL;
-      form.target = 'sheet_iframe';
-      Object.entries(data).forEach(([k, v]) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = k;
-        input.value = v || '';
-        form.appendChild(input);
-      });
-      document.body.appendChild(form);
-      form.submit();
-      setTimeout(() => {
-        try { document.body.removeChild(form); document.body.removeChild(iframe); } catch(e) {}
-      }, 5000);
-    } catch(e) {}
+    const params = new URLSearchParams({
+      name: user.name||'', age: user.age||'', gender: user.gender||'',
+      first: result.first.name||'', second: result.second.name||'', third: result.third.name||'',
+      phone: applyInfo.phone||'', location: applyInfo.location||'', concern: applyInfo.concern||''
+    });
+    fetch(`${SHEET_URL}?${params}`).catch(()=>{});
   };
   const handleNext = () => {
     if (step < 3) { setStep(s => s + 1); return; }
@@ -746,6 +725,24 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
 
 function Done({ result, user, onReset }) {
   const type = result.first;
+  const [copied, setCopied] = React.useState(false);
+
+  const handleShare = async () => {
+    const shareUrl = "https://junone-creater.github.io/lovetypetest/";
+    const shareText = `나의 연애 유형은 '${type.name}'! 당신도 테스트해보세요 👇`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title:"이음나루 연애유형 테스트", text:shareText, url:shareUrl });
+      } catch(e) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      } catch(e) {}
+    }
+  };
+
   return (
     <div style={S.pad} className="fade-in">
       <div style={{ height:30 }}/>
@@ -759,6 +756,16 @@ function Done({ result, user, onReset }) {
         <UnlockRow icon="💞" title="환상의 궁합 유형"         body={type.match}/>
         <UnlockRow icon="🗓️" title="올해 인연 들어오는 시기" body="늦봄~초여름, 익숙한 공간에서 예상치 못한 인연이 시작돼요."/>
       </div>
+
+      {/* 공유하기 */}
+      <div style={{ marginTop:22, padding:"18px", background:"#F3E8FF", borderRadius:16, textAlign:"center" }}>
+        <div style={{ fontSize:14, fontWeight:700, color:"#6B3FA0", marginBottom:4 }}>친구도 테스트해볼 수 있게 공유해요!</div>
+        <div style={{ fontSize:12, color:"#9B70C0", marginBottom:14 }}>나는 '{type.name}'— 친구는 어떤 유형일까요?</div>
+        <button onClick={handleShare} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#6B3FA0", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:FONT }}>
+          {copied ? "링크 복사됐어요 ✓" : "친구에게 공유하기 🔗"}
+        </button>
+      </div>
+
       <button onClick={onReset} style={S.ctaGhost}>다시 테스트하기</button>
     </div>
   );
