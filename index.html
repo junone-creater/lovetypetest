@@ -593,16 +593,11 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
   const [step, setStep] = React.useState(1);
   const type = result.first;
   const c = type.color;
-  const locations = ["서울","경기/인천","부산/경남","대구/경북","광주/전라","대전/충청","강원/제주","기타"];
-  const concerns = ["밀당/썸 관계","고백 타이밍","장거리 연애","이별 극복","재회","새로운 인연 만들기","연애 자신감","기타"];
   const canNext = step===1 ? applyInfo.phone.replace(/[^0-9]/g,"").length>=10
-                : step===2 ? applyInfo.location!==""
-                : applyInfo.concern.length>0;
+                : step===2 ? applyInfo.location.trim().length>=2
+                : applyInfo.concern.trim().length>=5;
   const handleNext = () => step<3 ? setStep(s=>s+1) : onDone();
-  const toggleConcern = (v) => {
-    const list = applyInfo.concern;
-    setApplyInfo({...applyInfo, concern: list.includes(v) ? list.filter(x=>x!==v) : [...list,v]});
-  };
+  const inputStyle = { ...S.input, background:"rgba(255,255,255,.1)", border:`1.5px solid ${c.accent}44`, color:"#fff", borderRadius:14, fontSize:16, padding:"16px 18px" };
 
   return (
     <div style={{ background:c.bg, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
@@ -616,13 +611,12 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
         ))}
       </div>
 
-      <div key={step} className="fade-in" style={{ flex:1, padding:"32px 24px 40px", display:"flex", flexDirection:"column" }}>
+      <div key={step} className="fade-in" style={{ flex:1, padding:"36px 24px 40px", display:"flex", flexDirection:"column" }}>
 
         {step===1 && <>
           <div style={{ fontSize:22, fontWeight:800, color:"#fff", lineHeight:1.4, marginBottom:10 }}>연락처를<br/>알려주세요</div>
           <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", marginBottom:32, lineHeight:1.7 }}>결과와 맞춤 연애 조언을<br/>문자로 바로 보내드려요</div>
-          <input
-            style={{ ...S.input, background:"rgba(255,255,255,.1)", border:`1.5px solid ${c.accent}55`, color:"#fff", borderRadius:14, fontSize:17, padding:"16px 18px", letterSpacing:"1px" }}
+          <input style={{ ...inputStyle, fontSize:18, letterSpacing:"1.5px" }}
             placeholder="010-0000-0000" inputMode="numeric"
             value={applyInfo.phone}
             onChange={e=>setApplyInfo({...applyInfo,phone:formatPhone(e.target.value)})}
@@ -632,29 +626,30 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
 
         {step===2 && <>
           <div style={{ fontSize:22, fontWeight:800, color:"#fff", lineHeight:1.4, marginBottom:10 }}>거주 지역을<br/>알려주세요</div>
-          <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", marginBottom:32, lineHeight:1.7 }}>지역에 맞는 모임과 프로그램을<br/>안내해드릴게요</div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
-            {locations.map(loc=>{
-              const on=applyInfo.location===loc;
-              return <button key={loc} onClick={()=>setApplyInfo({...applyInfo,location:loc})} style={{ padding:"12px 20px", borderRadius:24, border:`1.5px solid ${on?c.accent:"rgba(255,255,255,.12)"}`, background:on?`${c.chip}88`:"rgba(255,255,255,.06)", color:on?c.accent:"rgba(255,255,255,.55)", fontFamily:FONT, fontSize:14, fontWeight:600, cursor:"pointer", transition:"all .15s" }}>{loc}</button>;
-            })}
-          </div>
+          <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", marginBottom:10, lineHeight:1.7 }}>동 단위까지 적어주시면 더 잘 안내해드릴 수 있어요</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,.25)", marginBottom:28 }}>예) 서울 마포구 합정동 · 경기 성남시 분당구</div>
+          <input style={inputStyle}
+            placeholder="예) 서울 마포구 합정동"
+            value={applyInfo.location}
+            onChange={e=>setApplyInfo({...applyInfo,location:e.target.value})}
+          />
           <div style={{ flex:1 }}/>
         </>}
 
         {step===3 && <>
-          <div style={{ fontSize:22, fontWeight:800, color:"#fff", lineHeight:1.4, marginBottom:10 }}>해결하고 싶은<br/>고민이 있나요?</div>
-          <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", marginBottom:32, lineHeight:1.7 }}>여러 개 선택할 수 있어요</div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
-            {concerns.map(con=>{
-              const on=applyInfo.concern.includes(con);
-              return <button key={con} onClick={()=>toggleConcern(con)} style={{ padding:"12px 20px", borderRadius:24, border:`1.5px solid ${on?c.accent:"rgba(255,255,255,.12)"}`, background:on?`${c.chip}88`:"rgba(255,255,255,.06)", color:on?c.accent:"rgba(255,255,255,.55)", fontFamily:FONT, fontSize:14, fontWeight:600, cursor:"pointer", transition:"all .15s" }}>{con}</button>;
-            })}
-          </div>
+          <div style={{ fontSize:22, fontWeight:800, color:"#fff", lineHeight:1.4, marginBottom:10 }}>해결하고 싶은<br/>고민을 적어주세요</div>
+          <div style={{ fontSize:14, color:"rgba(255,255,255,.4)", marginBottom:10, lineHeight:1.7 }}>편하게 적어주시면 돼요<br/>전문가가 꼼꼼히 읽고 연락드려요</div>
+          <div style={{ fontSize:12, color:"rgba(255,255,255,.25)", marginBottom:28 }}>예) 좋아하는 사람이 생겼는데 어떻게 시작해야 할지 모르겠어요</div>
+          <textarea
+            style={{ ...inputStyle, minHeight:160, resize:"none", lineHeight:1.75 }}
+            placeholder="고민을 자유롭게 적어주세요..."
+            value={applyInfo.concern}
+            onChange={e=>setApplyInfo({...applyInfo,concern:e.target.value})}
+          />
           <div style={{ flex:1 }}/>
         </>}
 
-        <button onClick={handleNext} disabled={!canNext} style={{ ...S.cta, background:canNext?c.chip:"rgba(255,255,255,.1)", color:canNext?"#fff":"rgba(255,255,255,.3)", boxShadow:"none", cursor:canNext?"pointer":"not-allowed", fontSize:17, marginTop:32 }}>
+        <button onClick={handleNext} disabled={!canNext} style={{ ...S.cta, background:canNext?c.chip:"rgba(255,255,255,.1)", color:canNext?"#fff":"rgba(255,255,255,.3)", boxShadow:"none", cursor:canNext?"pointer":"not-allowed", fontSize:17, marginTop:28 }}>
           {step<3 ? "다음" : "신청 완료"}
         </button>
         <p style={{ ...S.fineprint, color:"rgba(255,255,255,.25)", marginTop:12 }}>입력하신 정보는 결과 안내 외 사용되지 않아요</p>
@@ -687,7 +682,7 @@ function Done({ result, user, onReset }) {
 function LoveTypeTest() {
   const [step, setStep] = React.useState("intro");
   const [user, setUser] = React.useState({ name:"", age:"", gender:"", agreed:false });
-  const [applyInfo, setApplyInfo] = React.useState({ phone:"", location:"", concern:[] });
+  const [applyInfo, setApplyInfo] = React.useState({ phone:"", location:"", concern:"" });
   const [qIndex, setQIndex] = React.useState(0);
   const [scores, setScores] = React.useState({ keeper:0, hunter:0, cool:0, grandma:0 });
   const [resultType, setResultType] = React.useState(null);
@@ -706,7 +701,7 @@ function LoveTypeTest() {
 
   const resetAll = () => {
     setStep("intro"); setUser({name:"",age:"",gender:"",agreed:false});
-    setApplyInfo({phone:"",location:"",concern:[]});
+    setApplyInfo({phone:"",location:"",concern:""});
     setQIndex(0); setScores({keeper:0,hunter:0,cool:0,grandma:0}); setResultType(null);
   };
 
