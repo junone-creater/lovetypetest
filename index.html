@@ -593,10 +593,24 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
   const [step, setStep] = React.useState(1);
   const type = result.first;
   const c = type.color;
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzPLaueRAg27XXRIsLsL0HPlbH58W-DLfKRA7EgNVad3KJFuKffrjSimIClPNccn_ad/exec";
   const canNext = step===1 ? applyInfo.phone.replace(/[^0-9]/g,"").length>=10
                 : step===2 ? applyInfo.location.trim().length>=2
                 : applyInfo.concern.trim().length>=5;
-  const handleNext = () => step<3 ? setStep(s=>s+1) : onDone();
+  const handleNext = () => {
+    if (step < 3) { setStep(s => s + 1); return; }
+    fetch(SHEET_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: user.name, age: user.age, gender: user.gender,
+        first: result.first.name, second: result.second.name, third: result.third.name,
+        phone: applyInfo.phone, location: applyInfo.location, concern: applyInfo.concern
+      })
+    }).catch(()=>{});
+    onDone();
+  };
   const inputStyle = { ...S.input, background:"rgba(255,255,255,.1)", border:`1.5px solid ${c.accent}44`, color:"#fff", borderRadius:14, fontSize:16, padding:"16px 18px" };
 
   return (
