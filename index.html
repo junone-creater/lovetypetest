@@ -343,15 +343,26 @@ function Quiz({ q, index, total, onAnswer }) {
 
 function Result({ type, user, onApply }) {
   const [slide, setSlide] = React.useState(0);
-  const TOTAL = 3;
+  const TOTAL = 5;
   const c = type.color;
   const imgSrc = `images/result-${type.key}-${user.gender === "남자" ? "male" : "female"}.png`;
   const next = () => setSlide(s => s + 1);
 
+  const descSentences = type.desc.split(/\. /).map((s, i, arr) =>
+    i < arr.length - 1 ? s + '.' : s
+  ).filter(s => s.length > 3);
+
+  const NavBtn = ({ label }) => (
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", marginTop:8 }}>
+      <button onClick={next} style={{ width:56, height:56, borderRadius:"50%", background:c.chip, border:"none", color:"#fff", fontSize:22, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:`0 8px 20px rgba(0,0,0,.35)`, fontFamily:FONT }}>→</button>
+      <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", marginTop:8 }}>{label||"다음"}</div>
+    </div>
+  );
+
   return (
     <div style={{ background:c.bg, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
 
-      {/* 상단 페이지 표시 */}
+      {/* 헤더 */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 22px 0" }}>
         <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", letterSpacing:"1.5px", fontWeight:600 }}>연애 유형 결과</div>
         <div style={{ fontSize:13, fontWeight:700, color:c.accent }}>{slide+1} / {TOTAL}</div>
@@ -360,62 +371,100 @@ function Result({ type, user, onApply }) {
       {/* 점 인디케이터 */}
       <div style={{ display:"flex", gap:6, justifyContent:"center", padding:"12px 0 0" }}>
         {Array.from({length:TOTAL}).map((_,i) => (
-          <div key={i} style={{ height:5, borderRadius:3, background: i===slide ? c.accent : "rgba(255,255,255,.2)", width: i===slide ? 22 : 6, transition:"all .3s ease" }}/>
+          <div key={i} style={{ height:5, borderRadius:3, background: i<=slide ? c.accent : "rgba(255,255,255,.18)", width: i===slide ? 22 : 6, transition:"all .3s ease" }}/>
         ))}
       </div>
 
-      {/* 슬라이드 콘텐츠 */}
+      {/* 슬라이드 */}
       <div key={slide} className="fade-in" style={{ flex:1, display:"flex", flexDirection:"column" }}>
 
         {/* ── 슬라이드 1: 유형 공개 ── */}
         {slide === 0 && (
           <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", padding:"24px 22px 36px", textAlign:"center" }}>
-            <div style={{ fontSize:13, color:c.accent, marginBottom:6 }}>{user.name||"당신"}님은</div>
-            <div style={{ fontSize:34, fontWeight:900, color:"#fff", lineHeight:1.2, marginBottom:6 }}>'{type.name}'</div>
-            <div style={{ fontSize:13, color:"rgba(255,255,255,.6)", fontStyle:"italic", marginBottom:20 }}>"{type.tagline}"</div>
+            <div style={{ fontSize:14, color:c.accent, marginBottom:8 }}>{user.name||"당신"}님의 연애 유형은</div>
+            <div style={{ fontSize:36, fontWeight:900, color:"#fff", lineHeight:1.2, marginBottom:6 }}>'{type.name}'</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.6)", fontStyle:"italic", marginBottom:24 }}>"{type.tagline}"</div>
             <img src={imgSrc} alt={type.name} style={{ width:"100%", maxWidth:260, borderRadius:16, marginBottom:20 }} onError={e=>{ e.target.style.display="none"; }}/>
             <div style={{ flex:1 }}/>
-            <button onClick={next} style={{ width:56, height:56, borderRadius:"50%", background:c.chip, border:"none", color:"#fff", fontSize:22, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto", boxShadow:`0 8px 20px rgba(0,0,0,.3)` }}>→</button>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", marginTop:10 }}>다음</div>
+            <NavBtn label="자세히 보기"/>
           </div>
         )}
 
-        {/* ── 슬라이드 2: 상세 분석 ── */}
+        {/* ── 슬라이드 2: 대화형 설명 ── */}
         {slide === 1 && (
-          <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"20px 22px 36px" }}>
-            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:16 }}>{type.name}은 어떤 사람인가요?</div>
-            <p style={{ fontSize:15, color:"rgba(255,255,255,.85)", lineHeight:1.85, marginBottom:20 }}>{type.desc}</p>
-            <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:14, padding:"16px 18px", marginBottom:24 }}>
-              <div style={{ fontSize:12, fontWeight:700, color:c.accent, letterSpacing:"1px", marginBottom:12 }}>이런 거 공감되지 않아요?</div>
-              {type.traits.map((t,i) => (
-                <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:i<type.traits.length-1?10:0 }}>
-                  <span style={{ color:c.accent, flexShrink:0 }}>✓</span>
-                  <span style={{ fontSize:13.5, color:"rgba(255,255,255,.8)", lineHeight:1.6 }}>{t}</span>
+          <div style={{ flex:1, padding:"22px 22px 36px", display:"flex", flexDirection:"column", overflowY:"auto" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:4 }}>{user.name||"당신"}님 이야기 해볼까요? 👀</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:20 }}>공감가는 부분이 분명 있을 거예요</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:28 }}>
+              {descSentences.map((s, i) => (
+                <div key={i} style={{ padding:"16px 18px", background: i % 2 === 0 ? "rgba(255,255,255,.09)" : "rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, fontSize:15, color:"rgba(255,255,255,.9)", lineHeight:1.85 }}>
+                  {s}
+                </div>
+              ))}
+            </div>
+            <NavBtn label="더 보기"/>
+          </div>
+        )}
+
+        {/* ── 슬라이드 3: 공감 체크 ── */}
+        {slide === 2 && (
+          <div style={{ flex:1, padding:"22px 22px 36px", display:"flex", flexDirection:"column" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:4 }}>이거 다 공감되죠? 😏</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:20 }}>솔직히 맞는 말만 써놨어요</div>
+            <div style={{ display:"flex", flexDirection:"column", gap:14, marginBottom:28 }}>
+              {type.traits.map((t, i) => (
+                <div key={i} style={{ display:"flex", gap:14, alignItems:"flex-start", padding:"18px", background:"rgba(255,255,255,.07)", border:`1px solid rgba(255,255,255,.1)`, borderRadius:16 }}>
+                  <span style={{ fontSize:20, flexShrink:0, marginTop:1 }}>{["😂","🤯","😅"][i]}</span>
+                  <span style={{ fontSize:14.5, color:"rgba(255,255,255,.9)", lineHeight:1.75 }}>{t}</span>
                 </div>
               ))}
             </div>
             <div style={{ flex:1 }}/>
-            <button onClick={next} style={{ width:56, height:56, borderRadius:"50%", background:c.chip, border:"none", color:"#fff", fontSize:22, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto", boxShadow:`0 8px 20px rgba(0,0,0,.3)` }}>→</button>
-            <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", marginTop:10, textAlign:"center" }}>다음</div>
+            <NavBtn label="다음"/>
           </div>
         )}
 
-        {/* ── 슬라이드 3: 신청 ── */}
-        {slide === 2 && (
-          <div style={{ flex:1, padding:"20px 22px 36px" }}>
-            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:16, textAlign:"center" }}>더 알고 싶으신가요?</div>
-            <div style={{ ...S.lockWrap, marginBottom:16 }}>
-              <div style={{ ...S.lockBlur, background:"rgba(255,255,255,.06)" }}>
-                <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)" }}>⚠️ {user.name||"당신"}님이 빠지기 쉬운 연애 함정</p>
-                <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>💞 {user.name||"당신"}님과 환상의 궁합 유형</p>
-                <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>🗓️ 올해 인연이 들어오는 시기</p>
-              </div>
-              <div style={S.lockOverlay}><span style={{ ...S.lockBadge, background:"rgba(0,0,0,.4)", color:c.accent, border:`1px solid ${c.accent}` }}>🔒 전체 결과 잠김</span></div>
+        {/* ── 슬라이드 4: 함정 + 궁합 미리보기 ── */}
+        {slide === 3 && (
+          <div style={{ flex:1, padding:"22px 22px 36px", display:"flex", flexDirection:"column" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:4 }}>조심해야 할 게 있어요 🚨</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.4)", marginBottom:16 }}>이 유형이 연애에서 자주 겪는 상황이에요</div>
+            <div style={{ padding:"18px", background:"rgba(255,255,255,.07)", border:`1px solid rgba(255,255,255,.1)`, borderRadius:16, marginBottom:22, fontSize:15, color:"rgba(255,255,255,.9)", lineHeight:1.85 }}>
+              {type.trap}
             </div>
-            <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, padding:18, marginBottom:16 }}>
-              <div style={{ fontSize:14.5, fontWeight:700, color:"#fff", lineHeight:1.5 }}>{user.name||"당신"}님 같은 '{type.name.replace("형","")}'이<br/>가장 잘 맞는 모임이 열려요</div>
-              <div style={{ display:"flex", gap:7, marginTop:9, fontSize:12.5, color:c.accent }}><span>👥</span> 같은 유형 78%가 이미 신청했어요</div>
-              <div style={{ display:"flex", gap:7, marginTop:6, fontSize:12.5, color:"rgba(255,255,255,.6)" }}><span>⏰</span> 이번 주 모임 · 마감까지 3자리</div>
+            <div style={{ fontSize:14, fontWeight:700, color:c.accent, marginBottom:12 }}>💞 {user.name||"당신"}님과 가장 잘 맞는 유형은?</div>
+            <div style={{ position:"relative", borderRadius:16, overflow:"hidden", marginBottom:8 }}>
+              <div style={{ filter:"blur(6px)", padding:"18px", background:"rgba(255,255,255,.07)", fontSize:15, color:"rgba(255,255,255,.9)", lineHeight:1.85, userSelect:"none" }}>
+                {type.match}
+              </div>
+              <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <span style={{ fontSize:13, fontWeight:600, color:c.accent, background:"rgba(0,0,0,.55)", padding:"8px 18px", borderRadius:20, border:`1px solid ${c.accent}` }}>🔒 신청하면 공개돼요</span>
+              </div>
+            </div>
+            <div style={{ flex:1 }}/>
+            <NavBtn label="다음"/>
+          </div>
+        )}
+
+        {/* ── 슬라이드 5: 나를 알아보기 신청 ── */}
+        {slide === 4 && (
+          <div style={{ flex:1, padding:"22px 22px 36px", display:"flex", flexDirection:"column" }}>
+            <div style={{ textAlign:"center", marginBottom:22 }}>
+              <div style={{ fontSize:22, fontWeight:800, color:"#fff", lineHeight:1.45, marginBottom:10 }}>
+                {user.name||"당신"}님을<br/>더 깊이 알아보고 싶지 않으세요?
+              </div>
+              <div style={{ fontSize:14, color:"rgba(255,255,255,.55)", lineHeight:1.75 }}>
+                유형 결과를 바탕으로<br/>나에게 딱 맞는 연애 조언을 드려요
+              </div>
+            </div>
+            <div style={{ background:"rgba(255,255,255,.07)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, padding:"18px 20px", marginBottom:18 }}>
+              <div style={{ fontSize:11.5, color:c.accent, fontWeight:700, letterSpacing:"1px", marginBottom:14 }}>신청하면 공개되는 것들</div>
+              {[["💞","나와 가장 잘 맞는 연애 유형"],["⚠️","내가 빠지기 쉬운 연애 함정 전체"],["🗓️","올해 인연이 들어오는 시기"],["💌","나에게 맞는 연애 시작법"]].map(([icon, text], i) => (
+                <div key={i} style={{ display:"flex", gap:10, alignItems:"center", padding:"10px 0", borderTop: i > 0 ? "1px solid rgba(255,255,255,.07)" : "none" }}>
+                  <span style={{ fontSize:16 }}>{icon}</span>
+                  <span style={{ fontSize:13.5, color:"rgba(255,255,255,.85)" }}>{text}</span>
+                </div>
+              ))}
             </div>
             <div style={{ marginBottom:16, padding:"14px 16px", border:"1.5px dashed rgba(255,255,255,.15)", borderRadius:12 }}>
               <div style={{ fontSize:11.5, color:"rgba(255,255,255,.35)", marginBottom:8 }}>입력하신 정보로 바로 신청돼요</div>
@@ -423,8 +472,8 @@ function Result({ type, user, onApply }) {
               <PrefillRow k="연락처" v={maskPhone(user.phone)} dark accent={c.accent}/>
               <PrefillRow k="관심" v={user.interest} dark accent={c.accent}/>
             </div>
-            <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none" }}>3초 만에 소모임 신청 완료</button>
-            <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>신청하면 잠긴 전체 결과도 함께 보내드려요</p>
+            <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none", fontSize:17 }}>신청하고 나를 더 알아보기</button>
+            <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>신청 즉시 잠긴 결과를 보내드려요</p>
           </div>
         )}
 
