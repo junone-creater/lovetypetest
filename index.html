@@ -342,64 +342,92 @@ function Quiz({ q, index, total, onAnswer }) {
 }
 
 function Result({ type, user, onApply }) {
+  const [slide, setSlide] = React.useState(0);
+  const TOTAL = 3;
   const c = type.color;
   const imgSrc = `images/result-${type.key}-${user.gender === "남자" ? "male" : "female"}.png`;
+  const next = () => setSlide(s => s + 1);
+
   return (
-    <div className="fade-in">
-      {/* 헤더 */}
-      <div style={{ ...S.resultHead, background:c.bg, paddingBottom:30 }}>
-        <div style={{ fontSize:11, fontWeight:700, color:c.accent, letterSpacing:"2px" }}>연애 유형 결과</div>
-        <div style={{ fontSize:14, color:c.accent, marginTop:14, opacity:0.8 }}>{user.name||"당신"}님은</div>
-        <div style={S.resultName}>'{type.name}'</div>
-        <div style={{ ...S.resultEmoji, background:c.chip }}>{type.emoji}</div>
-        <div style={{ fontSize:13, color:c.accent, marginTop:14, opacity:0.9 }}>"{type.tagline}"</div>
+    <div style={{ background:c.bg, minHeight:"100vh", display:"flex", flexDirection:"column" }}>
+
+      {/* 상단 페이지 표시 */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 22px 0" }}>
+        <div style={{ fontSize:11, color:"rgba(255,255,255,.35)", letterSpacing:"1.5px", fontWeight:600 }}>연애 유형 결과</div>
+        <div style={{ fontSize:13, fontWeight:700, color:c.accent }}>{slide+1} / {TOTAL}</div>
       </div>
 
-      {/* 유형별 일러스트 */}
-      <div style={{ background:c.bg, textAlign:"center", paddingBottom:24 }}>
-        <img src={imgSrc} alt={type.name} style={{ width:"100%", maxWidth:320, display:"block", margin:"0 auto", borderRadius:16 }} onError={e=>{ e.target.style.display="none"; }}/>
+      {/* 점 인디케이터 */}
+      <div style={{ display:"flex", gap:6, justifyContent:"center", padding:"12px 0 0" }}>
+        {Array.from({length:TOTAL}).map((_,i) => (
+          <div key={i} style={{ height:5, borderRadius:3, background: i===slide ? c.accent : "rgba(255,255,255,.2)", width: i===slide ? 22 : 6, transition:"all .3s ease" }}/>
+        ))}
       </div>
 
-      <div style={{ ...S.pad, background:c.bg }}>
-        {/* 설명 */}
-        <p style={{ fontSize:15, color:"rgba(255,255,255,.85)", lineHeight:1.85, marginBottom:20 }}>{type.desc}</p>
+      {/* 슬라이드 콘텐츠 */}
+      <div key={slide} className="fade-in" style={{ flex:1, display:"flex", flexDirection:"column" }}>
 
-        {/* 특징 카드 */}
-        <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:14, padding:"16px 18px", marginBottom:16 }}>
-          <div style={{ fontSize:12, fontWeight:700, color:c.accent, letterSpacing:"1px", marginBottom:12 }}>이런 거 공감되지 않아요?</div>
-          {type.traits.map((t,i) => (
-            <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:i<type.traits.length-1?10:0 }}>
-              <span style={{ fontSize:14, marginTop:1, color:c.accent }}>✓</span>
-              <span style={{ fontSize:13.5, color:"rgba(255,255,255,.8)", lineHeight:1.6 }}>{t}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* 잠긴 섹션 */}
-        <div style={{ ...S.lockWrap, marginBottom:16 }}>
-          <div style={{ ...S.lockBlur, background:"rgba(255,255,255,.06)" }}>
-            <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)" }}>⚠️ {user.name||"당신"}님이 빠지기 쉬운 연애 함정</p>
-            <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>💞 {user.name||"당신"}님과 환상의 궁합 유형</p>
-            <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>🗓️ 올해 인연이 들어오는 시기</p>
+        {/* ── 슬라이드 1: 유형 공개 ── */}
+        {slide === 0 && (
+          <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", padding:"24px 22px 36px", textAlign:"center" }}>
+            <div style={{ fontSize:13, color:c.accent, marginBottom:6 }}>{user.name||"당신"}님은</div>
+            <div style={{ fontSize:34, fontWeight:900, color:"#fff", lineHeight:1.2, marginBottom:6 }}>'{type.name}'</div>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,.6)", fontStyle:"italic", marginBottom:20 }}>"{type.tagline}"</div>
+            <img src={imgSrc} alt={type.name} style={{ width:"100%", maxWidth:260, borderRadius:16, marginBottom:20 }} onError={e=>{ e.target.style.display="none"; }}/>
+            <div style={{ flex:1 }}/>
+            <button onClick={next} style={{ width:56, height:56, borderRadius:"50%", background:c.chip, border:"none", color:"#fff", fontSize:22, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto", boxShadow:`0 8px 20px rgba(0,0,0,.3)` }}>→</button>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", marginTop:10 }}>다음</div>
           </div>
-          <div style={S.lockOverlay}><span style={{ ...S.lockBadge, background:"rgba(0,0,0,.4)", color:c.accent, border:`1px solid ${c.accent}` }}>🔒 전체 결과 잠김</span></div>
-        </div>
+        )}
 
-        {/* 프로모 */}
-        <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, padding:18, marginBottom:16 }}>
-          <div style={{ fontSize:14.5, fontWeight:700, color:"#fff", lineHeight:1.5 }}>{user.name||"당신"}님 같은 '{type.name.replace("형","")}'이<br/>가장 잘 맞는 모임이 열려요</div>
-          <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:9, fontSize:12.5, color:c.accent }}><span>👥</span> 같은 유형 78%가 이미 신청했어요</div>
-          <div style={{ display:"flex", alignItems:"center", gap:7, marginTop:6, fontSize:12.5, color:"rgba(255,255,255,.6)" }}><span>⏰</span> 이번 주 모임 · 마감까지 3자리</div>
-        </div>
+        {/* ── 슬라이드 2: 상세 분석 ── */}
+        {slide === 1 && (
+          <div style={{ flex:1, display:"flex", flexDirection:"column", padding:"20px 22px 36px" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:16 }}>{type.name}은 어떤 사람인가요?</div>
+            <p style={{ fontSize:15, color:"rgba(255,255,255,.85)", lineHeight:1.85, marginBottom:20 }}>{type.desc}</p>
+            <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:14, padding:"16px 18px", marginBottom:24 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:c.accent, letterSpacing:"1px", marginBottom:12 }}>이런 거 공감되지 않아요?</div>
+              {type.traits.map((t,i) => (
+                <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:i<type.traits.length-1?10:0 }}>
+                  <span style={{ color:c.accent, flexShrink:0 }}>✓</span>
+                  <span style={{ fontSize:13.5, color:"rgba(255,255,255,.8)", lineHeight:1.6 }}>{t}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ flex:1 }}/>
+            <button onClick={next} style={{ width:56, height:56, borderRadius:"50%", background:c.chip, border:"none", color:"#fff", fontSize:22, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto", boxShadow:`0 8px 20px rgba(0,0,0,.3)` }}>→</button>
+            <div style={{ fontSize:12, color:"rgba(255,255,255,.3)", marginTop:10, textAlign:"center" }}>다음</div>
+          </div>
+        )}
 
-        <div style={{ marginBottom:16, padding:"14px 16px", border:"1.5px dashed rgba(255,255,255,.15)", borderRadius:12 }}>
-          <div style={{ fontSize:11.5, color:"rgba(255,255,255,.35)", marginBottom:8 }}>입력하신 정보로 바로 신청돼요</div>
-          <PrefillRow k="이름" v={user.name||"—"} dark accent={c.accent}/>
-          <PrefillRow k="연락처" v={maskPhone(user.phone)} dark accent={c.accent}/>
-          <PrefillRow k="관심" v={user.interest} dark accent={c.accent}/>
-        </div>
-        <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none" }}>3초 만에 소모임 신청 완료</button>
-        <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>신청하면 잠긴 전체 결과도 함께 보내드려요</p>
+        {/* ── 슬라이드 3: 신청 ── */}
+        {slide === 2 && (
+          <div style={{ flex:1, padding:"20px 22px 36px" }}>
+            <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:16, textAlign:"center" }}>더 알고 싶으신가요?</div>
+            <div style={{ ...S.lockWrap, marginBottom:16 }}>
+              <div style={{ ...S.lockBlur, background:"rgba(255,255,255,.06)" }}>
+                <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)" }}>⚠️ {user.name||"당신"}님이 빠지기 쉬운 연애 함정</p>
+                <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>💞 {user.name||"당신"}님과 환상의 궁합 유형</p>
+                <p style={{ ...S.lockLine, color:"rgba(255,255,255,.6)", marginTop:6 }}>🗓️ 올해 인연이 들어오는 시기</p>
+              </div>
+              <div style={S.lockOverlay}><span style={{ ...S.lockBadge, background:"rgba(0,0,0,.4)", color:c.accent, border:`1px solid ${c.accent}` }}>🔒 전체 결과 잠김</span></div>
+            </div>
+            <div style={{ background:"rgba(255,255,255,.08)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, padding:18, marginBottom:16 }}>
+              <div style={{ fontSize:14.5, fontWeight:700, color:"#fff", lineHeight:1.5 }}>{user.name||"당신"}님 같은 '{type.name.replace("형","")}'이<br/>가장 잘 맞는 모임이 열려요</div>
+              <div style={{ display:"flex", gap:7, marginTop:9, fontSize:12.5, color:c.accent }}><span>👥</span> 같은 유형 78%가 이미 신청했어요</div>
+              <div style={{ display:"flex", gap:7, marginTop:6, fontSize:12.5, color:"rgba(255,255,255,.6)" }}><span>⏰</span> 이번 주 모임 · 마감까지 3자리</div>
+            </div>
+            <div style={{ marginBottom:16, padding:"14px 16px", border:"1.5px dashed rgba(255,255,255,.15)", borderRadius:12 }}>
+              <div style={{ fontSize:11.5, color:"rgba(255,255,255,.35)", marginBottom:8 }}>입력하신 정보로 바로 신청돼요</div>
+              <PrefillRow k="이름" v={user.name||"—"} dark accent={c.accent}/>
+              <PrefillRow k="연락처" v={maskPhone(user.phone)} dark accent={c.accent}/>
+              <PrefillRow k="관심" v={user.interest} dark accent={c.accent}/>
+            </div>
+            <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none" }}>3초 만에 소모임 신청 완료</button>
+            <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>신청하면 잠긴 전체 결과도 함께 보내드려요</p>
+          </div>
+        )}
+
       </div>
     </div>
   );
@@ -449,11 +477,11 @@ function LoveTypeTest() {
     setQIndex(0); setScores({keeper:0,hunter:0,cool:0,grandma:0}); setResultType(null);
   };
 
-  const isIntro = step === "intro";
+  const isFullscreen = step === "intro" || step === "result";
   return (
-    <div style={{ ...S.viewport, alignItems: isIntro ? "flex-start" : "center", padding: isIntro ? 0 : "24px 12px" }}>
+    <div style={{ ...S.viewport, alignItems: isFullscreen ? "flex-start" : "center", padding: isFullscreen ? 0 : "24px 12px" }}>
       <style>{globalCss}</style>
-      <div style={isIntro ? S.phone : S.phoneLight}>
+      <div style={isFullscreen ? S.phone : S.phoneLight}>
         {step==="intro"  && <Intro user={user} setUser={setUser} onStart={()=>setStep("quiz")}/>}
         {step==="quiz"   && <Quiz q={QUESTIONS[qIndex]} index={qIndex} total={QUESTIONS.length} onAnswer={handleAnswer}/>}
         {step==="result" && <Result type={resultType} user={user} onApply={()=>setStep("done")}/>}
