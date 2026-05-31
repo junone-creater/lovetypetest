@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이음나루 연애유형 테스트</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { background: #FAF6EF; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+// ── 디자인 토큰 ─────────────────────────────────────────
+const T = {
+  cream: "#FAF6EF", card: "#FFFFFF", ink: "#2B2520", sub: "#6B6259", line: "#EAE3D8",
+  green: "#1D9E75", greenDeep: "#0F6E56", greenSoft: "#E3F4EC",
+  coral: "#E5704A", coralDeep: "#B5421F", coralSoft: "#FBEAE3", amber: "#E0A23C",
+};
+const PALETTE = {
+  coral:     { bg: "#4A1B0C", chip: "#993C1D", accent: "#F0997B", soft: "#FBEAE3" },
+  amber:     { bg: "#4A350C", chip: "#9A7220", accent: "#F0C97B", soft: "#FBF3E3" },
+  green:     { bg: "#0C3A2E", chip: "#0F6E56", accent: "#7FD9B8", soft: "#E3F4EC" },
+  greenDeep: { bg: "#13332C", chip: "#1D6E5A", accent: "#9FD9C9", soft: "#E6F2EE" },
+};
+const FONT = "'Pretendard', -apple-system, sans-serif";
+
+const TYPES = {
+  keeper:  { key:"keeper",  emoji:"🛡️", name:"오징어 지킴이형",  tagline:"내 사람은 내가 지킨다, 독점욕 만렙",     desc:"한번 마음 주면 끝까지 가는 타입. 표현은 서툴러도 진심은 누구보다 깊어요.", color: PALETTE.coral },
+  hunter:  { key:"hunter",  emoji:"🎯", name:"직진 사냥꾼형",    tagline:"좋으면 바로 들이대는 돌격대장",          desc:"재고 따지는 거 질색. 마음이 동하면 그 자리에서 표현하는 솔직 끝판왕이에요.", color: PALETTE.amber },
+  cool:    { key:"cool",    emoji:"🧊", name:"쿨한 척 고수형",   tagline:"겉은 시크, 속은 활활",                   desc:"관심 없는 척하지만 사실 누구보다 신경 쓰는 타입. 밀당은 타고났어요.", color: PALETTE.green },
+  grandma: { key:"grandma", emoji:"🧶", name:"그랜마에라형",      tagline:"연애보다 내 평화가 우선",                desc:"혼자가 편하고 감정 소모는 사절. 설렘보다 안정과 내 시간을 더 사랑해요.", color: PALETTE.greenDeep },
+};
+
+const QUESTIONS = [
+  { q:"썸 타는 상대에게 카톡이 왔다. 내 반응은?", options:[
+    { label:"읽자마자 바로 답장함", score:"hunter" },
+    { label:"일부러 좀 뜸 들였다가 답함", score:"cool" },
+    { label:"뭐라고 보낼지 30분 고민함", score:"keeper" },
+    { label:"솔직히 답장이 귀찮을 때도 있음", score:"grandma" },
+  ]},
+  { q:"애인이 이성 친구랑 단둘이 밥 먹는다고 한다.", options:[
+    { label:"신경 쓰이지만 티는 안 냄", score:"cool" },
+    { label:"누구랑? 어디서? 다 물어봄", score:"keeper" },
+    { label:"쿨하게 '잘 다녀와' 함", score:"grandma" },
+    { label:"나도 약속 잡아서 똑같이 함", score:"hunter" },
+  ]},
+  { q:"데이트 코스는 보통 누가 정해?", options:[
+    { label:"내가 다 짜는 편 (계획형)", score:"hunter" },
+    { label:"상대 취향 맞춰 함께 정함", score:"keeper" },
+    { label:"그때그때 기분 따라", score:"cool" },
+    { label:"집에서 보는 게 제일 좋음", score:"grandma" },
+  ]},
+  { q:"싸웠을 때 나는?", options:[
+    { label:"먼저 연락해서 풀자고 함", score:"hunter" },
+    { label:"할 말은 끝까지 다 함", score:"keeper" },
+    { label:"일단 거리 두고 식힘", score:"cool" },
+    { label:"이 정도면 손절각 재기 시작", score:"grandma" },
+  ]},
+  { q:"연애에서 가장 중요한 건?", options:[
+    { label:"변치 않는 신뢰와 의리", score:"keeper" },
+    { label:"불타는 설렘과 표현", score:"hunter" },
+    { label:"적당한 거리와 밀당의 긴장감", score:"cool" },
+    { label:"서로 안 피곤한 편안함", score:"grandma" },
+  ]},
+];
+
+// ── 유틸 ────────────────────────────────────────────────
+function formatPhone(v) {
+  const n = v.replace(/[^0-9]/g,"").slice(0,11);
+  if (n.length < 4) return n;
+  if (n.length < 8) return `${n.slice(0,3)}-${n.slice(3)}`;
+  return `${n.slice(0,3)}-${n.slice(3,7)}-${n.slice(7)}`;
+}
+function maskPhone(v) {
+  const n = v.replace(/[^0-9]/g,"");
+  if (n.length < 8) return v || "—";
+  return `${n.slice(0,3)}-••••-${n.slice(7)}`;
+}
+
+// ── 스타일 ──────────────────────────────────────────────
+const S = {
+  viewport: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:`radial-gradient(circle at 30% 0%, #F3EAD9 0%, ${T.cream} 55%)`, padding:"24px 12px", fontFamily:FONT },
+  phone:    { width:"100%", maxWidth:390, background:T.card, borderRadius:28, overflow:"hidden", boxShadow:"0 20px 60px rgba(74,27,12,.12), 0 2px 8px rgba(0,0,0,.04)", border:`1px solid ${T.line}` },
+  pad:      { padding:"26px 22px 30px" },
+  brandRow: { display:"flex", alignItems:"center", gap:8 },
+  brandDot: { width:9, height:9, borderRadius:"50%", background:T.green, display:"inline-block" },
+  brandText:{ fontSize:13, fontWeight:700, color:T.greenDeep, letterSpacing:".5px" },
+  kicker:   { fontSize:12, fontWeight:600, color:T.coralDeep, letterSpacing:"1.5px" },
+  h1:       { fontSize:26, fontWeight:700, color:T.ink, lineHeight:1.35, margin:"10px 0 0" },
+  lead:     { fontSize:14, color:T.sub, lineHeight:1.6, marginTop:12 },
+  label:    { display:"block", fontSize:13, color:T.sub, marginBottom:7, fontWeight:500 },
+  input:    { width:"100%", padding:"13px 14px", fontSize:15, fontFamily:FONT, border:`1.5px solid ${T.line}`, borderRadius:12, background:"#FCFAF6", color:T.ink },
+  chips:    { display:"flex", flexWrap:"wrap", gap:8 },
+  chip:     { fontSize:13, padding:"9px 14px", borderRadius:20, border:"1.5px solid transparent", cursor:"pointer", fontFamily:FONT, fontWeight:500 },
+  cta:      { width:"100%", background:T.green, color:"#fff", border:"none", borderRadius:14, padding:"15px", fontSize:16, fontWeight:700, cursor:"pointer", fontFamily:FONT, boxShadow:"0 8px 20px rgba(29,158,117,.28)" },
+  ctaGhost: { width:"100%", background:"transparent", color:T.sub, border:`1.5px solid ${T.line}`, borderRadius:14, padding:"13px", fontSize:14, fontWeight:600, cursor:"pointer", fontFamily:FONT, marginTop:18 },
+  fineprint:{ textAlign:"center", fontSize:11, color:"#B8AE9F", marginTop:12 },
+  progressTop:{ display:"flex", alignItems:"center", gap:12 },
+  qcount:   { fontSize:14, fontWeight:700, color:T.coralDeep, whiteSpace:"nowrap" },
+  bar:      { flex:1, height:6, background:"#F0EBE2", borderRadius:6, overflow:"hidden" },
+  barFill:  { height:"100%", background:`linear-gradient(90deg,${T.amber},${T.coral})`, borderRadius:6, transition:"width .4s ease" },
+  qtext:    { fontSize:20, fontWeight:700, color:T.ink, lineHeight:1.45, margin:0 },
+  option:   { display:"flex", alignItems:"center", gap:12, width:"100%", textAlign:"left", padding:"15px 16px", fontSize:14.5, color:T.ink, background:"#FCFAF6", border:`1.5px solid ${T.line}`, borderRadius:14, cursor:"pointer", fontFamily:FONT, fontWeight:500 },
+  optionLetter:{ width:26, height:26, borderRadius:8, background:"#fff", border:`1px solid ${T.line}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:700, color:T.coralDeep, flexShrink:0 },
+  resultHead:{ padding:"30px 22px 26px", textAlign:"center" },
+  resultName:{ fontSize:26, fontWeight:800, color:"#fff", marginTop:4, lineHeight:1.3 },
+  resultEmoji:{ width:64, height:64, borderRadius:"50%", margin:"16px auto 0", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30 },
+  resultDesc:{ fontSize:14, color:T.sub, lineHeight:1.65, margin:"4px 0 0" },
+  lockWrap: { position:"relative", marginTop:16, borderRadius:12, overflow:"hidden" },
+  lockBlur: { filter:"blur(5px)", userSelect:"none", background:T.cream, padding:"16px 14px" },
+  lockLine: { fontSize:13, color:T.sub, margin:"0 0 8px" },
+  lockOverlay:{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" },
+  lockBadge:{ fontSize:13, fontWeight:600, color:T.coralDeep, background:T.coralSoft, padding:"8px 16px", borderRadius:18 },
+  promo:    { background:T.greenSoft, borderRadius:16, padding:18, marginTop:18 },
+  promoTitle:{ fontSize:14.5, fontWeight:700, color:T.greenDeep, lineHeight:1.5 },
+  promoRow: { display:"flex", alignItems:"center", gap:7, marginTop:9, fontSize:12.5, color:T.greenDeep },
+  prefill:  { marginTop:14, padding:"14px 16px", border:`1.5px dashed ${T.line}`, borderRadius:12 },
+  prefillLabel:{ fontSize:11.5, color:"#B8AE9F", marginBottom:8 },
+  prefillRow:{ display:"flex", justifyContent:"space-between", fontSize:13, padding:"3px 0" },
+  doneCheck:{ width:64, height:64, borderRadius:"50%", background:T.green, color:"#fff", fontSize:32, display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 18px", boxShadow:"0 10px 24px rgba(29,158,117,.32)" },
+  unlockCard:{ background:T.cream, borderRadius:16, padding:18, marginTop:22 },
+  unlockTitle:{ fontSize:14, fontWeight:700, color:T.ink, marginBottom:12 },
+  unlockRow:{ display:"flex", gap:12, alignItems:"flex-start", padding:"9px 0", borderTop:`1px solid ${T.line}` },
+};
+
+const globalCss = `
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  .fade-in { animation: fadeIn .35s ease both; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  .option-btn { transition: transform .12s ease, border-color .12s ease, background .12s ease; }
+  .option-btn:hover { border-color: ${T.green} !important; background: ${T.greenSoft} !important; }
+  .option-btn:active { transform: scale(.98); }
+  input:focus { outline: none; border-color: ${T.green} !important; }
+`;
+
+// ── 서브 컴포넌트 ──────────────────────────────────────
+function Field({ label, optional, children }) {
+  return (
+    <div style={{ marginBottom:16 }}>
+      <label style={S.label}>{label} {optional && <span style={{ color:"#B8AE9F" }}>(선택)</span>}</label>
+      {children}
+    </div>
+  );
+}
+function PrefillRow({ k, v }) {
+  return (
+    <div style={S.prefillRow}>
+      <span style={{ color:T.sub }}>{k}</span>
+      <span style={{ color:T.ink }}>{v} <span style={{ color:T.green }}>✓</span></span>
+    </div>
+  );
+}
+function UnlockRow({ icon, title, body }) {
+  return (
+    <div style={S.unlockRow}>
+      <span style={{ fontSize:18 }}>{icon}</span>
+      <div>
+        <div style={{ fontWeight:600, fontSize:13, color:T.ink }}>{title}</div>
+        <div style={{ fontSize:12, color:T.sub, marginTop:2, lineHeight:1.5 }}>{body}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── 화면 ────────────────────────────────────────────────
+function Intro({ user, setUser, onStart }) {
+  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g,"").length >= 10;
+  const interests = ["사주 연애 상담", "3코어 매직", "잘 모르겠어요"];
+  return (
+    <div style={S.pad} className="fade-in">
+      <div style={S.brandRow}><span style={S.brandDot}/><span style={S.brandText}>이음나루</span></div>
+      <div style={{ height:18 }}/>
+      <div style={S.kicker}>연애 심리 테스트</div>
+      <h1 style={S.h1}>나는 연애할 때<br/>어떤 사람일까?</h1>
+      <p style={S.lead}>5가지 질문으로 알아보는 내 연애 유형.<br/>결과는 바로 확인할 수 있어요.</p>
+      <div style={{ height:24 }}/>
+      <Field label="이름">
+        <input style={S.input} placeholder="홍길동" value={user.name} onChange={e=>setUser({...user,name:e.target.value})}/>
+      </Field>
+      <Field label="연락처">
+        <input style={S.input} placeholder="010-0000-0000" inputMode="numeric" value={user.phone} onChange={e=>setUser({...user,phone:formatPhone(e.target.value)})}/>
+      </Field>
+      <Field label="관심 있는 것" optional>
+        <div style={S.chips}>
+          {interests.map(it => {
+            const on = user.interest === it;
+            return (
+              <button key={it} onClick={()=>setUser({...user,interest:it})} style={{ ...S.chip, background:on?TYPES.keeper.color.soft:"#F3EFE8", color:on?TYPES.cool.color.chip:T.sub, borderColor:on?T.green:"transparent" }}>
+                {it}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+      <div style={{ height:8 }}/>
+      <button onClick={onStart} disabled={!valid} style={{ ...S.cta, opacity:valid?1:0.45, cursor:valid?"pointer":"not-allowed" }}>테스트 시작하기</button>
+      <p style={S.fineprint}>🔒 입력하신 정보는 결과 안내 목적으로만 사용돼요</p>
+    </div>
+  );
+}
+
+function Quiz({ q, index, total, onAnswer }) {
+  const pct = Math.round((index/total)*100);
+  return (
+    <div style={S.pad} className="fade-in" key={index}>
+      <div style={S.progressTop}>
+        <span style={S.qcount}>Q{index+1} <span style={{ color:T.line }}>/ {total}</span></span>
+        <div style={S.bar}><div style={{ ...S.barFill, width:`${pct+100/total}%` }}/></div>
+      </div>
+      <div style={{ height:28 }}/>
+      <h2 style={S.qtext}>{q.q}</h2>
+      <div style={{ height:20 }}/>
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        {q.options.map((op,i) => (
+          <button key={i} onClick={()=>onAnswer(op.score)} style={S.option} className="option-btn">
+            <span style={S.optionLetter}>{String.fromCharCode(65+i)}</span>
+            <span>{op.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Result({ type, user, onApply }) {
+  const c = type.color;
+  return (
+    <div className="fade-in">
+      <div style={{ ...S.resultHead, background:c.bg }}>
+        <div style={{ ...S.kicker, color:c.accent }}>연애 유형 결과</div>
+        <div style={{ fontSize:14, color:c.accent, marginTop:12, opacity:0.9 }}>{user.name||"당신"}님은</div>
+        <div style={S.resultName}>'{type.name}'</div>
+        <div style={{ ...S.resultEmoji, background:c.chip }}>{type.emoji}</div>
+        <div style={{ fontSize:13, color:c.accent, marginTop:14 }}>{type.tagline}</div>
+      </div>
+      <div style={S.pad}>
+        <p style={S.resultDesc}>{type.desc}</p>
+        <div style={S.lockWrap}>
+          <div style={S.lockBlur}>
+            <p style={S.lockLine}>{user.name||"당신"}님이 빠지기 쉬운 연애 함정은</p>
+            <p style={S.lockLine}>올해 인연이 들어오는 시기는 ○월</p>
+            <p style={S.lockLine}>{user.name||"당신"}님과 환상의 궁합인 유형은</p>
+          </div>
+          <div style={S.lockOverlay}><span style={S.lockBadge}>🔒 전체 결과 잠김</span></div>
+        </div>
+        <div style={S.promo}>
+          <div style={S.promoTitle}>{user.name||"당신"}님 같은 '{type.name.replace("형","")}'이<br/>가장 잘 맞는 모임이 열려요</div>
+          <div style={S.promoRow}><span>👥</span> 같은 유형 78%가 이미 신청했어요</div>
+          <div style={{ ...S.promoRow, color:T.coralDeep }}><span>⏰</span> 이번 주 모임 · 마감까지 3자리</div>
+        </div>
+        <div style={S.prefill}>
+          <div style={S.prefillLabel}>입력하신 정보로 바로 신청돼요</div>
+          <PrefillRow k="이름" v={user.name||"—"}/>
+          <PrefillRow k="연락처" v={maskPhone(user.phone)}/>
+          <PrefillRow k="관심" v={user.interest}/>
+        </div>
+        <button onClick={onApply} style={S.cta}>3초 만에 소모임 신청 완료</button>
+        <p style={S.fineprint}>신청하면 잠긴 전체 결과도 함께 보내드려요</p>
+      </div>
+    </div>
+  );
+}
+
+function Done({ type, user, onReset }) {
+  return (
+    <div style={S.pad} className="fade-in">
+      <div style={{ height:30 }}/>
+      <div style={S.doneCheck}>✓</div>
+      <h2 style={{ ...S.h1, textAlign:"center", fontSize:24 }}>신청 완료!</h2>
+      <p style={{ ...S.lead, textAlign:"center" }}>{user.name}님, 신청이 접수됐어요.<br/>곧 입력하신 번호로 안내드릴게요.</p>
+      <div style={S.unlockCard}>
+        <div style={S.unlockTitle}>🔓 잠겼던 전체 결과</div>
+        <UnlockRow icon="⚠️" title="빠지기 쉬운 연애 함정"   body="좋아하면 상대에게 다 맞춰주다 정작 내 마음을 놓쳐요."/>
+        <UnlockRow icon="🗓️" title="올해 인연 들어오는 시기" body="늦봄~초여름, 익숙한 모임 안에서 새로운 인연이 보여요."/>
+        <UnlockRow icon="💞" title="환상의 궁합 유형"         body="당신의 직진을 편안히 받아주는 '쿨한 척 고수형'."/>
+      </div>
+      <button onClick={onReset} style={S.ctaGhost}>다시 테스트하기</button>
+    </div>
+  );
+}
+
+// ── 메인 ────────────────────────────────────────────────
+function LoveTypeTest() {
+  const [step, setStep] = React.useState("intro");
+  const [user, setUser] = React.useState({ name:"", phone:"", interest:"사주 연애 상담" });
+  const [qIndex, setQIndex] = React.useState(0);
+  const [scores, setScores] = React.useState({ keeper:0, hunter:0, cool:0, grandma:0 });
+  const [resultType, setResultType] = React.useState(null);
+
+  const computeResult = (s) => {
+    let best="keeper", max=-1;
+    Object.entries(s).forEach(([k,v]) => { if(v>max){max=v;best=k;} });
+    return TYPES[best];
+  };
+
+  const handleAnswer = (scoreKey) => {
+    const next = { ...scores, [scoreKey]: scores[scoreKey]+1 };
+    setScores(next);
+    if (qIndex+1 < QUESTIONS.length) { setQIndex(qIndex+1); }
+    else { setResultType(computeResult(next)); setStep("result"); }
+  };
+
+  const resetAll = () => {
+    setStep("intro"); setUser({name:"",phone:"",interest:"사주 연애 상담"});
+    setQIndex(0); setScores({keeper:0,hunter:0,cool:0,grandma:0}); setResultType(null);
+  };
+
+  return (
+    <div style={S.viewport}>
+      <style>{globalCss}</style>
+      <div style={S.phone}>
+        {step==="intro"  && <Intro user={user} setUser={setUser} onStart={()=>setStep("quiz")}/>}
+        {step==="quiz"   && <Quiz q={QUESTIONS[qIndex]} index={qIndex} total={QUESTIONS.length} onAnswer={handleAnswer}/>}
+        {step==="result" && <Result type={resultType} user={user} onApply={()=>setStep("done")}/>}
+        {step==="done"   && <Done type={resultType} user={user} onReset={resetAll}/>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<LoveTypeTest/>);
+  </script>
+</body>
+</html>
