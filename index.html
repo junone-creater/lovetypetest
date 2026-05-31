@@ -226,7 +226,7 @@ function UnlockRow({ icon, title, body }) {
 
 // ── 화면 ────────────────────────────────────────────────
 function Intro({ user, setUser, onStart }) {
-  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g,"").length >= 10;
+  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g,"").length >= 10 && user.gender !== "";
   const interests = ["사주 연애 상담", "3코어 매직", "잘 모르겠어요"];
   return (
     <div className="fade-in" style={{ background:"#0E0816", minHeight:"100vh" }}>
@@ -279,6 +279,21 @@ function Intro({ user, setUser, onStart }) {
             placeholder="010-0000-0000" inputMode="numeric" value={user.phone} onChange={e=>setUser({...user,phone:formatPhone(e.target.value)})}/>
         </div>
 
+        {/* 성별 */}
+        <div style={{ marginBottom:14 }}>
+          <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.45)", marginBottom:7, fontWeight:500, fontFamily:FONT }}>성별</label>
+          <div style={{ display:"flex", gap:10 }}>
+            {[{ val:"여자", emoji:"👩" }, { val:"남자", emoji:"👨" }].map(({ val, emoji }) => {
+              const on = user.gender === val;
+              return (
+                <button key={val} onClick={()=>setUser({...user,gender:val})} style={{ flex:1, padding:"12px 0", borderRadius:12, border:"1.5px solid", borderColor:on?"#C084FC":"rgba(255,255,255,.12)", background:on?"rgba(192,132,252,.2)":"rgba(255,255,255,.07)", color:on?"#C084FC":"rgba(255,255,255,.45)", fontFamily:FONT, fontSize:15, fontWeight:600, cursor:"pointer" }}>
+                  {emoji} {val}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 관심 */}
         <div style={{ marginBottom:24 }}>
           <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.45)", marginBottom:7, fontWeight:500, fontFamily:FONT }}>관심 있는 것 <span style={{ color:"rgba(255,255,255,.25)" }}>(선택)</span></label>
@@ -328,6 +343,7 @@ function Quiz({ q, index, total, onAnswer }) {
 
 function Result({ type, user, onApply }) {
   const c = type.color;
+  const imgSrc = `images/result-${type.key}-${user.gender === "남자" ? "male" : "female"}.png`;
   return (
     <div className="fade-in">
       {/* 헤더 */}
@@ -337,6 +353,11 @@ function Result({ type, user, onApply }) {
         <div style={S.resultName}>'{type.name}'</div>
         <div style={{ ...S.resultEmoji, background:c.chip }}>{type.emoji}</div>
         <div style={{ fontSize:13, color:c.accent, marginTop:14, opacity:0.9 }}>"{type.tagline}"</div>
+      </div>
+
+      {/* 유형별 일러스트 */}
+      <div style={{ background:c.bg, textAlign:"center", paddingBottom:24 }}>
+        <img src={imgSrc} alt={type.name} style={{ width:"100%", maxWidth:320, display:"block", margin:"0 auto", borderRadius:16 }} onError={e=>{ e.target.style.display="none"; }}/>
       </div>
 
       <div style={S.pad}>
@@ -405,7 +426,7 @@ function Done({ type, user, onReset }) {
 // ── 메인 ────────────────────────────────────────────────
 function LoveTypeTest() {
   const [step, setStep] = React.useState("intro");
-  const [user, setUser] = React.useState({ name:"", phone:"", interest:"사주 연애 상담" });
+  const [user, setUser] = React.useState({ name:"", phone:"", interest:"사주 연애 상담", gender:"" });
   const [qIndex, setQIndex] = React.useState(0);
   const [scores, setScores] = React.useState({ keeper:0, hunter:0, cool:0, grandma:0 });
   const [resultType, setResultType] = React.useState(null);
