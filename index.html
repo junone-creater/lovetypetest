@@ -587,7 +587,11 @@ function Result({ result, user, onApply }) {
 
         {/* ── 슬라이드 5: 전문가 상담 CTA ── */}
         {slide === 4 && (
-          <div style={{ flex:1, padding:"28px 24px 40px", display:"flex", flexDirection:"column" }}>
+          <div style={{ flex:1, display:"flex", flexDirection:"column", position:"relative", overflow:"hidden" }}>
+            {/* 1위 캐릭터 배경 이미지 */}
+            <img src={imgSrc} alt="" style={{ position:"absolute", right:-30, bottom:0, width:"65%", maxWidth:260, opacity:0.13, filter:"grayscale(30%)", pointerEvents:"none", zIndex:0 }} onError={e=>{e.target.style.display="none";}}/>
+            {/* 콘텐츠 */}
+            <div style={{ flex:1, padding:"28px 24px 40px", display:"flex", flexDirection:"column", position:"relative", zIndex:1 }}>
             <div style={{ marginBottom:26 }}>
               <div style={{ fontSize:24, fontWeight:800, color:"#fff", lineHeight:1.45, marginBottom:12 }}>
                 전문가랑<br/>15분이면 충분해요
@@ -636,6 +640,7 @@ function Result({ result, user, onApply }) {
             </div>
             <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none", fontSize:17 }}>전문가랑 15분 상담 신청하기</button>
             <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>신청 즉시 담당자가 연락드려요</p>
+            </div>
           </div>
         )}
 
