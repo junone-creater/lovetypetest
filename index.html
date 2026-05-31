@@ -9,7 +9,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { background: #FAF6EF; }
+    body { background: #0E0816; }
   </style>
 </head>
 <body>
@@ -85,8 +85,9 @@ function maskPhone(v) {
 
 // ── 스타일 ──────────────────────────────────────────────
 const S = {
-  viewport: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:`radial-gradient(circle at 30% 0%, #F3EAD9 0%, ${T.cream} 55%)`, padding:"24px 12px", fontFamily:FONT },
-  phone:    { width:"100%", maxWidth:390, background:T.card, borderRadius:28, overflow:"hidden", boxShadow:"0 20px 60px rgba(74,27,12,.12), 0 2px 8px rgba(0,0,0,.04)", border:`1px solid ${T.line}` },
+  viewport: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"#0E0816", padding:"0", fontFamily:FONT },
+  phone:    { width:"100%", maxWidth:390, background:"#0E0816", borderRadius:0, overflow:"hidden", minHeight:"100vh" },
+  phoneLight: { width:"100%", maxWidth:390, background:T.card, borderRadius:28, overflow:"hidden", boxShadow:"0 20px 60px rgba(74,27,12,.12), 0 2px 8px rgba(0,0,0,.04)", border:`1px solid ${T.line}`, margin:"24px 12px" },
   pad:      { padding:"26px 22px 30px" },
   brandRow: { display:"flex", alignItems:"center", gap:8 },
   brandDot: { width:9, height:9, borderRadius:"50%", background:T.green, display:"inline-block" },
@@ -137,6 +138,7 @@ const globalCss = `
   .option-btn:hover { border-color: ${T.green} !important; background: ${T.greenSoft} !important; }
   .option-btn:active { transform: scale(.98); }
   input:focus { outline: none; border-color: ${T.green} !important; }
+  input::placeholder { color: rgba(255,255,255,.25); }
 `;
 
 // ── 서브 컴포넌트 ──────────────────────────────────────
@@ -173,34 +175,76 @@ function Intro({ user, setUser, onStart }) {
   const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g,"").length >= 10;
   const interests = ["사주 연애 상담", "3코어 매직", "잘 모르겠어요"];
   return (
-    <div style={S.pad} className="fade-in">
-      <div style={S.brandRow}><span style={S.brandDot}/><span style={S.brandText}>이음나루</span></div>
-      <div style={{ height:18 }}/>
-      <div style={S.kicker}>연애 심리 테스트</div>
-      <h1 style={S.h1}>나는 연애할 때<br/>어떤 사람일까?</h1>
-      <p style={S.lead}>5가지 질문으로 알아보는 내 연애 유형.<br/>결과는 바로 확인할 수 있어요.</p>
-      <div style={{ height:24 }}/>
-      <Field label="이름">
-        <input style={S.input} placeholder="홍길동" value={user.name} onChange={e=>setUser({...user,name:e.target.value})}/>
-      </Field>
-      <Field label="연락처">
-        <input style={S.input} placeholder="010-0000-0000" inputMode="numeric" value={user.phone} onChange={e=>setUser({...user,phone:formatPhone(e.target.value)})}/>
-      </Field>
-      <Field label="관심 있는 것" optional>
-        <div style={S.chips}>
-          {interests.map(it => {
-            const on = user.interest === it;
-            return (
-              <button key={it} onClick={()=>setUser({...user,interest:it})} style={{ ...S.chip, background:on?TYPES.keeper.color.soft:"#F3EFE8", color:on?TYPES.cool.color.chip:T.sub, borderColor:on?T.green:"transparent" }}>
-                {it}
-              </button>
-            );
-          })}
+    <div className="fade-in" style={{ background:"#0E0816", minHeight:"100vh" }}>
+      {/* 히어로 이미지 영역 */}
+      <div style={{ position:"relative", width:"100%", height:"62vw", maxHeight:380, overflow:"hidden" }}>
+        <img src="images/intro-hero.png" alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top" }}/>
+        {/* 상단 그라데이션 오버레이 */}
+        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, rgba(14,8,22,.3) 0%, rgba(14,8,22,0) 40%, rgba(14,8,22,.85) 80%, #0E0816 100%)" }}/>
+        {/* 브랜드 + 카피 */}
+        <div style={{ position:"absolute", top:18, left:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+            <span style={{ width:7, height:7, borderRadius:"50%", background:"#C084FC", display:"inline-block" }}/>
+            <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.8)", letterSpacing:".5px", fontFamily:FONT }}>이음나루</span>
+          </div>
         </div>
-      </Field>
-      <div style={{ height:8 }}/>
-      <button onClick={onStart} disabled={!valid} style={{ ...S.cta, opacity:valid?1:0.45, cursor:valid?"pointer":"not-allowed" }}>테스트 시작하기</button>
-      <p style={S.fineprint}>🔒 입력하신 정보는 결과 안내 목적으로만 사용돼요</p>
+        {/* 왼쪽 상단 말풍선 카피 */}
+        <div style={{ position:"absolute", top:20, left:20, maxWidth:180 }}>
+          <div style={{ marginTop:28, background:"rgba(255,255,255,.08)", backdropFilter:"blur(8px)", border:"1px solid rgba(255,255,255,.15)", borderRadius:"0 14px 14px 14px", padding:"12px 14px" }}>
+            <p style={{ fontSize:13, color:"#F3E8FF", lineHeight:1.6, fontFamily:FONT, fontWeight:500 }}>
+              나는 연애할 때<br/>어떤 사람일까?
+            </p>
+          </div>
+        </div>
+        {/* 하단 타이틀 */}
+        <div style={{ position:"absolute", bottom:16, left:20, right:20 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#C084FC", letterSpacing:"2px", fontFamily:FONT, marginBottom:6 }}>연애 심리 테스트</div>
+          <h1 style={{ fontSize:26, fontWeight:800, color:"#fff", lineHeight:1.3, fontFamily:FONT }}>
+            나의 연애 유형<br/>알아보기
+          </h1>
+        </div>
+      </div>
+
+      {/* 폼 영역 */}
+      <div style={{ padding:"20px 22px 36px" }}>
+        <p style={{ fontSize:14, color:"rgba(255,255,255,.5)", lineHeight:1.6, marginBottom:24, fontFamily:FONT }}>
+          5가지 질문으로 알아보는 내 연애 유형.<br/>결과는 바로 확인할 수 있어요.
+        </p>
+
+        {/* 이름 */}
+        <div style={{ marginBottom:14 }}>
+          <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.45)", marginBottom:7, fontWeight:500, fontFamily:FONT }}>이름</label>
+          <input style={{ ...S.input, background:"rgba(255,255,255,.07)", border:"1.5px solid rgba(255,255,255,.12)", color:"#fff", borderRadius:12 }}
+            placeholder="홍길동" value={user.name} onChange={e=>setUser({...user,name:e.target.value})}/>
+        </div>
+
+        {/* 연락처 */}
+        <div style={{ marginBottom:14 }}>
+          <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.45)", marginBottom:7, fontWeight:500, fontFamily:FONT }}>연락처</label>
+          <input style={{ ...S.input, background:"rgba(255,255,255,.07)", border:"1.5px solid rgba(255,255,255,.12)", color:"#fff", borderRadius:12 }}
+            placeholder="010-0000-0000" inputMode="numeric" value={user.phone} onChange={e=>setUser({...user,phone:formatPhone(e.target.value)})}/>
+        </div>
+
+        {/* 관심 */}
+        <div style={{ marginBottom:24 }}>
+          <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.45)", marginBottom:7, fontWeight:500, fontFamily:FONT }}>관심 있는 것 <span style={{ color:"rgba(255,255,255,.25)" }}>(선택)</span></label>
+          <div style={S.chips}>
+            {interests.map(it => {
+              const on = user.interest === it;
+              return (
+                <button key={it} onClick={()=>setUser({...user,interest:it})} style={{ ...S.chip, background:on?"rgba(192,132,252,.2)":"rgba(255,255,255,.06)", color:on?"#C084FC":"rgba(255,255,255,.45)", borderColor:on?"#C084FC":"rgba(255,255,255,.1)" }}>
+                  {it}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <button onClick={onStart} disabled={!valid} style={{ ...S.cta, background: valid ? "linear-gradient(135deg, #9B5DE5, #C084FC)" : "rgba(255,255,255,.1)", color: valid ? "#fff" : "rgba(255,255,255,.3)", boxShadow: valid ? "0 8px 24px rgba(155,93,229,.4)" : "none", opacity:1, cursor:valid?"pointer":"not-allowed" }}>
+          테스트 시작하기
+        </button>
+        <p style={{ ...S.fineprint, color:"rgba(255,255,255,.2)", marginTop:14 }}>🔒 입력하신 정보는 결과 안내 목적으로만 사용돼요</p>
+      </div>
     </div>
   );
 }
@@ -311,10 +355,11 @@ function LoveTypeTest() {
     setQIndex(0); setScores({keeper:0,hunter:0,cool:0,grandma:0}); setResultType(null);
   };
 
+  const isIntro = step === "intro";
   return (
-    <div style={S.viewport}>
+    <div style={{ ...S.viewport, alignItems: isIntro ? "flex-start" : "center", padding: isIntro ? 0 : "24px 12px" }}>
       <style>{globalCss}</style>
-      <div style={S.phone}>
+      <div style={isIntro ? S.phone : S.phoneLight}>
         {step==="intro"  && <Intro user={user} setUser={setUser} onStart={()=>setStep("quiz")}/>}
         {step==="quiz"   && <Quiz q={QUESTIONS[qIndex]} index={qIndex} total={QUESTIONS.length} onAnswer={handleAnswer}/>}
         {step==="result" && <Result type={resultType} user={user} onApply={()=>setStep("done")}/>}
