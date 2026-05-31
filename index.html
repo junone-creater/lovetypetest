@@ -649,14 +649,38 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
   const canNext = step===1 ? applyInfo.phone.replace(/[^0-9]/g,"").length>=10
                 : step===2 ? applyInfo.location.trim().length>=2
                 : applyInfo.concern.trim().length>=5;
-  const handleNext = () => {
-    if (step < 3) { setStep(s => s + 1); return; }
-    const params = new URLSearchParams({
+  const sendToSheet = () => {
+    const data = {
       name: user.name, age: user.age, gender: user.gender,
       first: result.first.name, second: result.second.name, third: result.third.name,
       phone: applyInfo.phone, location: applyInfo.location, concern: applyInfo.concern
-    });
-    new Image().src = `${SHEET_URL}?${params}`;
+    };
+    try {
+      const iframe = document.createElement('iframe');
+      iframe.name = 'sheet_iframe';
+      iframe.style.cssText = 'display:none;width:0;height:0;border:0;position:absolute;';
+      document.body.appendChild(iframe);
+      const form = document.createElement('form');
+      form.method = 'GET';
+      form.action = SHEET_URL;
+      form.target = 'sheet_iframe';
+      Object.entries(data).forEach(([k, v]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = k;
+        input.value = v || '';
+        form.appendChild(input);
+      });
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => {
+        try { document.body.removeChild(form); document.body.removeChild(iframe); } catch(e) {}
+      }, 5000);
+    } catch(e) {}
+  };
+  const handleNext = () => {
+    if (step < 3) { setStep(s => s + 1); return; }
+    sendToSheet();
     onDone();
   };
   const inputStyle = { ...S.input, background:"rgba(255,255,255,.1)", border:`1.5px solid ${c.accent}44`, color:"#fff", borderRadius:14, fontSize:16, padding:"16px 18px" };
