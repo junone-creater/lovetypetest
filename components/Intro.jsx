@@ -6,7 +6,7 @@ import { styles } from "../styles/styles";
 import Field from "./ui/Field";
 
 export default function Intro({ user, setUser, onStart }) {
-  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g, "").length >= 10;
+  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g, "").length >= 10 && user.gender !== "";
   const interests = ["사주 연애 상담", "3코어 매직", "잘 모르겠어요"];
 
   return (
@@ -38,6 +38,30 @@ export default function Intro({ user, setUser, onStart }) {
           value={user.phone}
           onChange={(e) => setUser({ ...user, phone: formatPhone(e.target.value) })}
         />
+      </Field>
+
+      <Field label="성별">
+        <div style={{ display: "flex", gap: 10 }}>
+          {[{ val: "여자", emoji: "👩" }, { val: "남자", emoji: "👨" }].map(({ val, emoji }) => {
+            const on = user.gender === val;
+            return (
+              <button
+                key={val}
+                onClick={() => setUser({ ...user, gender: val })}
+                style={{
+                  flex: 1, padding: "12px 0", borderRadius: 12, border: `1.5px solid`,
+                  borderColor: on ? T.green : T.line,
+                  background: on ? "#E8F5F0" : "#FCFAF6",
+                  color: on ? T.greenDeep : T.sub,
+                  fontFamily: "inherit", fontSize: 15, fontWeight: 600,
+                  cursor: "pointer", transition: "all .15s",
+                }}
+              >
+                {emoji} {val}
+              </button>
+            );
+          })}
+        </div>
       </Field>
 
       <Field label="관심 있는 것" optional>

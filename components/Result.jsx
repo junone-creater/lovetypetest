@@ -6,6 +6,9 @@ import PrefillRow from "./ui/PrefillRow";
 
 export default function Result({ type, user, onApply }) {
   const c = type.color;
+  const genderSuffix = user.gender === "남자" ? "male" : "female";
+  const imgSrc = `images/result-${type.key}-${genderSuffix}.png`;
+
   return (
     <div className="fade-in">
       {/* 결과 헤더 */}
@@ -17,6 +20,16 @@ export default function Result({ type, user, onApply }) {
         <div style={styles.resultName}>'{type.name}'</div>
         <div style={{ ...styles.resultEmoji, background: c.chip }}>{type.emoji}</div>
         <div style={{ fontSize: 13, color: c.accent, marginTop: 14 }}>{type.tagline}</div>
+      </div>
+
+      {/* 유형별 일러스트 */}
+      <div style={{ background: c.bg, paddingBottom: 24, textAlign: "center" }}>
+        <img
+          src={imgSrc}
+          alt={type.name}
+          style={{ width: "100%", maxWidth: 320, display: "block", margin: "0 auto", borderRadius: 16 }}
+          onError={(e) => { e.target.style.display = "none"; }}
+        />
       </div>
 
       <div style={styles.pad}>

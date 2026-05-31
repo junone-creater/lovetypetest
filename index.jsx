@@ -10,7 +10,7 @@ import Done from "./components/Done";
 
 export default function LoveTypeTest() {
   const [step, setStep] = useState("intro"); // intro | quiz | result | done
-  const [user, setUser] = useState({ name: "", phone: "", interest: "사주 연애 상담" });
+  const [user, setUser] = useState({ name: "", phone: "", interest: "사주 연애 상담", gender: "" });
   const [qIndex, setQIndex] = useState(0);
   const [scores, setScores] = useState({ keeper: 0, hunter: 0, cool: 0, grandma: 0 });
   const [resultType, setResultType] = useState(null);
