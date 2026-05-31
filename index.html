@@ -226,7 +226,7 @@ function UnlockRow({ icon, title, body }) {
 
 // ── 화면 ────────────────────────────────────────────────
 function Intro({ user, setUser, onStart }) {
-  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g,"").length >= 10 && user.gender !== "";
+  const valid = user.name.trim().length > 0 && user.phone.replace(/[^0-9]/g,"").length >= 10 && user.gender !== "" && user.agreed === true;
   const interests = ["사주 연애 상담", "3코어 매직", "잘 모르겠어요"];
   return (
     <div className="fade-in" style={{ background:"#0E0816", minHeight:"100vh" }}>
@@ -306,6 +306,21 @@ function Intro({ user, setUser, onStart }) {
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* 개인정보 동의 */}
+        <div onClick={()=>setUser({...user,agreed:!user.agreed})} style={{ display:"flex", alignItems:"flex-start", gap:12, marginBottom:22, cursor:"pointer", padding:"14px 16px", borderRadius:12, background: user.agreed ? "rgba(192,132,252,.1)" : "rgba(255,255,255,.04)", border:`1.5px solid ${user.agreed ? "rgba(192,132,252,.5)" : "rgba(255,255,255,.1)"}`, transition:"all .2s" }}>
+          <div style={{ width:20, height:20, borderRadius:6, border:`2px solid ${user.agreed ? "#C084FC" : "rgba(255,255,255,.25)"}`, background: user.agreed ? "#C084FC" : "transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1, transition:"all .2s" }}>
+            {user.agreed && <span style={{ color:"#fff", fontSize:12, fontWeight:700, lineHeight:1 }}>✓</span>}
+          </div>
+          <div>
+            <div style={{ fontSize:13, color: user.agreed ? "rgba(255,255,255,.85)" : "rgba(255,255,255,.5)", fontWeight:600, fontFamily:FONT, lineHeight:1.5 }}>
+              개인정보 수집 및 이용에 동의합니다 <span style={{ color:"#C084FC" }}>(필수)</span>
+            </div>
+            <div style={{ fontSize:11.5, color:"rgba(255,255,255,.28)", marginTop:3, fontFamily:FONT, lineHeight:1.5 }}>
+              이름·연락처는 결과 안내 목적으로만 사용되며, 제3자에게 제공되지 않아요
+            </div>
           </div>
         </div>
 
@@ -516,7 +531,7 @@ function Done({ type, user, onReset }) {
 // ── 메인 ────────────────────────────────────────────────
 function LoveTypeTest() {
   const [step, setStep] = React.useState("intro");
-  const [user, setUser] = React.useState({ name:"", phone:"", interest:"사주 연애 상담", gender:"" });
+  const [user, setUser] = React.useState({ name:"", phone:"", interest:"사주 연애 상담", gender:"", agreed:false });
   const [qIndex, setQIndex] = React.useState(0);
   const [scores, setScores] = React.useState({ keeper:0, hunter:0, cool:0, grandma:0 });
   const [resultType, setResultType] = React.useState(null);
@@ -535,7 +550,7 @@ function LoveTypeTest() {
   };
 
   const resetAll = () => {
-    setStep("intro"); setUser({name:"",phone:"",interest:"사주 연애 상담"});
+    setStep("intro"); setUser({name:"",phone:"",interest:"사주 연애 상담",gender:"",agreed:false});
     setQIndex(0); setScores({keeper:0,hunter:0,cool:0,grandma:0}); setResultType(null);
   };
 
