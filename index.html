@@ -599,16 +599,12 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
                 : applyInfo.concern.trim().length>=5;
   const handleNext = () => {
     if (step < 3) { setStep(s => s + 1); return; }
-    fetch(SHEET_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: user.name, age: user.age, gender: user.gender,
-        first: result.first.name, second: result.second.name, third: result.third.name,
-        phone: applyInfo.phone, location: applyInfo.location, concern: applyInfo.concern
-      })
-    }).catch(()=>{});
+    const params = new URLSearchParams({
+      name: user.name, age: user.age, gender: user.gender,
+      first: result.first.name, second: result.second.name, third: result.third.name,
+      phone: applyInfo.phone, location: applyInfo.location, concern: applyInfo.concern
+    });
+    fetch(`${SHEET_URL}?${params}`, { mode: "no-cors" }).catch(()=>{});
     onDone();
   };
   const inputStyle = { ...S.input, background:"rgba(255,255,255,.1)", border:`1.5px solid ${c.accent}44`, color:"#fff", borderRadius:14, fontSize:16, padding:"16px 18px" };
