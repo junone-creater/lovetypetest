@@ -653,21 +653,21 @@ function Apply({ result, user, applyInfo, setApplyInfo, onDone }) {
                 : step===2 ? applyInfo.location.trim().length>=2
                 : applyInfo.concern.trim().length>=5;
   const sendToSheet = () => {
+    const data = {
+      name: user.name||'', age: user.age||'', gender: user.gender||'',
+      first: result.first.name||'', second: result.second.name||'', third: result.third.name||'',
+      phone: applyInfo.phone||'', location: applyInfo.location||'', concern: applyInfo.concern||''
+    };
+    // POST (simple request — no preflight, works on all mobile browsers)
     try {
-      const cbName = 'gs_cb_' + Date.now();
-      const params = new URLSearchParams({
-        callback: cbName,
-        name: user.name||'', age: user.age||'', gender: user.gender||'',
-        first: result.first.name||'', second: result.second.name||'', third: result.third.name||'',
-        phone: applyInfo.phone||'', location: applyInfo.location||'', concern: applyInfo.concern||''
-      });
-      window[cbName] = () => {
-        try { delete window[cbName]; if(s && s.parentNode) s.parentNode.removeChild(s); } catch(e){}
-      };
+      fetch(SHEET_URL, { method:'POST', body: new URLSearchParams(data) }).catch(()=>{});
+    } catch(e) {}
+    // GET fallback
+    try {
       const s = document.createElement('script');
-      s.src = SHEET_URL + '?' + params.toString();
-      s.onerror = () => { try { delete window[cbName]; if(s.parentNode) s.parentNode.removeChild(s); } catch(e){}};
+      s.src = SHEET_URL + '?' + new URLSearchParams(data).toString();
       document.head.appendChild(s);
+      setTimeout(() => { try { s.parentNode && s.parentNode.removeChild(s); } catch(e){} }, 8000);
     } catch(e) {}
   };
   const handleNext = () => {
