@@ -52,7 +52,10 @@ function ApplyForm({ urlName, urlGender, urlType }) {
 
   const submit = () => {
     const data = { name:urlName, gender:urlGender, type:urlType, ...fd }
-    try { fetch(SHEET_URL, { method:'POST', body: new URLSearchParams(data) }).catch(() => {}) } catch {}
+    try {
+      fetch(SHEET_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(data) }).catch(() => {})
+    } catch {}
+    // GET 폴백 (JSONP)
     try {
       const s = document.createElement('script')
       s.src = SHEET_URL + '?' + new URLSearchParams(data).toString()
