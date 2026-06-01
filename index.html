@@ -400,11 +400,25 @@ function Quiz({ q, index, total, onAnswer }) {
 
 function Result({ result, user, onApply }) {
   const [slide, setSlide] = React.useState(0);
+  const [copied, setCopied] = React.useState(false);
   const TOTAL = 5;
   const { first, second, third } = result;
   const c = first.color;
   const imgSrc = `images/result-${first.key}-${user.gender === "남자" ? "male" : "female"}.png`;
   const next = () => setSlide(s => s + 1);
+
+  const handleShare = async () => {
+    const shareUrl = "https://junone-creater.github.io/lovetypetest/";
+    const shareText = `나의 연애 유형은 '${first.name}'! 당신도 테스트해보세요 👇`;
+    if (navigator.share) {
+      try { await navigator.share({ title:"이음나루 연애유형 테스트", text:shareText, url:shareUrl }); } catch(e) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        setCopied(true); setTimeout(()=>setCopied(false), 2500);
+      } catch(e) {}
+    }
+  };
 
   const splitDesc = (desc) => desc.split(/\. /).map((s, i, arr) =>
     i < arr.length - 1 ? s + '.' : s
@@ -640,8 +654,11 @@ function Result({ result, user, onApply }) {
               </p>
             </div>
 
-            <button onClick={onApply} style={{ ...S.cta, background:c.chip, boxShadow:"none", fontSize:17 }}>정확한 심리 분석 더알아보기</button>
-            <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)" }}>이음나루 심리 분석으로 연애 패턴을 바꿔보세요</p>
+            <button onClick={(e)=>{e.stopPropagation();onApply();}} style={{ ...S.cta, background:c.chip, boxShadow:"none", fontSize:17 }}>정확한 심리 분석 더알아보기</button>
+            <button onClick={(e)=>{e.stopPropagation();handleShare();}} style={{ width:"100%", marginTop:12, padding:"14px", borderRadius:14, border:`1.5px solid ${c.accent}55`, background:"transparent", color:"rgba(255,255,255,.7)", fontSize:15, fontWeight:600, cursor:"pointer", fontFamily:FONT }}>
+              {copied ? "링크 복사됐어요 ✓" : "친구에게 공유하기 🔗"}
+            </button>
+            <p style={{ ...S.fineprint, color:"rgba(255,255,255,.3)", marginTop:10 }}>나와 같은 유형인지 친구도 확인해보세요</p>
             </div>
           </div>
         )}
@@ -652,53 +669,6 @@ function Result({ result, user, onApply }) {
 }
 
 
-function Done({ result, user, onReset }) {
-  const type = result.first;
-  const [copied, setCopied] = React.useState(false);
-
-  const handleShare = async () => {
-    const shareUrl = "https://junone-creater.github.io/lovetypetest/";
-    const shareText = `나의 연애 유형은 '${type.name}'! 당신도 테스트해보세요 👇`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title:"이음나루 연애유형 테스트", text:shareText, url:shareUrl });
-      } catch(e) {}
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
-      } catch(e) {}
-    }
-  };
-
-  return (
-    <div style={S.pad} className="fade-in">
-      <div style={{ height:30 }}/>
-      <div style={S.doneCheck}>✓</div>
-      <h2 style={{ ...S.h1, textAlign:"center", fontSize:24 }}>전체 결과 공개!</h2>
-      <p style={{ ...S.lead, textAlign:"center" }}>{user.name}님의 연애 유형<br/>전체 분석 결과예요.</p>
-      <div style={S.unlockCard}>
-        <div style={S.unlockTitle}>🔓 잠겼던 전체 결과</div>
-        <UnlockRow icon="🥇" title={`1위 유형 — ${type.name}`} body={`"${type.tagline}" ${type.desc.slice(0,60)}...`}/>
-        <UnlockRow icon="⚠️" title="빠지기 쉬운 연애 함정"   body={type.trap}/>
-        <UnlockRow icon="💞" title="환상의 궁합 유형"         body={type.match}/>
-        <UnlockRow icon="🗓️" title="올해 인연 들어오는 시기" body="늦봄~초여름, 익숙한 공간에서 예상치 못한 인연이 시작돼요."/>
-      </div>
-
-      {/* 공유하기 */}
-      <div style={{ marginTop:22, padding:"18px", background:"#F3E8FF", borderRadius:16, textAlign:"center" }}>
-        <div style={{ fontSize:14, fontWeight:700, color:"#6B3FA0", marginBottom:4 }}>친구도 테스트해볼 수 있게 공유해요!</div>
-        <div style={{ fontSize:12, color:"#9B70C0", marginBottom:14 }}>나는 '{type.name}'— 친구는 어떤 유형일까요?</div>
-        <button onClick={handleShare} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#6B3FA0", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:FONT }}>
-          {copied ? "링크 복사됐어요 ✓" : "친구에게 공유하기 🔗"}
-        </button>
-      </div>
-
-      <button onClick={onReset} style={S.ctaGhost}>다시 테스트하기</button>
-    </div>
-  );
-}
 
 // ── 메인 ────────────────────────────────────────────────
 function LoveTypeTest() {
@@ -732,8 +702,10 @@ function LoveTypeTest() {
       <div style={isFullscreen ? S.phone : S.phoneLight}>
         {step==="intro"  && <Intro user={user} setUser={setUser} onStart={()=>setStep("quiz")}/>}
         {step==="quiz"   && <Quiz q={QUESTIONS[qIndex]} index={qIndex} total={QUESTIONS.length} onAnswer={handleAnswer}/>}
-        {step==="result" && <Result result={resultType} user={user} onApply={()=>setStep("done")}/>}
-        {step==="done"   && <Done result={resultType} user={user} onReset={resetAll}/>}
+        {step==="result" && <Result result={resultType} user={user} onApply={()=>{
+          const LANDING_URL = "./ieumnaru-love-landing.html";
+          window.open(`${LANDING_URL}?type=${encodeURIComponent(resultType.first.name)}&name=${encodeURIComponent(user.name)}`, "_blank");
+        }}/>}
       </div>
     </div>
   );

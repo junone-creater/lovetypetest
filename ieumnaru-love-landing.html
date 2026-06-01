@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>이음나루 · 정확한 심리 분석</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:#0C2820; font-family:'Pretendard',-apple-system,sans-serif; -webkit-text-size-adjust:100%; }
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+
+const FONT = "'Pretendard',-apple-system,sans-serif";
+const GREEN = "#1D9E75";
+const GREEN_DEEP = "#0F6E56";
+const BG = "#0C2820";
+const ACCENT = "#7FD9B8";
+
+// URL 파라미터 파싱
+const params = new URLSearchParams(window.location.search);
+const userName = decodeURIComponent(params.get("name") || "");
+const userType = decodeURIComponent(params.get("type") || "");
+
+function Landing() {
+  return (
+    <div style={{ background:BG, minHeight:"100vh", maxWidth:390, margin:"0 auto" }}>
+
+      {/* 헤더 */}
+      <div style={{ padding:"20px 22px 0", display:"flex", alignItems:"center", gap:7 }}>
+        <span style={{ width:7, height:7, borderRadius:"50%", background:ACCENT, display:"inline-block" }}/>
+        <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.7)", letterSpacing:".5px" }}>이음나루</span>
+      </div>
+
+      {/* 히어로 */}
+      <div style={{ padding:"36px 22px 28px" }}>
+        <div style={{ fontSize:11, fontWeight:700, color:ACCENT, letterSpacing:"2px", marginBottom:10 }}>정확한 심리 분석</div>
+        <h1 style={{ fontSize:28, fontWeight:900, color:"#fff", lineHeight:1.35, marginBottom:14 }}>
+          {userName ? `${userName}님,` : ""}<br/>
+          연애 패턴을<br/>
+          이제 바꿀 수 있어요
+        </h1>
+        <p style={{ fontSize:14.5, color:"rgba(255,255,255,.5)", lineHeight:1.8 }}>
+          {userType ? `'${userType}'` : "내 유형"}이 연애에서 반복하는 패턴,<br/>
+          왜 그런지 알면 달라져요.
+        </p>
+      </div>
+
+      {/* 신청 폼 영역 — 추후 추가 예정 */}
+      <div style={{ margin:"0 22px 32px", padding:"28px 22px", background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, textAlign:"center" }}>
+        <div style={{ fontSize:32, marginBottom:16 }}>🛠️</div>
+        <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:8 }}>신청 폼 준비 중</div>
+        <div style={{ fontSize:13.5, color:"rgba(255,255,255,.4)", lineHeight:1.7 }}>
+          곧 오픈돼요.<br/>조금만 기다려주세요!
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Landing/>);
+  </script>
+</body>
+</html>
