@@ -1,71 +1,335 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>이음나루 · 정확한 심리 분석</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    body { background:#0C2820; font-family:'Pretendard',-apple-system,sans-serif; -webkit-text-size-adjust:100%; }
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>이음나루 — 연애만 하면 작아지던 내가, 편해진 이유</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  :root{
+    --bg:#0E0816;
+    --bg-deep:#080410;
+    --bg-soft:#1A1130;
+    --purple:#9B5DE5;
+    --lilac:#C084FC;
+    --deep:#6B3FA0;
+    --text:#F3E8FF;
+    --cream:#EAE3D8;
+    --muted:#A99BC4;
+    --beige:#B8AE9F;
+    --line:rgba(243,232,255,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Pretendard',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:0 24px;}
+  section{position:relative;}
+
+  /* 배경 질감 */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ───────────── HOOK ───────────── */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:88px 0 64px;position:relative;overflow:hidden;
+    background:radial-gradient(120% 80% at 70% 0%, #25164d 0%, var(--bg) 48%, var(--bg-deep) 100%);
+  }
+  .hero::before{
+    content:"";position:absolute;width:440px;height:440px;border-radius:50%;
+    top:-150px;right:-170px;
+    background:radial-gradient(circle, rgba(155,93,229,.40), transparent 65%);
+    filter:blur(10px);
+  }
+  .hero::after{
+    content:"";position:absolute;width:320px;height:320px;border-radius:50%;
+    bottom:-110px;left:-130px;
+    background:radial-gradient(circle, rgba(192,132,252,.22), transparent 70%);
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
+    font-size:12.5px;letter-spacing:.04em;color:var(--lilac);
+    border:1px solid rgba(192,132,252,.4);border-radius:999px;
+    padding:7px 14px;margin-bottom:28px;backdrop-filter:blur(4px);
+    opacity:0;animation:rise .8s .1s forwards;
+  }
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--purple);box-shadow:0 0 8px var(--purple);}
+  .hook-h1{
+    font-size:clamp(34px,9vw,46px);font-weight:800;line-height:1.22;
+    letter-spacing:-.02em;margin-bottom:22px;
+  }
+  .hook-h1 .em{color:var(--lilac);position:relative;display:inline-block;}
+  .hook-h1 .em::after{
+    content:"";position:absolute;left:0;bottom:4px;width:100%;height:10px;
+    background:rgba(155,93,229,.30);z-index:-1;border-radius:2px;
+  }
+  .hook-line{opacity:0;animation:rise .9s forwards;}
+  .l1{animation-delay:.22s;}
+  .l2{animation-delay:.36s;}
+  .hook-sub{
+    font-size:16.5px;color:var(--muted);margin-bottom:40px;max-width:440px;
+    opacity:0;animation:rise .9s .5s forwards;
+  }
+  .hook-sub b{color:var(--cream);font-weight:600;}
+  .scroll-cue{
+    opacity:0;animation:rise .9s .7s forwards;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    align-self:center;margin-top:8px;color:var(--beige);font-size:12px;letter-spacing:.1em;
+  }
+  .scroll-cue .arrow{width:1px;height:34px;background:linear-gradient(var(--lilac),transparent);animation:pulse 1.8s infinite;}
+
+  @keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+  /* ───────────── STORY ───────────── */
+  .story{padding:96px 0;}
+  .eyebrow{
+    font-size:13px;letter-spacing:.16em;color:var(--lilac);font-weight:700;
+    text-transform:uppercase;margin-bottom:18px;
+  }
+  .story-h2{
+    font-size:clamp(25px,6.5vw,31px);font-weight:800;line-height:1.36;
+    letter-spacing:-.02em;margin-bottom:36px;
+  }
+  .story-h2 .accent{color:var(--lilac);font-weight:800;}
+
+  /* 공감 카드 — 말풍선형 radius */
+  .pains{display:flex;flex-direction:column;gap:14px;margin-bottom:18px;}
+  .pain{
+    background:rgba(192,132,252,.06);border:1px solid var(--line);
+    border-left:3px solid var(--purple);border-radius:0 14px 14px 14px;
+    padding:18px 20px;font-size:15.5px;color:var(--cream);
+    display:flex;gap:13px;align-items:flex-start;
+  }
+  .pain .q{font-size:19px;line-height:1;color:var(--lilac);flex-shrink:0;}
+  .pain b{color:#fff;font-weight:600;}
+  .reveal{opacity:0;transform:translateY(28px);transition:.7s cubic-bezier(.2,.7,.3,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  .pivot{
+    margin:48px 0;padding:30px 26px;border-radius:18px;
+    background:linear-gradient(135deg, rgba(107,63,160,.30), rgba(26,17,48,.85));
+    border:1px solid rgba(192,132,252,.28);position:relative;overflow:hidden;
+  }
+  .pivot::before{
+    content:"";position:absolute;top:-40px;right:-40px;width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle,rgba(155,93,229,.30),transparent 70%);
+  }
+  .pivot .tag{font-size:13px;color:var(--lilac);font-weight:700;letter-spacing:.04em;margin-bottom:12px;}
+  .pivot p{font-size:18px;line-height:1.6;color:var(--cream);font-weight:500;}
+  .pivot p .hl{color:var(--lilac);font-weight:800;}
+
+  /* 변화 후기 */
+  .voices{display:flex;flex-direction:column;gap:16px;margin-top:18px;}
+  .voice{
+    background:rgba(192,132,252,.05);border:1px solid var(--line);border-radius:0 16px 16px 16px;
+    padding:22px;position:relative;
+  }
+  .voice .quote{font-size:34px;color:var(--purple);line-height:.5;opacity:.6;font-weight:800;}
+  .voice p{font-size:15px;color:var(--cream);margin:6px 0 14px;line-height:1.7;}
+  .voice .who{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+  .voice .av{
+    width:30px;height:30px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;
+  }
+
+  /* ───────────── OFFER ───────────── */
+  .offer{
+    padding:96px 0 110px;
+    background:radial-gradient(120% 70% at 30% 100%, #25164d 0%, var(--bg) 52%);
+    position:relative;border-top:1px solid var(--line);
+  }
+  .offer-h2{
+    font-size:clamp(26px,7vw,33px);font-weight:800;line-height:1.32;
+    letter-spacing:-.02em;margin-bottom:14px;text-align:center;
+  }
+  .offer-h2 .accent{color:var(--lilac);}
+  .offer-lead{text-align:center;color:var(--muted);font-size:15.5px;margin-bottom:42px;}
+  .offer-lead b{color:var(--cream);}
+
+  .cores{display:flex;flex-direction:column;gap:16px;margin-bottom:40px;}
+  .core{
+    display:flex;gap:16px;align-items:flex-start;
+    background:rgba(192,132,252,.05);border:1px solid var(--line);border-radius:18px;
+    padding:22px 20px;transition:.4s;
+  }
+  .core:hover{border-color:rgba(192,132,252,.45);background:rgba(155,93,229,.10);transform:translateY(-3px);}
+  .core .num{
+    width:42px;height:42px;border-radius:13px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:800;color:#fff;
+  }
+  .core h4{font-size:17px;font-weight:700;color:#fff;margin-bottom:5px;}
+  .core h4 span{font-size:12.5px;font-weight:600;color:var(--lilac);margin-left:7px;}
+  .core p{font-size:14px;color:var(--muted);line-height:1.6;}
+
+  .price{
+    text-align:center;margin-bottom:34px;padding:26px;border-radius:18px;
+    background:linear-gradient(135deg,rgba(155,93,229,.16),rgba(192,132,252,.08));
+    border:1px solid rgba(192,132,252,.32);
+  }
+  .price .old{color:var(--muted);text-decoration:line-through;font-size:16px;}
+  .price .free{font-size:38px;font-weight:800;color:var(--lilac);letter-spacing:-.02em;margin:4px 0;}
+  .price .note{font-size:13.5px;color:var(--beige);}
+  .price .note b{color:var(--lilac);}
+
+  .trust{display:flex;justify-content:center;gap:24px;margin-bottom:38px;flex-wrap:wrap;}
+  .trust .item{text-align:center;}
+  .trust .big{font-size:24px;font-weight:800;color:var(--lilac);}
+  .trust .lbl{font-size:12px;color:var(--muted);}
+
+  .cta-area{position:sticky;bottom:0;}
+  .cta{
+    display:block;width:100%;text-align:center;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    color:#fff;font-size:18px;font-weight:800;letter-spacing:.01em;
+    padding:20px;border-radius:16px;border:none;cursor:pointer;
+    box-shadow:0 10px 24px rgba(155,93,229,.42), 0 2px 8px rgba(0,0,0,.3);
+    transition:.3s;text-decoration:none;
+  }
+  .cta:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(155,93,229,.52);}
+  .cta:active{transform:translateY(0);}
+  .cta-sub{text-align:center;font-size:12.5px;color:var(--muted);margin-top:14px;}
+  .cta-sub b{color:var(--lilac);}
+
+  footer{
+    text-align:center;padding:40px 24px;color:var(--muted);font-size:12px;
+    border-top:1px solid var(--line);background:var(--bg-deep);
+  }
+  footer b{color:var(--beige);}
+</style>
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script type="text/babel">
+<div class="grain"></div>
 
-const FONT = "'Pretendard',-apple-system,sans-serif";
-const GREEN = "#1D9E75";
-const GREEN_DEEP = "#0F6E56";
-const BG = "#0C2820";
-const ACCENT = "#7FD9B8";
-
-// URL 파라미터 파싱
-const params = new URLSearchParams(window.location.search);
-const userName = decodeURIComponent(params.get("name") || "");
-const userType = decodeURIComponent(params.get("type") || "");
-
-function Landing() {
-  return (
-    <div style={{ background:BG, minHeight:"100vh", maxWidth:390, margin:"0 auto" }}>
-
-      {/* 헤더 */}
-      <div style={{ padding:"20px 22px 0", display:"flex", alignItems:"center", gap:7 }}>
-        <span style={{ width:7, height:7, borderRadius:"50%", background:ACCENT, display:"inline-block" }}/>
-        <span style={{ fontSize:12, fontWeight:700, color:"rgba(255,255,255,.7)", letterSpacing:".5px" }}>이음나루</span>
-      </div>
-
-      {/* 히어로 */}
-      <div style={{ padding:"36px 22px 28px" }}>
-        <div style={{ fontSize:11, fontWeight:700, color:ACCENT, letterSpacing:"2px", marginBottom:10 }}>정확한 심리 분석</div>
-        <h1 style={{ fontSize:28, fontWeight:900, color:"#fff", lineHeight:1.35, marginBottom:14 }}>
-          {userName ? `${userName}님,` : ""}<br/>
-          연애 패턴을<br/>
-          이제 바꿀 수 있어요
-        </h1>
-        <p style={{ fontSize:14.5, color:"rgba(255,255,255,.5)", lineHeight:1.8 }}>
-          {userType ? `'${userType}'` : "내 유형"}이 연애에서 반복하는 패턴,<br/>
-          왜 그런지 알면 달라져요.
-        </p>
-      </div>
-
-      {/* 신청 폼 영역 — 추후 추가 예정 */}
-      <div style={{ margin:"0 22px 32px", padding:"28px 22px", background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", borderRadius:16, textAlign:"center" }}>
-        <div style={{ fontSize:32, marginBottom:16 }}>🛠️</div>
-        <div style={{ fontSize:16, fontWeight:700, color:"#fff", marginBottom:8 }}>신청 폼 준비 중</div>
-        <div style={{ fontSize:13.5, color:"rgba(255,255,255,.4)", lineHeight:1.7 }}>
-          곧 오픈돼요.<br/>조금만 기다려주세요!
-        </div>
-      </div>
-
+<!-- ════════ HOOK ════════ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span>이음나루 인지심리연구소 · 20대 무료 프로그램</span>
+    <h1 class="hook-h1">
+      <span class="hook-line l1">연애만 하면 작아지던 내가,</span><br/>
+      <span class="hook-line l2"><span class="em">편해진</span> 이유</span>
+    </h1>
+    <p class="hook-sub">
+      연락 한 번에 마음이 흔들리고, 늘 같은 이유로 끝나던 연애 <br/>
+      <b>편해진 건 성격을 바꿔서가 아니었어요.</b>
+    </p>
+    <div class="scroll-cue">
+      <span>그 이유 보기</span>
+      <span class="arrow"></span>
     </div>
-  );
-}
+  </div>
+</section>
 
-ReactDOM.createRoot(document.getElementById("root")).render(<Landing/>);
-  </script>
+<!-- ════════ STORY ════════ -->
+<section class="story">
+  <div class="wrap">
+    <p class="eyebrow reveal">혹시, 이런 적 있나요?</p>
+    <h2 class="story-h2 reveal">
+      문제는 당신의 성격이 아니라,<br/>
+      <span class="accent">아직 모르고 있던 '마음의 패턴'</span>이에요.
+    </h2>
+
+    <div class="pains">
+      <div class="pain reveal"><span class="q">“</span><span>좋아하는 사람 앞에서는 이상하게 <b>말도 행동도 부자연스러워져요.</b></span></div>
+      <div class="pain reveal"><span class="q">“</span><span>연락이 조금만 늦어도 <b>'내가 뭘 잘못했나' 하고 곱씹어요.</b></span></div>
+      <div class="pain reveal"><span class="q">“</span><span>사람은 매번 다른데, <b>헤어지는 이유는 늘 비슷하게 반복돼요.</b></span></div>
+    </div>
+
+    <div class="pivot reveal">
+      <p class="tag">◆ 우리가 발견한 것</p>
+      <p>
+        같은 연애여도 누구는 편하고 누구는 힘든 이유.<br/>
+        그건 의지가 아니라 <span class="hl">내 안의 심리 구조</span> 때문이에요.
+        구조를 알면, 관계는 <span class="hl">노력 없이도</span> 편해져요.
+      </p>
+    </div>
+
+    <p class="eyebrow reveal" style="margin-top:8px;">먼저 경험한 사람들</p>
+    <div class="voices">
+      <div class="voice reveal">
+        <div class="quote">”</div>
+        <p>내가 왜 연애만 하면 불안해지는지 처음 알았어요. 이유를 아니까 신기하게 덜 흔들려요.</p>
+        <div class="who"><div class="av">지</div>대학교 3학년 · 지윤님</div>
+      </div>
+      <div class="voice reveal">
+        <div class="quote">”</div>
+        <p>"내가 예민한 게 아니었구나" 하고 나니까, 관계에서 오던 피로가 확 줄었어요.</p>
+        <div class="who"><div class="av">현</div>대학교 4학년 · 현우님</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ OFFER ════════ -->
+<section class="offer">
+  <div class="wrap">
+    <h2 class="offer-h2 reveal">
+      나의 연애 패턴을 <span class="accent">3단계</span>로<br/>풀어내는 시간
+    </h2>
+    <p class="offer-lead reveal">이음나루 <b>3코어 매직</b> · 20대만을 위한 프로그램</p>
+
+    <div class="cores">
+      <div class="core reveal">
+        <div class="num">1</div>
+        <div><h4>강연 <span>90분</span></h4><p>내 연애와 관계의 패턴, 그 심리 구조를 이해하는 시간. 왜 늘 같은 지점에서 힘들었는지 그 뿌리를 짚어요.</p></div>
+      </div>
+      <div class="core reveal">
+        <div class="num">2</div>
+        <div><h4>1:1 심리코칭 <span>맞춤</span></h4><p>나에게 맞는 관계 방향을 함께 설계해요. 혼자 끙끙대지 않고, 전문가와 같이 길을 찾아요.</p></div>
+      </div>
+      <div class="core reveal">
+        <div class="num">3</div>
+        <div><h4>IDT 검사 체험 <span>10분</span></h4><p>이음나루가 직접 개발한 인지구조 패턴 검사. 내 마음이 관계에서 어떻게 작동하는지 데이터로 확인해요.</p></div>
+      </div>
+    </div>
+
+    <div class="trust reveal">
+      <div class="item"><div class="big">9유형</div><div class="lbl">정밀 심리 분석</div></div>
+      <div class="item"><div class="big">1:1</div><div class="lbl">맞춤 코칭</div></div>
+      <div class="item"><div class="big">100%</div><div class="lbl">무료 참여</div></div>
+    </div>
+
+    <div class="price reveal">
+      <div class="old">정가 380,000원</div>
+      <div class="free">0원</div>
+      <div class="note"><b>취업창업지원금</b>으로 전액 지원돼요</div>
+    </div>
+
+    <div class="cta-area">
+      <a href="https://junone-creater.github.io/lovetypetest/" class="cta">테스트하고 무료 신청하기 →</a>
+      <p class="cta-sub">먼저 <b>내 연애유형</b>을 확인한 뒤 신청까지 한 번에 · 이번 기수 <b>30명 한정</b></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  이음나루 인지심리연구소<br/>
+  <b>사람과 사람을 잇는 마음의 나루터</b>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){
+        setTimeout(()=>e.target.classList.add('in'), i*60);
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>
