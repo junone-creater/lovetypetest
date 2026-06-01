@@ -209,6 +209,69 @@
     border-top:1px solid var(--line);background:var(--bg-deep);
   }
   footer b{color:var(--beige);}
+
+  /* ───────────── FORM ───────────── */
+  #form{
+    padding:80px 0 100px;
+    background:radial-gradient(100% 60% at 60% 0%, rgba(107,63,160,.22) 0%, var(--bg) 60%);
+    border-top:1px solid var(--line);
+  }
+  .form-title{font-size:26px;font-weight:800;line-height:1.35;margin-bottom:8px;letter-spacing:-.02em;}
+  .form-title .accent{color:var(--lilac);}
+  .form-sub{font-size:14.5px;color:var(--muted);margin-bottom:32px;line-height:1.7;}
+  .form-sub b{color:var(--cream);}
+
+  .form-progress{display:flex;gap:6px;margin-bottom:32px;align-items:center;}
+  .f-dot{height:5px;border-radius:3px;background:rgba(255,255,255,.15);transition:all .3s ease;width:6px;}
+  .f-dot.active{background:var(--lilac);width:22px;}
+  .f-dot.done{background:var(--purple);width:6px;}
+
+  .form-step{display:none;animation:rise .35s ease both;}
+  .form-step.active{display:block;}
+
+  .field-label{font-size:12.5px;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:9px;display:block;text-transform:uppercase;}
+  .field-note{font-size:12px;color:rgba(192,132,252,.65);margin-top:8px;display:flex;align-items:center;gap:5px;}
+  .field-input{
+    width:100%;padding:17px 18px;font-size:16px;font-family:'Pretendard',sans-serif;
+    background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);
+    border-radius:14px;color:var(--text);outline:none;
+    transition:.2s;-webkit-appearance:none;appearance:none;
+  }
+  .field-input:focus{border-color:var(--lilac);}
+  .field-input::placeholder{color:rgba(255,255,255,.25);}
+  .field-input.textarea{min-height:150px;resize:none;line-height:1.75;}
+  .field-group{display:flex;flex-direction:column;gap:18px;}
+
+  .time-options{display:flex;flex-direction:column;gap:10px;}
+  .time-opt{
+    display:flex;align-items:center;gap:14px;padding:16px 18px;
+    background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);
+    border-radius:14px;cursor:pointer;transition:.2s;-webkit-tap-highlight-color:transparent;
+  }
+  .time-opt:active{transform:scale(.98);}
+  .time-opt.sel{border-color:var(--lilac);background:rgba(155,93,229,.18);}
+  .t-radio{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s;}
+  .time-opt.sel .t-radio{border-color:var(--lilac);}
+  .t-inner{width:10px;height:10px;border-radius:50%;background:var(--lilac);display:none;}
+  .time-opt.sel .t-inner{display:block;}
+  .t-label{font-size:15.5px;color:var(--cream);font-weight:500;}
+  .time-opt.sel .t-label{color:#fff;font-weight:600;}
+
+  .form-btn{
+    width:100%;margin-top:28px;padding:18px;border-radius:14px;border:none;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    color:#fff;font-size:17px;font-weight:800;cursor:pointer;
+    font-family:'Pretendard',sans-serif;
+    box-shadow:0 8px 24px rgba(155,93,229,.38);transition:.2s;
+  }
+  .form-btn:disabled{background:rgba(255,255,255,.1);color:rgba(255,255,255,.3);box-shadow:none;cursor:not-allowed;}
+  .form-btn:not(:disabled):active{transform:scale(.98);}
+
+  .form-success{display:none;text-align:center;padding:40px 0 20px;}
+  .f-check{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--lilac));margin:0 auto 24px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 12px 28px rgba(155,93,229,.4);}
+  .form-success h3{font-size:24px;font-weight:800;margin-bottom:14px;}
+  .form-success p{font-size:15px;color:var(--muted);line-height:1.8;}
+  .form-success p b{color:var(--cream);}
 </style>
 </head>
 <body>
@@ -309,8 +372,75 @@
     </div>
 
     <div class="cta-area">
-      <a href="https://junone-creater.github.io/lovetypetest/" class="cta">테스트하고 무료 신청하기 →</a>
-      <p class="cta-sub">먼저 <b>내 연애유형</b>을 확인한 뒤 신청까지 한 번에 · 이번 기수 <b>30명 한정</b></p>
+      <a href="#form" class="cta" id="apply-btn">무료 신청하기 →</a>
+      <p class="cta-sub">이번 기수 <b>30명 한정</b> · 신청 후 1영업일 내 연락드려요</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FORM ════════ -->
+<section id="form">
+  <div class="wrap">
+    <p class="eyebrow reveal">무료 신청</p>
+    <div class="form-title reveal">딱 <span class="accent">5가지</span>만 알려주세요</div>
+    <p class="form-sub reveal">이름과 성별은 이미 받았어요.<br/><b>순서대로 입력하면 바로 신청돼요.</b></p>
+
+    <div class="form-progress" id="fp"></div>
+
+    <!-- Step 1: 연락처 -->
+    <div class="form-step active" data-step="1">
+      <label class="field-label">연락처</label>
+      <input class="field-input" id="f-phone" type="tel" inputmode="numeric" maxlength="13" placeholder="010-0000-0000"/>
+      <button class="form-btn" id="n1" disabled>다음</button>
+    </div>
+
+    <!-- Step 2: 나이 + 직업 -->
+    <div class="form-step" data-step="2">
+      <div class="field-group">
+        <div>
+          <label class="field-label">나이</label>
+          <input class="field-input" id="f-age" type="number" inputmode="numeric" placeholder="예) 24" min="15" max="50"/>
+        </div>
+        <div>
+          <label class="field-label">직업</label>
+          <input class="field-input" id="f-job" type="text" placeholder="예) 대학생, 직장인, 취준생"/>
+        </div>
+      </div>
+      <button class="form-btn" id="n2" disabled>다음</button>
+    </div>
+
+    <!-- Step 3: 거주지 -->
+    <div class="form-step" data-step="3">
+      <label class="field-label">거주지</label>
+      <input class="field-input" id="f-loc" type="text" placeholder="예) 서울 마포구 합정동"/>
+      <p class="field-note">📍 지점별 정확한 안내를 도와드려요</p>
+      <button class="form-btn" id="n3" disabled>다음</button>
+    </div>
+
+    <!-- Step 4: 희망시간 -->
+    <div class="form-step" data-step="4">
+      <label class="field-label">안내 전화 희망시간</label>
+      <div class="time-options">
+        <div class="time-opt" data-v="평일 오전 (10:00~12:00)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">평일 오전 (10:00~12:00)</span></div>
+        <div class="time-opt" data-v="평일 오후 (13:00~18:00)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">평일 오후 (13:00~18:00)</span></div>
+        <div class="time-opt" data-v="평일 저녁 (18:00~19:00)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">평일 저녁 (18:00~19:00)</span></div>
+        <div class="time-opt" data-v="주말 (예약제)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">주말 (예약제)</span></div>
+      </div>
+      <button class="form-btn" id="n4" disabled>다음</button>
+    </div>
+
+    <!-- Step 5: 상담 내용 -->
+    <div class="form-step" data-step="5">
+      <label class="field-label">상담하고 싶은 내용</label>
+      <textarea class="field-input textarea" id="f-concern" placeholder="상담하시고 싶은 내용을 입력하세요"></textarea>
+      <button class="form-btn" id="n5" disabled>신청 완료</button>
+    </div>
+
+    <!-- 완료 화면 -->
+    <div class="form-success" id="f-success">
+      <div class="f-check">✓</div>
+      <h3>신청 완료!</h3>
+      <p>입력하신 <b>연락처로 담당자가 직접 연락</b>드려요.<br/>보통 <b>1영업일 이내</b>에 연락드려요.</p>
     </div>
   </div>
 </section>
@@ -321,15 +451,116 @@
 </footer>
 
 <script>
+  // ── 스크롤 애니메이션 ──
   const io = new IntersectionObserver((entries)=>{
     entries.forEach((e,i)=>{
-      if(e.isIntersecting){
-        setTimeout(()=>e.target.classList.add('in'), i*60);
-        io.unobserve(e.target);
-      }
+      if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('in'), i*60); io.unobserve(e.target); }
     });
   },{threshold:.15});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // ── CTA 스무스 스크롤 ──
+  document.getElementById('apply-btn').addEventListener('click',function(e){
+    e.preventDefault();
+    document.getElementById('form').scrollIntoView({behavior:'smooth'});
+  });
+
+  // ── 신청 폼 ──
+  (function(){
+    const SHEET_URL = "https://script.google.com/macros/s/LANDING_SCRIPT_ID/exec";
+    const STEPS = 5;
+
+    const p = new URLSearchParams(window.location.search);
+    const urlName   = decodeURIComponent(p.get('name')   || '');
+    const urlGender = decodeURIComponent(p.get('gender') || '');
+    const urlType   = decodeURIComponent(p.get('type')   || '');
+
+    let cur = 1;
+    const fd = {};
+
+    // 진행 바
+    const fp = document.getElementById('fp');
+    for(let i=1;i<=STEPS;i++){
+      const d=document.createElement('div');
+      d.className='f-dot'+(i===1?' active':'');
+      if(i===1) d.style.width='22px';
+      fp.appendChild(d);
+    }
+    function updateBar(step){
+      fp.querySelectorAll('.f-dot').forEach((d,i)=>{
+        d.classList.remove('active','done'); d.style.width='6px';
+        if(i+1<step){d.classList.add('done');}
+        if(i+1===step){d.classList.add('active');d.style.width='22px';}
+      });
+    }
+    function goStep(step){
+      document.querySelectorAll('.form-step').forEach(s=>s.classList.remove('active'));
+      const el=document.querySelector('[data-step="'+step+'"]');
+      if(el){el.classList.add('active'); el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+      updateBar(step); cur=step;
+    }
+
+    // 전화번호 포맷
+    function fmtPhone(v){
+      const n=v.replace(/[^0-9]/g,'').slice(0,11);
+      if(n.length<4)return n;
+      if(n.length<8)return n.slice(0,3)+'-'+n.slice(3);
+      return n.slice(0,3)+'-'+n.slice(3,7)+'-'+n.slice(7);
+    }
+
+    // Step 1: 연락처
+    const ph=document.getElementById('f-phone'), n1=document.getElementById('n1');
+    ph.addEventListener('input',function(){ this.value=fmtPhone(this.value); n1.disabled=this.value.replace(/[^0-9]/g,'').length<10; });
+    n1.addEventListener('click',function(){ fd.phone=ph.value; goStep(2); });
+
+    // Step 2: 나이 + 직업
+    const ag=document.getElementById('f-age'), jb=document.getElementById('f-job'), n2=document.getElementById('n2');
+    function chk2(){ n2.disabled=!(ag.value.trim()&&jb.value.trim()); }
+    ag.addEventListener('input',chk2); jb.addEventListener('input',chk2);
+    n2.addEventListener('click',function(){ fd.age=ag.value.trim(); fd.job=jb.value.trim(); goStep(3); });
+
+    // Step 3: 거주지
+    const lc=document.getElementById('f-loc'), n3=document.getElementById('n3');
+    lc.addEventListener('input',function(){ n3.disabled=this.value.trim().length<2; });
+    n3.addEventListener('click',function(){ fd.location=lc.value.trim(); goStep(4); });
+
+    // Step 4: 희망시간
+    const n4=document.getElementById('n4');
+    document.querySelectorAll('.time-opt').forEach(function(opt){
+      opt.addEventListener('click',function(){
+        document.querySelectorAll('.time-opt').forEach(o=>o.classList.remove('sel'));
+        this.classList.add('sel');
+        fd.calltime=this.dataset.v;
+        n4.disabled=false;
+      });
+    });
+    n4.addEventListener('click',function(){ goStep(5); });
+
+    // Step 5: 상담 내용
+    const cn=document.getElementById('f-concern'), n5=document.getElementById('n5');
+    cn.addEventListener('input',function(){ n5.disabled=this.value.trim().length<5; });
+    n5.addEventListener('click',function(){
+      fd.concern=cn.value.trim();
+      submitAll();
+    });
+
+    function submitAll(){
+      const data={ name:urlName, gender:urlGender, type:urlType, ...fd };
+      try{ fetch(SHEET_URL,{method:'POST',body:new URLSearchParams(data)}).catch(()=>{}); }catch(e){}
+      try{
+        const s=document.createElement('script');
+        s.src=SHEET_URL+'?'+new URLSearchParams(data).toString();
+        document.head.appendChild(s);
+        setTimeout(()=>{ try{s.parentNode&&s.parentNode.removeChild(s);}catch(e){} },8000);
+      }catch(e){}
+      // 완료 화면
+      document.querySelectorAll('.form-step').forEach(s=>s.style.display='none');
+      fp.style.display='none';
+      document.querySelector('#form .form-title').innerHTML='🎉 신청 완료!';
+      document.querySelector('#form .form-sub').style.display='none';
+      document.getElementById('f-success').style.display='block';
+    }
+  })();
 </script>
 </body>
 </html>
