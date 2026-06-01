@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import './LandingPage.css'
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec'
@@ -176,13 +176,14 @@ function ApplyForm({ urlName, urlGender, urlType }) {
 // ── 메인 ──────────────────────────────────────────
 export default function LandingPage() {
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const urlName   = decodeURIComponent(params.get('name')   || '')
   const urlGender = decodeURIComponent(params.get('gender') || '')
   const urlType   = decodeURIComponent(params.get('type')   || '')
 
-  const scrollToForm = (e) => {
+  const goApply = (e) => {
     e.preventDefault()
-    document.getElementById('form-section')?.scrollIntoView({ behavior:'smooth' })
+    navigate(`/apply?type=${encodeURIComponent(urlType)}&name=${encodeURIComponent(urlName)}&gender=${encodeURIComponent(urlGender)}`)
   }
 
   return (
@@ -279,24 +280,14 @@ export default function LandingPage() {
           </Reveal>
           <Reveal>
             <div style={{ position:'sticky', bottom:0 }}>
-              <a href="#form-section" onClick={scrollToForm} className="lp-cta">무료 신청하기 →</a>
+              <a href="/apply" onClick={goApply} className="lp-cta">무료 신청하기 →</a>
               <p className="lp-cta-sub">이번 기수 <b>30명 한정</b> · 신청 후 1영업일 내 연락드려요</p>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* FORM */}
-      <section id="form-section" className="lp-form-section">
-        <div className="lp-wrap">
-          <Reveal><p className="lp-eyebrow">무료 신청</p></Reveal>
-          <Reveal delay={.08}><h2 className="lp-form-title">딱 <span className="lp-accent">5가지</span>만 알려주세요</h2></Reveal>
-          <Reveal delay={.12}><p className="lp-form-sub">이름과 성별은 이미 받았어요.<br/><b>순서대로 입력하면 바로 신청돼요.</b></p></Reveal>
-          <ApplyForm urlName={urlName} urlGender={urlGender} urlType={urlType} />
-        </div>
-      </section>
-
-      <footer className="lp-footer">
+<footer className="lp-footer">
         이음나루 인지심리연구소<br/><b>사람과 사람을 잇는 마음의 나루터</b>
       </footer>
     </div>
