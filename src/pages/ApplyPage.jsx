@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { store } from '../store'
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec'
 const FONT = "'Pretendard', -apple-system, sans-serif"
@@ -18,17 +19,23 @@ function fmtPhone(v) {
 export default function ApplyPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
-  const urlName   = decodeURIComponent(params.get('name')   || '')
-  const urlGender = decodeURIComponent(params.get('gender') || '')
+  // 테스트에서 받은 정보(같은 세션) — URL 파라미터가 없으면 여기서 보충
+  const testUser = store.getUser() || {}
+  const urlName   = decodeURIComponent(params.get('name')   || '') || testUser.name   || ''
+  const urlGender = decodeURIComponent(params.get('gender') || '') || testUser.gender || ''
   const urlType   = decodeURIComponent(params.get('type')   || '')
 
   const [step, setStep] = useState(1)
   const [done, setDone] = useState(false)
-  const [fd, setFd] = useState({ phone:'', age:'', job:'', location:'', calltime:'', concern:'' })
+  // 테스트에서 받은 이름·성별·나이를 미리 채워둠 (모두 수정 가능, 그대로 제출됨)
+  const [fd, setFd] = useState({
+    name: urlName, gender: urlGender, phone:'',
+    age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'',
+  })
 
   const canNext = {
-    1: fd.phone.replace(/[^0-9]/g, '').length >= 10,
-    2: fd.age.trim() && fd.job.trim(),
+    1: fd.name.trim() && fd.gender && fd.age.trim() && fd.job.trim(),
+    2: fd.phone.replace(/[^0-9]/g, '').length >= 10,
     3: fd.location.trim().length >= 2,
     4: fd.calltime !== '',
     5: fd.concern.trim().length >= 5,
@@ -37,7 +44,7 @@ export default function ApplyPage() {
   const goStep = (n) => { setStep(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }
 
   const submit = () => {
-    const data = { name: urlName, gender: urlGender, type: urlType, ...fd }
+    const data = { type: urlType, ...fd }
     try { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(data) }).catch(() => {}) } catch {}
     try {
       const s = document.createElement('script')
@@ -108,24 +115,37 @@ export default function ApplyPage() {
           <span style={{ marginLeft: 8, fontSize: 13, color: 'rgba(255,255,255,.35)', fontWeight: 600 }}>{step} / {TOTAL}</span>
         </div>
 
-        {/* Step 1: 연락처 */}
+        {/* Step 1: 내 정보 확인/수정 (이름·성별·나이·직업) */}
         {step === 1 && (
           <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>연락처를<br/>알려주세요</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 32, lineHeight: 1.7 }}>결과와 맞춤 연애 조언을 문자로 바로 보내드려요</p>
-            <label style={labelSt}>연락처</label>
-            <input style={{ ...inputSt, fontSize: 18, letterSpacing: '1.5px' }} type="tel" inputMode="numeric" maxLength={13} placeholder="010-0000-0000"
-              value={fd.phone} onChange={e => setFd({ ...fd, phone: fmtPhone(e.target.value) })}/>
-            <button style={btnSt(canNext[1])} disabled={!canNext[1]} onClick={() => canNext[1] && goStep(2)}>다음</button>
-          </div>
-        )}
-
-        {/* Step 2: 나이 + 직업 */}
-        {step === 2 && (
-          <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>나이와 직업을<br/>알려주세요</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 32, lineHeight: 1.7 }}>맞춤 안내를 위해 필요해요</p>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>내 정보를<br/>확인해주세요</h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 32, lineHeight: 1.7 }}>
+              {(testUser.name || testUser.age) ? '테스트에서 받은 정보예요 · 틀린 부분은 수정해주세요' : '맞춤 안내를 위해 필요해요'}
+            </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <div>
+                <label style={labelSt}>이름</label>
+                <input style={inputSt} type="text" placeholder="예) 홍길동"
+                  value={fd.name} onChange={e => setFd({ ...fd, name: e.target.value })}/>
+              </div>
+              <div>
+                <label style={labelSt}>성별</label>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  {[{ val:'여자', emoji:'👩' }, { val:'남자', emoji:'👨' }].map(({ val, emoji }) => {
+                    const on = fd.gender === val
+                    return (
+                      <button key={val} type="button" onClick={() => setFd({ ...fd, gender: val })}
+                        style={{ flex: 1, padding: '15px 0', borderRadius: 14, border: '1.5px solid',
+                          borderColor: on ? LILAC : 'rgba(255,255,255,.12)',
+                          background: on ? 'rgba(192,132,252,.2)' : 'rgba(255,255,255,.07)',
+                          color: on ? LILAC : 'rgba(255,255,255,.45)',
+                          fontFamily: FONT, fontSize: 15.5, fontWeight: 600, cursor: 'pointer' }}>
+                        {emoji} {val}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
               <div>
                 <label style={labelSt}>나이</label>
                 <input style={inputSt} type="number" inputMode="numeric" placeholder="예) 24" min={15} max={50}
@@ -137,6 +157,20 @@ export default function ApplyPage() {
                   value={fd.job} onChange={e => setFd({ ...fd, job: e.target.value })}/>
               </div>
             </div>
+            <button style={btnSt(canNext[1])} disabled={!canNext[1]} onClick={() => canNext[1] && goStep(2)}>다음</button>
+          </div>
+        )}
+
+        {/* Step 2: 연락처 */}
+        {step === 2 && (
+          <div className="fade-in">
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>
+              {fd.name ? `${fd.name}님,` : '연락처를'}<br/>{fd.name ? '연락처를 알려주세요' : '알려주세요'}
+            </h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 32, lineHeight: 1.7 }}>결과와 맞춤 연애 조언을 문자로 바로 보내드려요</p>
+            <label style={labelSt}>연락처</label>
+            <input style={{ ...inputSt, fontSize: 18, letterSpacing: '1.5px' }} type="tel" inputMode="numeric" maxLength={13} placeholder="010-0000-0000"
+              value={fd.phone} onChange={e => setFd({ ...fd, phone: fmtPhone(e.target.value) })}/>
             <button style={btnSt(canNext[2])} disabled={!canNext[2]} onClick={() => canNext[2] && goStep(3)}>다음</button>
           </div>
         )}

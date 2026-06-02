@@ -295,7 +295,7 @@ export default function LandingPage() {
           </Reveal>
           <Reveal>
             <div style={{ position:'sticky', bottom:0 }}>
-              <a href="/apply" onClick={goApply} className="lp-cta">무료 신청하기 →</a>
+              <a href="/apply" onClick={goApply} className="lp-cta">무료 신청하고 연애 유형 1순위 확인하기</a>
               <p className="lp-cta-sub">이번 기수 <b>30명 한정</b> · 신청 후 1영업일 내 연락드려요</p>
             </div>
           </Reveal>

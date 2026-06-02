@@ -7,6 +7,13 @@ import { store, INIT_SCORES } from '../store'
 
 const TOTAL = QUESTIONS.length
 
+const ANALYZE_MSGS = [
+  '답변을 꼼꼼히 살펴보는 중',
+  '9가지 연애 유형과 비교하는 중',
+  '당신의 1순위 유형을 찾는 중',
+  '결과를 정리하고 있어요',
+]
+
 // answers(선택한 보기 인덱스 배열) → 점수 합산 → 1·2·3위
 function computeResult(answers) {
   const scores = { ...INIT_SCORES }
@@ -27,11 +34,21 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState(store.getAnswers())
   const [selected, setSelected] = useState(null)   // 탭 직후 강조용
   const [locked, setLocked] = useState(false)       // 전환 중 중복 입력 방지
+  const [analyzing, setAnalyzing] = useState(false) // 마지막 답변 후 "분석 중" 연출
+  const [phase, setPhase] = useState(0)             // 분석 메시지 단계
 
   useEffect(() => { if (!user) navigate('/') }, [])
 
   // 질문이 바뀌면 이전에 고른 답을 표시(뒤로 왔을 때)
   useEffect(() => { setSelected(answers[qIndex] ?? null); setLocked(false) }, [qIndex])
+
+  // 분석 중 연출: 메시지 순환 후 결과로 이동
+  useEffect(() => {
+    if (!analyzing) return
+    const timers = ANALYZE_MSGS.map((_, i) => setTimeout(() => setPhase(i), i * 850))
+    timers.push(setTimeout(() => navigate('/result'), ANALYZE_MSGS.length * 850 + 650))
+    return () => timers.forEach(clearTimeout)
+  }, [analyzing])
 
   const handleAnswer = (optIdx) => {
     if (locked) return
@@ -51,7 +68,7 @@ export default function QuizPage() {
         const { scores, result } = computeResult(nextAnswers)
         store.setScores(scores)
         store.setResult(result)
-        navigate('/result')
+        setAnalyzing(true)   // 바로 이동하지 않고 분석 중 화면 표시
       }
     }, 280)
   }
@@ -65,6 +82,42 @@ export default function QuizPage() {
 
   const q = QUESTIONS[qIndex]
   const pct = Math.round(((qIndex + 1) / TOTAL) * 100)
+
+  // ── 분석 중 화면 ──
+  if (analyzing) {
+    const totalMs = ANALYZE_MSGS.length * 850 + 650
+    return (
+      <div style={{ background:'#0E0816', minHeight:'100vh', fontFamily:FONT, position:'relative', overflow:'hidden',
+        display:'flex', alignItems:'center', justifyContent:'center', padding:'0 36px' }}>
+        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'140%', height:'45%',
+          background:'radial-gradient(50% 50% at 50% 50%, rgba(155,93,229,.28), transparent 70%)', pointerEvents:'none' }}/>
+
+        <div style={{ position:'relative', zIndex:1, textAlign:'center', width:'100%', maxWidth:340 }}>
+          {/* 회전 링 + 중앙 하트 */}
+          <div style={{ position:'relative', width:100, height:100, margin:'0 auto 34px' }}>
+            <div style={{ position:'absolute', inset:0, borderRadius:'50%',
+              background:'radial-gradient(circle, rgba(155,93,229,.35), transparent 70%)', animation:'azPulse 1.6s ease-in-out infinite' }}/>
+            <div style={{ position:'absolute', inset:6, borderRadius:'50%', border:'3px solid rgba(192,132,252,.18)',
+              borderTopColor:'#C084FC', animation:'azSpin .9s linear infinite' }}/>
+            <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:36 }}>💜</div>
+          </div>
+
+          <h2 style={{ fontSize:22, fontWeight:800, color:'#fff', marginBottom:12 }}>결과를 분석하고 있어요</h2>
+          <p key={phase} className="fade-in" style={{ fontSize:14.5, color:'#C084FC', fontWeight:600, minHeight:22, marginBottom:30 }}>
+            {ANALYZE_MSGS[phase]}
+          </p>
+
+          <div style={{ width:'100%', height:6, background:'rgba(255,255,255,.1)', borderRadius:6, overflow:'hidden' }}>
+            <div style={{ height:'100%', borderRadius:6, background:'linear-gradient(90deg,#9B5DE5,#C084FC)',
+              animation:`azFill ${totalMs}ms ease-out forwards` }}/>
+          </div>
+          <p style={{ fontSize:12, color:'rgba(255,255,255,.3)', marginTop:14 }}>
+            {user?.name ? `${user.name}님의 ` : ''}연애 유형을 찾는 중...
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ background:'#0E0816', minHeight:'100vh', fontFamily:FONT, position:'relative', overflow:'hidden',
