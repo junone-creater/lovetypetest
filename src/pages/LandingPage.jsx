@@ -265,6 +265,21 @@ export default function LandingPage() {
             </Reveal>
           ))}
           <Reveal>
+            <div className="lp-give">
+              <p className="lp-give-tag">✦ 신청하시면 이걸 드려요</p>
+              <ul className="lp-give-list">
+                {[
+                  '애착 유형 심화 분석',
+                  '연애 회피 패턴 체크',
+                  '이상형 vs 실제 끌리는 유형 비교',
+                  '연애 준비도 점수',
+                ].map((t, i) => (
+                  <li key={i}><span className="lp-give-check">✓</span>{t}</li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+          <Reveal>
             <div className="lp-trust">
               {[['9유형','정밀 심리 분석'],['1:1','맞춤 코칭'],['100%','무료 참여']].map(([big,lbl]) => (
                 <div key={big} className="lp-trust-item"><div className="lp-big">{big}</div><div className="lp-lbl">{lbl}</div></div>
