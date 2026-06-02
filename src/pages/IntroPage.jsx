@@ -59,7 +59,7 @@ export default function IntroPage() {
           <div style={{ position:'absolute', top:'9%', left:'3%', width:'37%', textAlign:'center' }}>
             <p style={{ fontSize:'4.4cqw', color:'#F8F0FF', lineHeight:1.5, fontFamily:FONT, fontWeight:700,
               textShadow:'0 1px 6px rgba(0,0,0,.55)', margin:0 }}>
-              나는 연애할 때<br/>어떤 사람일까?
+              너는 연애할 때<br/>어떤 사람일까?
             </p>
           </div>
 

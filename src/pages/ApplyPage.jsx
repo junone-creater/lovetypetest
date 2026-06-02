@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { store } from '../store'
+import { TYPES } from '../constants/types'
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec'
 const FONT = "'Pretendard', -apple-system, sans-serif"
@@ -73,25 +74,62 @@ export default function ApplyPage() {
     letterSpacing: '.06em', textTransform: 'uppercase', marginBottom: 9,
   }
 
-  if (done) return (
-    <div style={{ background: BG, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT }}>
-      <div style={{ textAlign: 'center', padding: '40px 24px' }}>
-        <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg,${PURPLE},${LILAC})`,
-          margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 36, boxShadow: '0 12px 28px rgba(155,93,229,.4)' }}>✓</div>
-        <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 14 }}>신청 완료!</h2>
-        <p style={{ fontSize: 15, color: '#A99BC4', lineHeight: 1.8, marginBottom: 32 }}>
-          입력하신 <b style={{ color: '#EAE3D8' }}>연락처로 담당자가 직접 연락</b>드려요.<br/>
-          보통 <b style={{ color: '#EAE3D8' }}>1영업일 이내</b>에 연락드려요.
-        </p>
-        <button onClick={() => navigate('/')}
-          style={{ padding: '14px 32px', borderRadius: 14, border: 'none', background: 'rgba(255,255,255,.1)',
-            color: 'rgba(255,255,255,.6)', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
-          처음으로 돌아가기
-        </button>
+  if (done) {
+    const result = store.getResult()
+    const firstType = result ? TYPES[result.first] : null
+    const gender = fd.gender || testUser.gender
+    const displayName = fd.name || testUser.name || ''
+    const imgSrc = firstType
+      ? `${import.meta.env.BASE_URL}images/result-${firstType.key}-${gender === '남자' ? 'male' : 'female'}.png`
+      : null
+    return (
+      <div style={{ background: BG, minHeight: '100vh', fontFamily: FONT }}>
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '48px 24px 60px', textAlign: 'center' }}>
+          {/* 완료 체크 */}
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: `linear-gradient(135deg,${PURPLE},${LILAC})`,
+            margin: '0 auto 22px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 34, boxShadow: '0 12px 28px rgba(155,93,229,.4)' }}>✓</div>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 12 }}>신청 완료!</h2>
+          <p style={{ fontSize: 14.5, color: '#A99BC4', lineHeight: 1.8 }}>
+            <b style={{ color: '#EAE3D8' }}>1영업일 이내</b>에 담당자가 연락드려요.
+          </p>
+
+          {/* 잠겨있던 1순위 공개 */}
+          {firstType && (
+            <div className="fade-in" style={{ marginTop: 34, padding: '26px 22px', borderRadius: 20, textAlign: 'left',
+              background: 'linear-gradient(135deg, rgba(155,93,229,.18), rgba(26,17,48,.6))',
+              border: '1px solid rgba(192,132,252,.3)' }}>
+              <div style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: LILAC, letterSpacing: '.04em', marginBottom: 18 }}>
+                🔓 잠겨있던 결과가 공개됐어요
+              </div>
+              <div style={{ textAlign: 'center', fontSize: 13, color: LILAC, fontWeight: 700, letterSpacing: '1px', marginBottom: 4 }}>
+                🥇 {displayName ? `${displayName}님의 ` : ''}1순위 연애 유형
+              </div>
+              <div style={{ textAlign: 'center', fontSize: 26, fontWeight: 900, color: '#fff', marginBottom: 4 }}>{firstType.name}</div>
+              <div style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,.5)', fontStyle: 'italic', marginBottom: 18 }}>"{firstType.tagline}"</div>
+              {imgSrc && (
+                <img src={imgSrc} alt={firstType.name} onError={e => { e.target.style.display = 'none' }}
+                  style={{ display: 'block', width: '100%', maxWidth: 200, borderRadius: 14, margin: '0 auto 20px' }}/>
+              )}
+              <div style={{ padding: '16px 18px', borderRadius: 14, background: 'rgba(0,0,0,.25)', border: '1px solid rgba(192,132,252,.2)' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: LILAC, marginBottom: 8 }}>💡 이 유형이 연애에서 반복하는 핵심 패턴</div>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,.82)', lineHeight: 1.75 }}>{firstType.trap}</p>
+              </div>
+              <p style={{ textAlign: 'center', fontSize: 12.5, color: 'rgba(255,255,255,.45)', lineHeight: 1.7, marginTop: 18 }}>
+                더 깊은 분석은 상담에서 담당자가 자세히 알려드려요 💜
+              </p>
+            </div>
+          )}
+
+          <button onClick={() => navigate('/')}
+            style={{ marginTop: 28, padding: '14px 32px', borderRadius: 14, border: 'none', background: 'rgba(255,255,255,.1)',
+              color: 'rgba(255,255,255,.6)', fontSize: 15, fontWeight: 600, cursor: 'pointer', fontFamily: FONT }}>
+            처음으로 돌아가기
+          </button>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div style={{ background: BG, minHeight: '100vh', fontFamily: FONT }}>

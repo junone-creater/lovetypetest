@@ -225,7 +225,7 @@ export default function ResultPage() {
                   <LockBadge text="🔒 더 알아보기 후 공개" />
                 </div>
               </div>
-              <NavBtn label="심리 분석 신청하기"/><TapHint/>
+              <NavBtn label="더 알아보기"/><TapHint/>
             </div>
           )
         })()}
