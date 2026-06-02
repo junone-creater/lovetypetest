@@ -132,9 +132,9 @@ export default function ApplyPage() {
   }
 
   return (
-    <div style={{ background: BG, minHeight: '100vh', fontFamily: FONT }}>
+    <div style={{ background: BG, height: '100dvh', overflow: 'hidden', fontFamily: FONT, display: 'flex', flexDirection: 'column' }}>
       {/* 헤더 */}
-      <div style={{ padding: '20px 24px 0', display: 'flex', alignItems: 'center', gap: 7 }}>
+      <div style={{ padding: '20px 24px 0', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
         <button onClick={() => navigate(-1)}
           style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 20, cursor: 'pointer', padding: '4px 8px 4px 0' }}>
           ←
@@ -142,9 +142,10 @@ export default function ApplyPage() {
         <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,.5)', letterSpacing: '.5px' }}>무료 신청</span>
       </div>
 
-      <div style={{ padding: '28px 24px 60px', maxWidth: 480, margin: '0 auto' }}>
+      <div style={{ padding: '22px 24px 28px', maxWidth: 480, margin: '0 auto', width: '100%', flex: 1, minHeight: 0,
+        display: 'flex', flexDirection: 'column' }}>
         {/* 진행 표시 */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 36, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 26, alignItems: 'center', flexShrink: 0 }}>
           {Array.from({ length: TOTAL }, (_, i) => (
             <div key={i} style={{ height: 5, borderRadius: 3, transition: 'all .3s',
               background: i + 1 < step ? PURPLE : i + 1 === step ? LILAC : 'rgba(255,255,255,.15)',
@@ -157,10 +158,10 @@ export default function ApplyPage() {
         {step === 1 && (
           <div className="fade-in">
             <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>내 정보를<br/>확인해주세요</h2>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 32, lineHeight: 1.7 }}>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 24, lineHeight: 1.7 }}>
               {(testUser.name || testUser.age) ? '테스트에서 받은 정보예요 · 틀린 부분은 수정해주세요' : '맞춤 안내를 위해 필요해요'}
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <label style={labelSt}>이름</label>
                 <input style={inputSt} type="text" placeholder="예) 홍길동"

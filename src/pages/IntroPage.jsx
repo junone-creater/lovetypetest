@@ -46,12 +46,11 @@ export default function IntroPage() {
   // ── 0단계: 시작 화면 (큰 히어로) ──
   if (step === 0) {
     return (
-      <div className="fade-in" style={{ background:'#0E0816', minHeight:'100vh', display:'flex', flexDirection:'column' }}>
-        {/* 히어로: 원본 비율 그대로 → 말풍선 위치가 모든 화면에서 고정.
-            containerType:inline-size 로 글자 크기를 이미지 너비 기준(cqw)으로 잡아 항상 말풍선에 맞춤 */}
-        <div style={{ position:'relative', width:'100%', containerType:'inline-size', overflow:'hidden' }}>
+      <div className="fade-in" style={{ background:'#0E0816', height:'100dvh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+        {/* 히어로: 남는 공간을 채우되 위(말풍선) 기준으로 크롭 → 한 화면에 고정 */}
+        <div style={{ position:'relative', width:'100%', flex:1, minHeight:0, containerType:'inline-size', overflow:'hidden' }}>
           <img src={`${import.meta.env.BASE_URL}images/intro-hero.png`} alt=""
-            style={{ width:'100%', height:'auto', display:'block' }}/>
+            style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top', display:'block' }}/>
           <div style={{ position:'absolute', inset:0,
             background:'linear-gradient(to bottom, rgba(14,8,22,.15) 0%, rgba(14,8,22,0) 45%, rgba(14,8,22,.85) 82%, #0E0816 100%)' }}/>
 
@@ -78,11 +77,10 @@ export default function IntroPage() {
           </div>
         </div>
 
-        <div style={{ flex:1, display:'flex', flexDirection:'column', padding:'20px 22px 36px' }}>
-          <p style={{ fontSize:14, color:'rgba(255,255,255,.5)', lineHeight:1.6, marginBottom:24, fontFamily:FONT }}>
+        <div style={{ flexShrink:0, padding:'16px 22px 26px' }}>
+          <p style={{ fontSize:14, color:'rgba(255,255,255,.5)', lineHeight:1.6, marginBottom:18, fontFamily:FONT }}>
             12가지 질문으로 알아보는 내 연애 유형.<br/>결과는 바로 확인할 수 있어요.
           </p>
-          <div style={{ flex:1, minHeight:8 }}/>
           <button onClick={next} style={ctaStyle(true)}>테스트 시작하기</button>
           <p style={{ textAlign:'center', fontSize:11, color:'rgba(255,255,255,.2)', marginTop:14, fontFamily:FONT }}>
             🔒 입력하신 정보는 결과 안내 목적으로만 사용돼요
@@ -105,7 +103,7 @@ export default function IntroPage() {
   }[step]
 
   return (
-    <div className="fade-in" style={{ background:'#0E0816', minHeight:'100vh', display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
+    <div className="fade-in" style={{ background:'#0E0816', height:'100dvh', display:'flex', flexDirection:'column', position:'relative', overflow:'hidden' }}>
       {/* 은은한 보라 배경광 */}
       <div style={{ position:'absolute', top:'-15%', left:'50%', transform:'translateX(-50%)', width:'120%', height:'55%',
         background:'radial-gradient(60% 60% at 50% 40%, rgba(155,93,229,.22), transparent 70%)', pointerEvents:'none' }}/>

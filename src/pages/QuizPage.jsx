@@ -87,7 +87,7 @@ export default function QuizPage() {
   if (analyzing) {
     const totalMs = ANALYZE_MSGS.length * 850 + 650
     return (
-      <div style={{ background:'#0E0816', minHeight:'100vh', fontFamily:FONT, position:'relative', overflow:'hidden',
+      <div style={{ background:'#0E0816', height:'100dvh', fontFamily:FONT, position:'relative', overflow:'hidden',
         display:'flex', alignItems:'center', justifyContent:'center', padding:'0 36px' }}>
         <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'140%', height:'45%',
           background:'radial-gradient(50% 50% at 50% 50%, rgba(155,93,229,.28), transparent 70%)', pointerEvents:'none' }}/>
@@ -120,7 +120,7 @@ export default function QuizPage() {
   }
 
   return (
-    <div style={{ background:'#0E0816', minHeight:'100vh', fontFamily:FONT, position:'relative', overflow:'hidden',
+    <div style={{ background:'#0E0816', height:'100dvh', fontFamily:FONT, position:'relative', overflow:'hidden',
       display:'flex', flexDirection:'column' }}>
       {/* 은은한 보라 배경광 — 인트로와 톤 통일 */}
       <div style={{ position:'absolute', top:'-12%', left:'50%', transform:'translateX(-50%)', width:'120%', height:'45%',
