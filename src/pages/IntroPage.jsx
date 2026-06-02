@@ -30,6 +30,7 @@ export default function IntroPage() {
   const onStart = () => {
     store.setUser(user)
     store.setScores({ ...INIT_SCORES })
+    store.setAnswers([])
     store.setQIndex(0)
     navigate('/quiz')
   }
@@ -100,7 +101,7 @@ export default function IntroPage() {
   const stepBtn = {
     1: { label:'다음', active:canNext[1], onClick:() => canNext[1] && next() },
     2: { label:'다음', active:canNext[2], onClick:() => canNext[2] && next() },
-    3: { label:'결과 보러 가기', active:canNext[3], onClick:() => canNext[3] && onStart() },
+    3: { label:'다음', active:canNext[3], onClick:() => canNext[3] && onStart() },
   }[step]
 
   return (

@@ -23,6 +23,13 @@ export default function ResultPage() {
   const c = first.color
   const imgSrc = (key) => `${import.meta.env.BASE_URL}images/result-${key}-${user.gender === '남자' ? 'male' : 'female'}.png`
   const next = () => setSlide(s => s + 1)
+  const prev = () => { if (slide > 0) setSlide(s => s - 1) }  // 첫 화면(0)에선 뒤로 안 됨
+  // 화면 왼쪽 절반 탭 → 뒤로, 오른쪽 절반 → 다음 (버튼 클릭은 제외)
+  const handleTap = (e) => {
+    if (e.target.closest('button')) return
+    if (e.clientX < window.innerWidth * 0.5) prev()
+    else next()
+  }
 
   const splitDesc = (desc) => desc.split(/\. /).map((s, i, arr) =>
     i < arr.length - 1 ? s + '.' : s).filter(s => s.length > 3)
@@ -56,7 +63,9 @@ export default function ResultPage() {
 
   const TapHint = () => (
     <div style={{ textAlign:'center', fontSize:11, color:'rgba(255,255,255,.18)', marginTop:16,
-      letterSpacing:'1px', pointerEvents:'none' }}>화면을 톡 누르면 넘어가요</div>
+      letterSpacing:'1px', pointerEvents:'none' }}>
+      {slide === 0 ? '오른쪽을 누르면 다음으로 →' : '← 왼쪽 뒤로 · 오른쪽 다음 →'}
+    </div>
   )
 
   const LockBadge = ({ text }) => (
@@ -67,8 +76,16 @@ export default function ResultPage() {
   return (
     <div style={{ background:c.bg, minHeight:'100vh', display:'flex', flexDirection:'column' }}>
       {/* 헤더 */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 22px 0' }}>
-        <div style={{ fontSize:11, color:'rgba(255,255,255,.35)', letterSpacing:'1.5px', fontWeight:600 }}>연애 유형 결과</div>
+      <div style={{ display:'flex', alignItems:'center', gap:12, padding:'18px 22px 0' }}>
+        {slide > 0 ? (
+          <button onClick={(e) => { e.stopPropagation(); prev() }} aria-label="이전"
+            style={{ width:34, height:34, borderRadius:'50%', flexShrink:0, border:'1px solid rgba(255,255,255,.18)',
+              background:'rgba(0,0,0,.25)', color:'rgba(255,255,255,.85)', fontSize:18, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', fontFamily:FONT }}>←</button>
+        ) : (
+          <div style={{ width:34, height:34, flexShrink:0 }}/>
+        )}
+        <div style={{ flex:1, fontSize:11, color:'rgba(255,255,255,.35)', letterSpacing:'1.5px', fontWeight:600 }}>연애 유형 결과</div>
         <div style={{ fontSize:13, fontWeight:700, color:c.accent }}>{slide + 1} / {TOTAL}</div>
       </div>
 
@@ -86,7 +103,7 @@ export default function ResultPage() {
 
         {/* ── 슬라이드 0: 순위 공개 ── */}
         {slide === 0 && (
-          <div onClick={next} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', cursor:'pointer' }}>
+          <div onClick={handleTap} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', cursor:'pointer' }}>
             <div style={{ fontSize:17, fontWeight:700, color:'#fff', marginBottom:6 }}>{user.name}님의 연애 유형 순위</div>
             <div style={{ fontSize:13, color:'rgba(255,255,255,.35)', marginBottom:28 }}>3가지 유형이 함께 나왔어요</div>
             <div style={{ display:'flex', flexDirection:'column', gap:12, marginBottom:36 }}>
@@ -102,7 +119,7 @@ export default function ResultPage() {
                   </div>
                 </div>
                 <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <LockBadge text="🔒 더알아보기로 공개돼요" />
+                  <LockBadge text="🔒 더 알아보기로 공개돼요" />
                 </div>
               </div>
               {/* 2위 */}
@@ -138,7 +155,7 @@ export default function ResultPage() {
         {slide === 1 && (() => {
           const ss = splitDesc(third.desc); const h = Math.ceil(ss.length / 2)
           return (
-            <div onClick={next} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', overflowY:'auto', WebkitOverflowScrolling:'touch', cursor:'pointer' }}>
+            <div onClick={handleTap} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', overflowY:'auto', WebkitOverflowScrolling:'touch', cursor:'pointer' }}>
               <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
                 <span style={{ fontSize:22 }}>🥉</span>
                 <div style={{ fontSize:17, fontWeight:700, color:'#fff' }}>{third.name}</div>
@@ -161,7 +178,7 @@ export default function ResultPage() {
         {slide === 2 && (() => {
           const ss = splitDesc(second.desc); const h = Math.ceil(ss.length / 2)
           return (
-            <div onClick={next} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', overflowY:'auto', WebkitOverflowScrolling:'touch', cursor:'pointer' }}>
+            <div onClick={handleTap} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', overflowY:'auto', WebkitOverflowScrolling:'touch', cursor:'pointer' }}>
               <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
                 <span style={{ fontSize:22 }}>🥈</span>
                 <div style={{ fontSize:17, fontWeight:700, color:'#fff' }}>{second.name}</div>
@@ -184,7 +201,7 @@ export default function ResultPage() {
         {slide === 3 && (() => {
           const ss = splitDesc(first.desc)
           return (
-            <div onClick={next} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', overflowY:'auto', WebkitOverflowScrolling:'touch', cursor:'pointer' }}>
+            <div onClick={handleTap} style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', overflowY:'auto', WebkitOverflowScrolling:'touch', cursor:'pointer' }}>
               <div style={{ fontSize:13, color:c.accent, fontWeight:700, letterSpacing:'1.5px', marginBottom:10 }}>🥇 {user.name}님의 1위 유형</div>
               <div style={{ fontSize:28, fontWeight:900, color:'#fff', lineHeight:1.25, marginBottom:4 }}>{first.name}</div>
               <div style={{ fontSize:13, color:'rgba(255,255,255,.5)', fontStyle:'italic', marginBottom:20 }}>"{first.tagline}"</div>
@@ -205,7 +222,7 @@ export default function ResultPage() {
                   <p style={{ fontSize:14, color:'rgba(255,255,255,.8)', lineHeight:1.75, marginBottom:8 }}>{first.trap}</p>
                 </div>
                 <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <LockBadge text="🔒 더알아보기 후 공개" />
+                  <LockBadge text="🔒 더 알아보기 후 공개" />
                 </div>
               </div>
               <NavBtn label="심리 분석 신청하기"/><TapHint/>
@@ -237,7 +254,7 @@ export default function ResultPage() {
                     ))}
                   </div>
                   <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <LockBadge text="🔒 더알아보기 후 공개돼요" />
+                    <LockBadge text="🔒 더 알아보기 후 공개돼요" />
                   </div>
                 </div>
               </div>
@@ -253,7 +270,7 @@ export default function ResultPage() {
 
               <button onClick={onApply}
                 style={{ width:'100%', background:c.chip, color:'#fff', border:'none', borderRadius:14, padding:'15px', fontSize:17, fontWeight:700, cursor:'pointer', fontFamily:FONT, boxShadow:'none', marginBottom:12 }}>
-                정확한 심리 분석 더알아보기
+                정확한 심리 분석 더 알아보기
               </button>
               <button onClick={handleShare}
                 style={{ width:'100%', padding:'14px', borderRadius:14, border:`1.5px solid ${c.accent}55`, background:'transparent', color:'rgba(255,255,255,.7)', fontSize:15, fontWeight:600, cursor:'pointer', fontFamily:FONT }}>

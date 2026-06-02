@@ -7,9 +7,16 @@ import { store, INIT_SCORES } from '../store'
 
 const TOTAL = QUESTIONS.length
 
-function computeResult(scores) {
+// answers(선택한 보기 인덱스 배열) → 점수 합산 → 1·2·3위
+function computeResult(answers) {
+  const scores = { ...INIT_SCORES }
+  answers.forEach((optIdx, qi) => {
+    if (optIdx == null) return
+    const key = QUESTIONS[qi].options[optIdx].score
+    scores[key] += 1
+  })
   const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]).map(([k]) => k)
-  return { first: sorted[0], second: sorted[1], third: sorted[2] }
+  return { scores, result: { first: sorted[0], second: sorted[1], third: sorted[2] } }
 }
 
 export default function QuizPage() {
@@ -17,60 +24,102 @@ export default function QuizPage() {
   const user = store.getUser()
 
   const [qIndex, setQIndex] = useState(store.getQIndex())
-  const [scores, setScores] = useState(store.getScores())
+  const [answers, setAnswers] = useState(store.getAnswers())
+  const [selected, setSelected] = useState(null)   // 탭 직후 강조용
+  const [locked, setLocked] = useState(false)       // 전환 중 중복 입력 방지
 
   useEffect(() => { if (!user) navigate('/') }, [])
 
-  const handleAnswer = (scoreKey) => {
-    const next = { ...scores, [scoreKey]: scores[scoreKey] + 1 }
-    setScores(next)
-    store.setScores(next)
-    if (qIndex + 1 < TOTAL) {
-      const ni = qIndex + 1
-      setQIndex(ni)
-      store.setQIndex(ni)
-    } else {
-      store.setResult(computeResult(next))
-      navigate('/result')
-    }
+  // 질문이 바뀌면 이전에 고른 답을 표시(뒤로 왔을 때)
+  useEffect(() => { setSelected(answers[qIndex] ?? null); setLocked(false) }, [qIndex])
+
+  const handleAnswer = (optIdx) => {
+    if (locked) return
+    setLocked(true)
+    setSelected(optIdx)
+    const nextAnswers = [...answers]
+    nextAnswers[qIndex] = optIdx
+    setAnswers(nextAnswers)
+    store.setAnswers(nextAnswers)
+
+    setTimeout(() => {
+      if (qIndex + 1 < TOTAL) {
+        const ni = qIndex + 1
+        setQIndex(ni)
+        store.setQIndex(ni)
+      } else {
+        const { scores, result } = computeResult(nextAnswers)
+        store.setScores(scores)
+        store.setResult(result)
+        navigate('/result')
+      }
+    }, 280)
+  }
+
+  const goBack = () => {
+    if (qIndex === 0) { navigate('/'); return }
+    const pi = qIndex - 1
+    setQIndex(pi)
+    store.setQIndex(pi)
   }
 
   const q = QUESTIONS[qIndex]
-  const pct = Math.round((qIndex / TOTAL) * 100)
+  const pct = Math.round(((qIndex + 1) / TOTAL) * 100)
 
   return (
-    <div key={qIndex} className="fade-in"
-      style={{ padding:'26px 22px 30px', background:'#0E0816', minHeight:'100vh', fontFamily:FONT }}>
-      {/* 진행 바 */}
-      <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-        <span style={{ fontSize:14, fontWeight:700, color:'#C084FC', whiteSpace:'nowrap' }}>
-          Q{qIndex + 1} <span style={{ color:'#EAE3D8' }}>/ {TOTAL}</span>
-        </span>
-        <div style={{ flex:1, height:5, background:'rgba(255,255,255,.1)', borderRadius:6, overflow:'hidden' }}>
-          <div style={{ height:'100%', background:'linear-gradient(90deg,#9B5DE5,#C084FC)',
-            borderRadius:6, transition:'width .4s ease', width:`${pct + 100/TOTAL}%` }}/>
+    <div style={{ background:'#0E0816', minHeight:'100vh', fontFamily:FONT, position:'relative', overflow:'hidden',
+      display:'flex', flexDirection:'column' }}>
+      {/* 은은한 보라 배경광 — 인트로와 톤 통일 */}
+      <div style={{ position:'absolute', top:'-12%', left:'50%', transform:'translateX(-50%)', width:'120%', height:'45%',
+        background:'radial-gradient(60% 60% at 50% 40%, rgba(155,93,229,.20), transparent 70%)', pointerEvents:'none' }}/>
+
+      {/* 상단 바: 뒤로 + 진행 바 (고정) */}
+      <div style={{ position:'relative', zIndex:1, padding:'22px 22px 0' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <button onClick={goBack} aria-label="이전"
+            style={{ width:34, height:34, borderRadius:'50%', flexShrink:0, border:'1px solid rgba(255,255,255,.12)',
+              background:'rgba(255,255,255,.06)', color:'rgba(255,255,255,.7)', fontSize:18, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', fontFamily:FONT }}>←</button>
+          <div style={{ flex:1, height:6, background:'rgba(255,255,255,.1)', borderRadius:6, overflow:'hidden' }}>
+            <div style={{ height:'100%', background:'linear-gradient(90deg,#9B5DE5,#C084FC)',
+              borderRadius:6, transition:'width .4s ease', width:`${pct}%` }}/>
+          </div>
+          <span style={{ fontSize:13, fontWeight:700, color:'#C084FC', whiteSpace:'nowrap' }}>
+            {qIndex + 1}<span style={{ color:'rgba(255,255,255,.4)' }}> / {TOTAL}</span>
+          </span>
         </div>
       </div>
 
-      <div style={{ height:28 }}/>
-      <h2 style={{ fontSize:20, fontWeight:700, color:'#F3E8FF', lineHeight:1.5, margin:0 }}>{q.q}</h2>
-      <div style={{ height:20 }}/>
+      {/* 질문 + 보기 (헤더 아래 공간 중앙 정렬, 질문마다 페이드인) */}
+      <div key={qIndex} className="fade-in"
+        style={{ position:'relative', zIndex:1, flex:1, display:'flex', flexDirection:'column', justifyContent:'center', padding:'0 22px 48px' }}>
+        <h2 style={{ fontSize:21, fontWeight:700, color:'#F3E8FF', lineHeight:1.55, margin:'0 0 24px' }}>{q.q}</h2>
 
-      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-        {q.options.map((op, i) => (
-          <button key={i} onClick={() => handleAnswer(op.score)} className="option-btn"
-            style={{ display:'flex', alignItems:'center', gap:12, width:'100%', textAlign:'left',
-              padding:'15px 16px', fontSize:14.5, color:'rgba(255,255,255,.85)',
-              background:'rgba(255,255,255,.06)', border:'1.5px solid rgba(255,255,255,.1)',
-              borderRadius:14, cursor:'pointer', fontFamily:FONT, fontWeight:500 }}>
-            <span style={{ width:26, height:26, borderRadius:8, background:'rgba(192,132,252,.15)',
-              border:'1px solid rgba(192,132,252,.3)', display:'flex', alignItems:'center',
-              justifyContent:'center', fontSize:12, fontWeight:700, color:'#C084FC', flexShrink:0 }}>
-              {String.fromCharCode(65 + i)}
-            </span>
-            <span>{op.label}</span>
-          </button>
-        ))}
+        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            {q.options.map((op, i) => {
+              const on = selected === i
+              return (
+                <button key={i} onClick={() => handleAnswer(i)} className="option-btn" disabled={locked}
+                  style={{ display:'flex', alignItems:'center', gap:13, width:'100%', textAlign:'left',
+                    padding:'16px 16px', fontSize:14.5,
+                    color: on ? '#fff' : 'rgba(255,255,255,.85)',
+                    background: on ? 'rgba(155,93,229,.22)' : 'rgba(255,255,255,.06)',
+                    border:`1.5px solid ${on ? '#C084FC' : 'rgba(255,255,255,.1)'}`,
+                    borderRadius:14, cursor: locked ? 'default' : 'pointer', fontFamily:FONT, fontWeight:500,
+                    boxShadow: on ? '0 6px 20px rgba(155,93,229,.3)' : 'none',
+                    transition:'background .2s, border-color .2s, box-shadow .2s' }}>
+                  <span style={{ width:26, height:26, borderRadius:8, flexShrink:0,
+                    background: on ? 'linear-gradient(135deg,#9B5DE5,#C084FC)' : 'rgba(192,132,252,.15)',
+                    border:`1px solid ${on ? 'transparent' : 'rgba(192,132,252,.3)'}`,
+                    display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700,
+                    color: on ? '#fff' : '#C084FC', transition:'all .2s' }}>
+                    {on ? '✓' : String.fromCharCode(65 + i)}
+                  </span>
+                  <span>{op.label}</span>
+                </button>
+              )
+            })}
+        </div>
       </div>
     </div>
   )
