@@ -15,3 +15,4 @@ input:focus, textarea:focus { outline: none; }
 @keyframes azSpin { to { transform: rotate(360deg); } }
 @keyframes azFill { from { width: 4%; } to { width: 100%; } }
 @keyframes azPulse { 0%,100% { transform: scale(1); opacity: .55; } 50% { transform: scale(1.18); opacity: .95; } }
+@keyframes azPop { 0% { transform: scale(0); opacity: 0; } 60% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); } }

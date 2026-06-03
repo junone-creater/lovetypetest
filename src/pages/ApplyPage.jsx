@@ -5,7 +5,7 @@ import { TYPES } from '../constants/types'
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec'
 const FONT = "'Pretendard', -apple-system, sans-serif"
-const TOTAL = 5
+const TOTAL = 6
 const BG = '#0E0816'
 const PURPLE = '#9B5DE5'
 const LILAC = '#C084FC'
@@ -31,7 +31,7 @@ export default function ApplyPage() {
   // 테스트에서 받은 이름·성별·나이를 미리 채워둠 (모두 수정 가능, 그대로 제출됨)
   const [fd, setFd] = useState({
     name: urlName, gender: urlGender, phone:'',
-    age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'',
+    age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'', source:'',
   })
 
   const canNext = {
@@ -40,9 +40,12 @@ export default function ApplyPage() {
     3: fd.location.trim().length >= 2,
     4: fd.calltime !== '',
     5: fd.concern.trim().length >= 5,
+    6: fd.source !== '',
   }
 
   const goStep = (n) => { setStep(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  // 뒤로가기: 1단계보다 뒤면 이전 단계로, 1단계에서만 이전 페이지(랜딩)로
+  const goBack = () => { if (step > 1) goStep(step - 1); else navigate(-1) }
 
   const submit = () => {
     const data = { type: urlType, ...fd }
@@ -135,7 +138,7 @@ export default function ApplyPage() {
     <div style={{ background: BG, height: '100dvh', overflow: 'hidden', fontFamily: FONT, display: 'flex', flexDirection: 'column' }}>
       {/* 헤더 */}
       <div style={{ padding: '20px 24px 0', display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
-        <button onClick={() => navigate(-1)}
+        <button onClick={goBack}
           style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 20, cursor: 'pointer', padding: '4px 8px 4px 0' }}>
           ←
         </button>
@@ -263,7 +266,39 @@ export default function ApplyPage() {
             <textarea style={{ ...inputSt, minHeight: 150, resize: 'none', lineHeight: 1.75 }}
               placeholder="상담하시고 싶은 내용을 입력하세요"
               value={fd.concern} onChange={e => setFd({ ...fd, concern: e.target.value })}/>
-            <button style={btnSt(canNext[5])} disabled={!canNext[5]} onClick={() => canNext[5] && submit()}>신청 완료</button>
+            <button style={btnSt(canNext[5])} disabled={!canNext[5]} onClick={() => canNext[5] && goStep(6)}>다음</button>
+          </div>
+        )}
+
+        {/* Step 6: 유입 경로 */}
+        {step === 6 && (
+          <div className="fade-in">
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>마지막이에요!<br/>어떻게 알고 오셨어요?</h2>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 28, lineHeight: 1.7 }}>더 좋은 안내를 위해 살짝 여쭤봐요</p>
+            {[
+              { val: '카카오톡', emoji: '💬' },
+              { val: '친구/지인', emoji: '👥' },
+              { val: '인스타', emoji: '📷' },
+              { val: '블로그', emoji: '📝' },
+            ].map(({ val, emoji }) => {
+              const sel = fd.source === val
+              return (
+                <div key={val} onClick={() => setFd({ ...fd, source: val })}
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', marginBottom: 10,
+                    background: sel ? 'rgba(155,93,229,.18)' : 'rgba(255,255,255,.06)',
+                    border: `1.5px solid ${sel ? LILAC : 'rgba(255,255,255,.1)'}`,
+                    borderRadius: 14, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                    border: `2px solid ${sel ? LILAC : 'rgba(255,255,255,.3)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {sel && <div style={{ width: 10, height: 10, borderRadius: '50%', background: LILAC }}/>}
+                  </div>
+                  <span style={{ fontSize: 16 }}>{emoji}</span>
+                  <span style={{ fontSize: 15.5, color: sel ? '#fff' : '#EAE3D8', fontWeight: sel ? 600 : 500 }}>{val}</span>
+                </div>
+              )
+            })}
+            <button style={btnSt(canNext[6])} disabled={!canNext[6]} onClick={() => canNext[6] && submit()}>신청 완료</button>
             <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,.2)', marginTop: 14 }}>
               입력하신 정보는 결과 안내 외 사용되지 않아요
             </p>
