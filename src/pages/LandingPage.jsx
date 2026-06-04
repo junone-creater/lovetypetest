@@ -17,7 +17,7 @@ function getDDay() {
 // ── 신청자 수 카운터 설정 ──────────────────────────
 const COUNT_FROM_SHEET = true     // Apps Script에서 실제 누적 신청수 받아오기 (doGet에 action===count 분기 추가 필요)
 const APPLICANT_BASE   = 893      // 실제 누적 수에 더해 보여줄 값 (표출 = 실제 + 893)
-const APPLICANT_FALLBACK = 893    // 실제 수를 못 받아왔을 때 보여줄 값
+const COUNT_CACHE_KEY  = 'lp_applicant_count'  // 마지막으로 받아온 실제 count 캐시 (재방문 시 즉시 표시)
 
 function useReveal() {
   const ref = useRef(null)
@@ -48,15 +48,25 @@ export default function LandingPage() {
   const urlGender = decodeURIComponent(params.get('gender') || '')
   const urlType   = decodeURIComponent(params.get('type')   || '')
 
-  // 누적 신청수 (Apps Script에서 실제값 + 가산치, 실패 시 폴백값)
-  const [applicants, setApplicants] = useState(APPLICANT_FALLBACK)
+  // 누적 신청수: 시트에서 실제값을 받기 전엔 null(숨김).
+  // 재방문 시엔 캐시된 직전 값으로 즉시 표시해 깜빡임/지연 방지.
+  const [applicants, setApplicants] = useState(() => {
+    try {
+      const c = Number(localStorage.getItem(COUNT_CACHE_KEY))
+      if (Number.isFinite(c) && c > 0) return c + APPLICANT_BASE
+    } catch {}
+    return null
+  })
   useEffect(() => {
     if (!COUNT_FROM_SHEET) return
     const cb = '__lpCount_' + Math.floor(Math.random() * 1e6)
     let s
     const cleanup = () => { try { delete window[cb] } catch {} ; try { s && s.remove() } catch {} }
     window[cb] = (data) => {
-      if (data && typeof data.count === 'number') setApplicants(data.count + APPLICANT_BASE)
+      if (data && typeof data.count === 'number') {
+        try { localStorage.setItem(COUNT_CACHE_KEY, String(data.count)) } catch {}
+        setApplicants(data.count + APPLICANT_BASE)
+      }
       cleanup()
     }
     s = document.createElement('script')
@@ -66,6 +76,24 @@ export default function LandingPage() {
     const t = setTimeout(cleanup, 8000)
     return () => { clearTimeout(t); cleanup() }
   }, [])
+
+  // 값이 정해지면 숫자가 부드럽게 올라가는 카운트업 (실시간 집계 느낌)
+  const [display, setDisplay] = useState(applicants)
+  useEffect(() => {
+    if (applicants == null) { setDisplay(null); return }
+    const from = display == null ? Math.max(APPLICANT_BASE, applicants - 60) : display
+    if (from === applicants) { setDisplay(applicants); return }
+    let raf, t0
+    const tick = (now) => {
+      if (t0 == null) t0 = now
+      const p = Math.min(1, (now - t0) / 900)
+      const eased = 1 - Math.pow(1 - p, 3)  // easeOutCubic
+      setDisplay(Math.round(from + (applicants - from) * eased))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [applicants])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const goApply = (e) => {
     e.preventDefault()
@@ -90,7 +118,9 @@ export default function LandingPage() {
       <section className="lp-hero">
         <div className="lp-wrap">
           <span className="lp-badge"><span className="lp-dot"/>이음나루 인지심리연구소 · 20대 무료 프로그램</span>
-          <div className="lp-live"><span className="lp-live-dot"/>지금까지 <b>{applicants.toLocaleString()}명</b>이 무료 프로그램을 신청했어요</div>
+          {display != null && (
+            <div className="lp-live"><span className="lp-live-dot"/>지금까지 <b>{display.toLocaleString()}명</b>이 무료 프로그램을 신청했어요</div>
+          )}
           <h1 className="lp-h1">
             <span className="lp-line lp-l1">연애만 하면 작아지던 내가,</span>{' '}
             <span className="lp-line lp-l2"><span className="lp-em">편해진</span> 이유</span>
