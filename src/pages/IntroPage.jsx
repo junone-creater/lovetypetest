@@ -58,7 +58,7 @@ export default function IntroPage() {
           <div style={{ position:'absolute', top:'9%', left:'3%', width:'37%', textAlign:'center' }}>
             <p style={{ fontSize:'4.4cqw', color:'#F8F0FF', lineHeight:1.5, fontFamily:FONT, fontWeight:700,
               textShadow:'0 1px 6px rgba(0,0,0,.55)', margin:0 }}>
-              너는 연애할 때<br/>어떤 사람일까?
+              너는 연애할 때 어떤 사람일까?
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export default function IntroPage() {
           </div>
           <div style={{ position:'absolute', bottom:16, left:20, right:20 }}>
             <div style={{ fontSize:11, fontWeight:700, color:'#C084FC', letterSpacing:'2px', fontFamily:FONT, marginBottom:6 }}>연애 심리 테스트</div>
-            <h1 style={{ fontSize:26, fontWeight:800, color:'#fff', lineHeight:1.3, fontFamily:FONT }}>나의 연애 유형<br/>알아보기</h1>
+            <h1 style={{ fontSize:26, fontWeight:800, color:'#fff', lineHeight:1.3, fontFamily:FONT }}>나의 연애 유형 알아보기</h1>
           </div>
         </div>
 

@@ -15,6 +15,7 @@ export default function ResultPage() {
   const user = store.getUser()
 
   useEffect(() => { if (!resultKeys || !user) navigate('/') }, [])
+  useEffect(() => { window.scrollTo(0, 0) }, [slide])  // 슬라이드 넘길 때마다 맨 위로
   if (!resultKeys || !user) return null
 
   const first  = TYPES[resultKeys.first]
@@ -48,7 +49,7 @@ export default function ResultPage() {
   }
 
   const onApply = () => {
-    navigate(`/landing?type=${encodeURIComponent(first.name)}&name=${encodeURIComponent(user.name)}`)
+    navigate(`/landing?type=${encodeURIComponent(first.name)}&name=${encodeURIComponent(user.name)}&gender=${encodeURIComponent(user.gender)}`)
   }
 
   const NavBtn = ({ label }) => (
@@ -214,7 +215,7 @@ export default function ResultPage() {
               </div>
               <p style={{ fontSize:16, fontWeight:600, color:'#fff', lineHeight:1.7, marginBottom:16 }}>이 유형, 그냥 알고 끝내기엔 아까워요.</p>
               <p style={{ fontSize:14.5, color:'rgba(255,255,255,.6)', lineHeight:1.8, marginBottom:20 }}>
-                이 유형의 사람들이 연애에서 가장 많이 놓치는 게 뭔지 — 정확한 심리 분석으로 확인해보세요.
+                이 유형의 사람들이 연애에서 가장 많이 놓치는 게 뭔지,<br/>정확한 심리 분석으로 확인해보세요.
               </p>
               <div style={{ position:'relative', borderRadius:14, overflow:'hidden', marginBottom:28 }}>
                 <div style={{ padding:'18px 20px', background:'rgba(255,255,255,.07)', filter:'blur(5px)', userSelect:'none' }}>
@@ -236,9 +237,9 @@ export default function ResultPage() {
             <img src={imgSrc(first.key)} alt="" style={{ position:'absolute', right:-30, bottom:0, width:'65%', maxWidth:260, opacity:0.13, filter:'grayscale(30%)', pointerEvents:'none', zIndex:0 }} onError={e => { e.target.style.display='none' }}/>
             <div style={{ flex:1, padding:'28px 24px 40px', display:'flex', flexDirection:'column', position:'relative', zIndex:1 }}>
               <div style={{ marginBottom:26 }}>
-                <div style={{ fontSize:24, fontWeight:800, color:'#fff', lineHeight:1.45, marginBottom:12 }}>나를 제대로<br/>알아볼 시간이에요</div>
+                <div style={{ fontSize:24, fontWeight:800, color:'#fff', lineHeight:1.45, marginBottom:12 }}>나를 제대로 알아볼 시간이에요</div>
                 <div style={{ fontSize:14.5, color:'rgba(255,255,255,.5)', lineHeight:1.8 }}>
-                  유형을 아는 것보다,<br/><span style={{ color:c.accent, fontWeight:600 }}>어떻게 써야 하는지</span>가 중요하거든요
+                  유형을 아는 것보다,{' '}<span style={{ color:c.accent, fontWeight:600 }}>어떻게 써야 하는지</span>가 중요하거든요
                 </div>
               </div>
 
@@ -264,7 +265,7 @@ export default function ResultPage() {
                 <div style={{ fontSize:12, fontWeight:700, color:c.accent, letterSpacing:'1.5px', marginBottom:6 }}>이음나루 · 3코어 매직</div>
                 <div style={{ fontSize:14.5, fontWeight:700, color:'#fff', lineHeight:1.5, marginBottom:6 }}>나를 알면, 연애가 달라져요</div>
                 <p style={{ fontSize:13, color:'rgba(255,255,255,.6)', lineHeight:1.8, margin:0 }}>
-                  내 유형의 핵심을 꿰뚫는 <span style={{ color:c.accent, fontWeight:600 }}>3가지 코어</span>를 알면 — 왜 이 패턴이 반복됐는지, 어떻게 바꿀 수 있는지가 보여요.
+                  내 유형의 핵심을 꿰뚫는 <span style={{ color:c.accent, fontWeight:600 }}>3가지 코어</span>를 알면<br/>왜 이 패턴이 반복됐는지,<br/>어떻게 바꿀 수 있는지가 보여요.
                 </p>
               </div>
 

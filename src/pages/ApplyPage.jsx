@@ -28,14 +28,16 @@ export default function ApplyPage() {
 
   const [step, setStep] = useState(1)
   const [done, setDone] = useState(false)
+  const [jobEtc, setJobEtc] = useState(false)   // 직업 '기타' 직접 입력 모드
   // 테스트에서 받은 이름·성별·나이를 미리 채워둠 (모두 수정 가능, 그대로 제출됨)
   const [fd, setFd] = useState({
     name: urlName, gender: urlGender, phone:'',
     age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'', source:'',
   })
 
+  const ageOk = Number(fd.age) >= 15 && Number(fd.age) <= 50
   const canNext = {
-    1: fd.name.trim() && fd.gender && fd.age.trim() && fd.job.trim(),
+    1: fd.name.trim() && fd.gender && ageOk && fd.job.trim(),
     2: fd.phone.replace(/[^0-9]/g, '').length >= 10,
     3: fd.location.trim().length >= 2,
     4: fd.calltime !== '',
@@ -49,13 +51,8 @@ export default function ApplyPage() {
 
   const submit = () => {
     const data = { type: urlType, ...fd }
+    // POST 한 번만 전송 (GET/JSONP 동시 전송 시 시트에 행이 2개씩 들어가 제거함)
     try { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(data) }).catch(() => {}) } catch {}
-    try {
-      const s = document.createElement('script')
-      s.src = SHEET_URL + '?' + new URLSearchParams(data).toString()
-      document.head.appendChild(s)
-      setTimeout(() => { try { s.parentNode?.removeChild(s) } catch {} }, 8000)
-    } catch {}
     setDone(true)
   }
 
@@ -160,7 +157,7 @@ export default function ApplyPage() {
         {/* Step 1: 내 정보 확인/수정 (이름·성별·나이·직업) */}
         {step === 1 && (
           <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>내 정보를<br/>확인해주세요</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>내 정보를 확인해주세요</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 24, lineHeight: 1.7 }}>
               {(testUser.name || testUser.age) ? '테스트에서 받은 정보예요 · 틀린 부분은 수정해주세요' : '맞춤 안내를 위해 필요해요'}
             </p>
@@ -195,8 +192,29 @@ export default function ApplyPage() {
               </div>
               <div>
                 <label style={labelSt}>직업</label>
-                <input style={inputSt} type="text" placeholder="예) 대학생, 직장인, 취준생"
-                  value={fd.job} onChange={e => setFd({ ...fd, job: e.target.value })}/>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {['대학생', '직장인', '취준생', '프리랜서', '기타'].map(opt => {
+                    const on = opt === '기타' ? jobEtc : (!jobEtc && fd.job === opt)
+                    return (
+                      <button key={opt} type="button"
+                        onClick={() => {
+                          if (opt === '기타') { setJobEtc(true); setFd({ ...fd, job: '' }) }
+                          else { setJobEtc(false); setFd({ ...fd, job: opt }) }
+                        }}
+                        style={{ flex: '1 1 28%', padding: '13px 0', borderRadius: 12, border: '1.5px solid',
+                          borderColor: on ? LILAC : 'rgba(255,255,255,.12)',
+                          background: on ? 'rgba(192,132,252,.2)' : 'rgba(255,255,255,.07)',
+                          color: on ? LILAC : 'rgba(255,255,255,.45)',
+                          fontFamily: FONT, fontSize: 14.5, fontWeight: 600, cursor: 'pointer' }}>
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+                {jobEtc && (
+                  <input style={{ ...inputSt, marginTop: 10 }} type="text" placeholder="직업을 직접 입력해주세요" autoFocus
+                    value={fd.job} onChange={e => setFd({ ...fd, job: e.target.value })}/>
+                )}
               </div>
             </div>
             <button style={btnSt(canNext[1])} disabled={!canNext[1]} onClick={() => canNext[1] && goStep(2)}>다음</button>
@@ -207,7 +225,7 @@ export default function ApplyPage() {
         {step === 2 && (
           <div className="fade-in">
             <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>
-              {fd.name ? `${fd.name}님,` : '연락처를'}<br/>{fd.name ? '연락처를 알려주세요' : '알려주세요'}
+              {fd.name ? `${fd.name}님, 연락처를 알려주세요` : '연락처를 알려주세요'}
             </h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 32, lineHeight: 1.7 }}>결과와 맞춤 연애 조언을 문자로 바로 보내드려요</p>
             <label style={labelSt}>연락처</label>
@@ -220,7 +238,7 @@ export default function ApplyPage() {
         {/* Step 3: 거주지 */}
         {step === 3 && (
           <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>거주 지역을<br/>알려주세요</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>거주 지역을 알려주세요</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 6, lineHeight: 1.7 }}>지점별 정확한 안내를 도와드리기 위해 받고 있습니다</p>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,.25)', marginBottom: 28 }}>예) 서울 마포구 합정동 · 경기 성남시 분당구</p>
             <label style={labelSt}>거주지</label>
@@ -234,7 +252,7 @@ export default function ApplyPage() {
         {/* Step 4: 희망시간 */}
         {step === 4 && (
           <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>안내 전화<br/>희망시간을 골라주세요</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>안내 전화 희망시간을 골라주세요</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 28, lineHeight: 1.7 }}>선택하신 시간대에 연락드려요</p>
             {['평일 오전 (10:00~12:00)', '평일 오후 (13:00~18:00)', '평일 저녁 (18:00~19:00)', '주말 (예약제)'].map(v => {
               const sel = fd.calltime === v
@@ -260,7 +278,7 @@ export default function ApplyPage() {
         {/* Step 5: 상담 내용 */}
         {step === 5 && (
           <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>상담하고 싶은<br/>내용을 적어주세요</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>상담하고 싶은 내용을 적어주세요</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 10, lineHeight: 1.7 }}>편하게 적어주시면 돼요</p>
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,.25)', marginBottom: 28 }}>예) 좋아하는 사람이 생겼는데 어떻게 시작해야 할지 모르겠어요</p>
             <textarea style={{ ...inputSt, minHeight: 150, resize: 'none', lineHeight: 1.75 }}
@@ -273,7 +291,7 @@ export default function ApplyPage() {
         {/* Step 6: 유입 경로 */}
         {step === 6 && (
           <div className="fade-in">
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>마지막이에요!<br/>어떻게 알고 오셨어요?</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>마지막이에요! 어떻게 알고 오셨어요?</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 28, lineHeight: 1.7 }}>더 좋은 안내를 위해 살짝 여쭤봐요</p>
             {[
               { val: '카카오톡', emoji: '💬' },

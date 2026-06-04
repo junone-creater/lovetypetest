@@ -3,15 +3,21 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import './LandingPage.css'
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec'
-const FONT = "'Pretendard', -apple-system, sans-serif"
-const TOTAL = 5
 
-function fmtPhone(v) {
-  const n = v.replace(/[^0-9]/g, '').slice(0, 11)
-  if (n.length < 4) return n
-  if (n.length < 8) return `${n.slice(0,3)}-${n.slice(3)}`
-  return `${n.slice(0,3)}-${n.slice(3,7)}-${n.slice(7)}`
+// ── 마감 카운트다운 ──────────────────────────────────
+const DEADLINE_LABEL = '6월 13일'        // 화면 표기용 마감일
+const DEADLINE_DATE  = [2026, 5, 13]     // 실제 마감일 [년, 월(0-base), 일]
+function getDDay() {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const dl = new Date(DEADLINE_DATE[0], DEADLINE_DATE[1], DEADLINE_DATE[2])
+  return Math.max(0, Math.round((dl - today) / 86400000))
 }
+
+// ── 신청자 수 카운터 설정 ──────────────────────────
+const COUNT_FROM_SHEET = true     // Apps Script에서 실제 누적 신청수 받아오기 (doGet에 action===count 분기 추가 필요)
+const APPLICANT_BASE   = 893      // 실제 누적 수에 더해 보여줄 값 (표출 = 실제 + 893)
+const APPLICANT_FALLBACK = 893    // 실제 수를 못 받아왔을 때 보여줄 값
 
 function useReveal() {
   const ref = useRef(null)
@@ -34,145 +40,6 @@ function Reveal({ children, delay = 0 }) {
   )
 }
 
-// ── 신청 폼 ──────────────────────────────────────────
-function ApplyForm({ urlName, urlGender, urlType }) {
-  const [step, setStep] = useState(1)
-  const [done, setDone] = useState(false)
-  const [fd, setFd] = useState({ phone:'', age:'', job:'', location:'', calltime:'', concern:'' })
-
-  const canNext = {
-    1: fd.phone.replace(/[^0-9]/g, '').length >= 10,
-    2: fd.age.trim() && fd.job.trim(),
-    3: fd.location.trim().length >= 2,
-    4: fd.calltime !== '',
-    5: fd.concern.trim().length >= 5,
-  }
-
-  const goStep = (n) => { setStep(n); setTimeout(() => document.getElementById('form-top')?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50) }
-
-  const submit = () => {
-    const data = { name:urlName, gender:urlGender, type:urlType, ...fd }
-    try {
-      fetch(SHEET_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(data) }).catch(() => {})
-    } catch {}
-    // GET 폴백 (JSONP)
-    try {
-      const s = document.createElement('script')
-      s.src = SHEET_URL + '?' + new URLSearchParams(data).toString()
-      document.head.appendChild(s)
-      setTimeout(() => { try { s.parentNode?.removeChild(s) } catch {} }, 8000)
-    } catch {}
-    setDone(true)
-  }
-
-  const dots = Array.from({ length: TOTAL }, (_, i) => (
-    <div key={i} style={{ height:5, borderRadius:3, transition:'all .3s',
-      background: i + 1 < step ? '#6B3FA0' : i + 1 === step ? '#C084FC' : 'rgba(255,255,255,.15)',
-      width: i + 1 === step ? 22 : 6 }}/>
-  ))
-
-  const inputStyle = { width:'100%', padding:'17px 18px', fontSize:16, fontFamily:FONT,
-    background:'rgba(255,255,255,.07)', border:'1.5px solid rgba(255,255,255,.12)',
-    borderRadius:14, color:'#F3E8FF', outline:'none', WebkitAppearance:'none' }
-
-  const btnStyle = (active) => ({
-    width:'100%', marginTop:28, padding:18, borderRadius:14, border:'none',
-    background: active ? 'linear-gradient(135deg,#9B5DE5,#C084FC)' : 'rgba(255,255,255,.1)',
-    color: active ? '#fff' : 'rgba(255,255,255,.3)',
-    fontSize:17, fontWeight:800, cursor: active ? 'pointer' : 'not-allowed',
-    fontFamily:FONT, boxShadow: active ? '0 8px 24px rgba(155,93,229,.38)' : 'none',
-  })
-
-  if (done) return (
-    <div style={{ textAlign:'center', padding:'40px 0 20px' }}>
-      <div style={{ width:72, height:72, borderRadius:'50%', background:'linear-gradient(135deg,#9B5DE5,#C084FC)',
-        margin:'0 auto 24px', display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:32, boxShadow:'0 12px 28px rgba(155,93,229,.4)' }}>✓</div>
-      <h3 style={{ fontSize:24, fontWeight:800, color:'#fff', marginBottom:14 }}>신청 완료!</h3>
-      <p style={{ fontSize:15, color:'#A99BC4', lineHeight:1.8 }}>
-        입력하신 <b style={{ color:'#EAE3D8' }}>연락처로 담당자가 직접 연락</b>드려요.<br/>
-        보통 <b style={{ color:'#EAE3D8' }}>1영업일 이내</b>에 연락드려요.
-      </p>
-    </div>
-  )
-
-  return (
-    <div id="form-top">
-      <div style={{ display:'flex', gap:6, marginBottom:32, alignItems:'center' }}>{dots}</div>
-
-      {step === 1 && (
-        <div>
-          <label style={{ display:'block', fontSize:12.5, color:'#A99BC4', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:9 }}>연락처</label>
-          <input style={inputStyle} type="tel" inputMode="numeric" maxLength={13} placeholder="010-0000-0000"
-            value={fd.phone} onChange={e => setFd({ ...fd, phone: fmtPhone(e.target.value) })}/>
-          <button style={btnStyle(canNext[1])} disabled={!canNext[1]} onClick={() => canNext[1] && goStep(2)}>다음</button>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div>
-          <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
-            <div>
-              <label style={{ display:'block', fontSize:12.5, color:'#A99BC4', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:9 }}>나이</label>
-              <input style={inputStyle} type="number" inputMode="numeric" placeholder="예) 24" min={15} max={50}
-                value={fd.age} onChange={e => setFd({ ...fd, age: e.target.value })}/>
-            </div>
-            <div>
-              <label style={{ display:'block', fontSize:12.5, color:'#A99BC4', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:9 }}>직업</label>
-              <input style={inputStyle} type="text" placeholder="예) 대학생, 직장인, 취준생"
-                value={fd.job} onChange={e => setFd({ ...fd, job: e.target.value })}/>
-            </div>
-          </div>
-          <button style={btnStyle(canNext[2])} disabled={!canNext[2]} onClick={() => canNext[2] && goStep(3)}>다음</button>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div>
-          <label style={{ display:'block', fontSize:12.5, color:'#A99BC4', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:9 }}>거주지</label>
-          <input style={inputStyle} type="text" placeholder="예) 서울 마포구 합정동"
-            value={fd.location} onChange={e => setFd({ ...fd, location: e.target.value })}/>
-          <div style={{ fontSize:12, color:'rgba(192,132,252,.65)', marginTop:8 }}>📍 지점별 정확한 안내를 도와드려요</div>
-          <button style={btnStyle(canNext[3])} disabled={!canNext[3]} onClick={() => canNext[3] && goStep(4)}>다음</button>
-        </div>
-      )}
-
-      {step === 4 && (
-        <div>
-          <label style={{ display:'block', fontSize:12.5, color:'#A99BC4', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:9 }}>안내 전화 희망시간</label>
-          {['평일 오전 (10:00~12:00)', '평일 오후 (13:00~18:00)', '평일 저녁 (18:00~19:00)', '주말 (예약제)'].map(v => {
-            const sel = fd.calltime === v
-            return (
-              <div key={v} onClick={() => setFd({ ...fd, calltime: v })}
-                style={{ display:'flex', alignItems:'center', gap:14, padding:'16px 18px', marginBottom:10,
-                  background: sel ? 'rgba(155,93,229,.18)' : 'rgba(255,255,255,.06)',
-                  border: `1.5px solid ${sel ? '#C084FC' : 'rgba(255,255,255,.1)'}`,
-                  borderRadius:14, cursor:'pointer', WebkitTapHighlightColor:'transparent' }}>
-                <div style={{ width:20, height:20, borderRadius:'50%', border:`2px solid ${sel ? '#C084FC' : 'rgba(255,255,255,.3)'}`,
-                  display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  {sel && <div style={{ width:10, height:10, borderRadius:'50%', background:'#C084FC' }}/>}
-                </div>
-                <span style={{ fontSize:15.5, color: sel ? '#fff' : '#EAE3D8', fontWeight: sel ? 600 : 500 }}>{v}</span>
-              </div>
-            )
-          })}
-          <button style={btnStyle(canNext[4])} disabled={!canNext[4]} onClick={() => canNext[4] && goStep(5)}>다음</button>
-        </div>
-      )}
-
-      {step === 5 && (
-        <div>
-          <label style={{ display:'block', fontSize:12.5, color:'#A99BC4', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:9 }}>상담하고 싶은 내용</label>
-          <textarea style={{ ...inputStyle, minHeight:150, resize:'none', lineHeight:1.75 }}
-            placeholder="상담하시고 싶은 내용을 입력하세요"
-            value={fd.concern} onChange={e => setFd({ ...fd, concern: e.target.value })}/>
-          <button style={btnStyle(canNext[5])} disabled={!canNext[5]} onClick={() => canNext[5] && submit()}>신청 완료</button>
-        </div>
-      )}
-    </div>
-  )
-}
-
 // ── 메인 ──────────────────────────────────────────
 export default function LandingPage() {
   const [params] = useSearchParams()
@@ -181,21 +48,51 @@ export default function LandingPage() {
   const urlGender = decodeURIComponent(params.get('gender') || '')
   const urlType   = decodeURIComponent(params.get('type')   || '')
 
+  // 누적 신청수 (Apps Script에서 실제값 + 가산치, 실패 시 폴백값)
+  const [applicants, setApplicants] = useState(APPLICANT_FALLBACK)
+  useEffect(() => {
+    if (!COUNT_FROM_SHEET) return
+    const cb = '__lpCount_' + Math.floor(Math.random() * 1e6)
+    let s
+    const cleanup = () => { try { delete window[cb] } catch {} ; try { s && s.remove() } catch {} }
+    window[cb] = (data) => {
+      if (data && typeof data.count === 'number') setApplicants(data.count + APPLICANT_BASE)
+      cleanup()
+    }
+    s = document.createElement('script')
+    s.src = `${SHEET_URL}?action=count&callback=${cb}`
+    s.onerror = cleanup
+    document.head.appendChild(s)
+    const t = setTimeout(cleanup, 8000)
+    return () => { clearTimeout(t); cleanup() }
+  }, [])
+
   const goApply = (e) => {
     e.preventDefault()
     navigate(`/apply?type=${encodeURIComponent(urlType)}&name=${encodeURIComponent(urlName)}&gender=${encodeURIComponent(urlGender)}`)
   }
 
+  const dday = getDDay()
+
   return (
     <div className="lp-root">
       <div className="lp-grain"/>
+
+      {/* 마감 압박 고정 바 */}
+      <div className="lp-topbar">
+        <span className="lp-topbar-fire">🔥</span>
+        <span><b>{DEADLINE_LABEL} 마감</b> <span className="lp-topbar-dday">{dday === 0 ? '오늘 마감' : `D-${dday}`}</span></span>
+        <span className="lp-topbar-div">·</span>
+        <span className="lp-topbar-soft">30명 한정, 조기 마감될 수 있어요</span>
+      </div>
 
       {/* HERO */}
       <section className="lp-hero">
         <div className="lp-wrap">
           <span className="lp-badge"><span className="lp-dot"/>이음나루 인지심리연구소 · 20대 무료 프로그램</span>
+          <div className="lp-live"><span className="lp-live-dot"/>지금까지 <b>{applicants.toLocaleString()}명</b>이 무료 프로그램을 신청했어요</div>
           <h1 className="lp-h1">
-            <span className="lp-line lp-l1">연애만 하면 작아지던 내가,</span><br/>
+            <span className="lp-line lp-l1">연애만 하면 작아지던 내가,</span>{' '}
             <span className="lp-line lp-l2"><span className="lp-em">편해진</span> 이유</span>
           </h1>
           <p className="lp-sub">
@@ -213,7 +110,7 @@ export default function LandingPage() {
       <section className="lp-story">
         <div className="lp-wrap">
           <Reveal><p className="lp-eyebrow">혹시, 이런 적 있나요?</p></Reveal>
-          <Reveal delay={.08}><h2 className="lp-h2">문제는 당신의 성격이 아니라,<br/><span className="lp-accent">아직 모르고 있던 '마음의 패턴'</span>이에요.</h2></Reveal>
+          <Reveal delay={.08}><h2 className="lp-h2">문제는 당신의 성격이 아니라,{' '}<span className="lp-accent">아직 모르고 있던 '마음의 패턴'</span>이에요.</h2></Reveal>
           <div className="lp-pains">
             {[
               '좋아하는 사람 앞에서는 이상하게 <b>말도 행동도 부자연스러워져요.</b>',
@@ -228,7 +125,7 @@ export default function LandingPage() {
           <Reveal>
             <div className="lp-pivot">
               <p className="lp-ptag">◆ 우리가 발견한 것</p>
-              <p>같은 연애여도 누구는 편하고 누구는 힘든 이유.<br/>그건 의지가 아니라 <span className="lp-hl">내 안의 심리 구조</span> 때문이에요. 구조를 알면, 관계는 <span className="lp-hl">노력 없이도</span> 편해져요.</p>
+              <p>같은 연애여도 누구는 편하고 누구는 힘든 이유. 그건 의지가 아니라 <span className="lp-hl">내 안의 심리 구조</span> 때문이에요. 구조를 알면, 관계는 <span className="lp-hl">노력 없이도</span> 편해져요.</p>
             </div>
           </Reveal>
           <Reveal><p className="lp-eyebrow" style={{ marginTop:8 }}>먼저 경험한 사람들</p></Reveal>
@@ -250,7 +147,7 @@ export default function LandingPage() {
       {/* OFFER */}
       <section className="lp-offer">
         <div className="lp-wrap">
-          <Reveal><h2 className="lp-offer-h2">나의 연애 패턴을 <span className="lp-accent">3단계</span>로<br/>풀어내는 시간</h2></Reveal>
+          <Reveal><h2 className="lp-offer-h2">나의 연애 패턴을 <span className="lp-accent">3단계</span>로 풀어내는 시간</h2></Reveal>
           <Reveal delay={.08}><p className="lp-offer-lead">이음나루 <b>3코어 매직</b> · 20대만을 위한 프로그램</p></Reveal>
           {[
             { n:'1', title:'강연', sub:'90분', desc:'내 연애와 관계의 패턴, 그 심리 구조를 이해하는 시간. 왜 늘 같은 지점에서 힘들었는지 그 뿌리를 짚어요.' },
@@ -296,14 +193,14 @@ export default function LandingPage() {
           <Reveal>
             <div style={{ position:'sticky', bottom:0 }}>
               <a href="/apply" onClick={goApply} className="lp-cta">무료 신청하고 연애 유형 1순위 확인하기</a>
-              <p className="lp-cta-sub">이번 기수 <b>30명 한정</b> · 신청 후 1영업일 내 연락드려요</p>
+              <p className="lp-cta-sub">이번 기수 <b>30명 한정</b> · <b>{DEADLINE_LABEL} 마감(조기 마감 가능)</b> · 신청 후 1영업일 내 안심번호로 연락</p>
             </div>
           </Reveal>
         </div>
       </section>
 
-<footer className="lp-footer">
-        이음나루 인지심리연구소<br/><b>사람과 사람을 잇는 마음의 나루터</b>
+      <footer className="lp-footer">
+        이음나루 인지심리연구소{' '}<b>사람과 사람을 잇는 마음의 나루터</b>
       </footer>
     </div>
   )
