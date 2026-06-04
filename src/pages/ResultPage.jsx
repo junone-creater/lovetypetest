@@ -36,7 +36,7 @@ export default function ResultPage() {
     i < arr.length - 1 ? s + '.' : s).filter(s => s.length > 3)
 
   const handleShare = async () => {
-    const url = 'https://junone-creater.github.io/lovetypetest/'
+    const url = 'https://love-type-test.ieumnaru.co.kr/'
     const text = `나의 연애 유형은 '${first.name}'! 당신도 테스트해보세요 👇`
     if (navigator.share) {
       try { await navigator.share({ title:'이음나루 연애유형 테스트', text, url }) } catch {}

@@ -121,7 +121,7 @@ export default function LandingPage() {
       {/* HERO */}
       <section className="lp-hero">
         <div className="lp-wrap">
-          <span className="lp-badge"><span className="lp-dot"/>이음나루 인지심리연구소 · 20대 무료 프로그램</span>
+          <span className="lp-badge"><span className="lp-dot"/>이음나루 인지심리연구소 · 20·30대 무료 프로그램</span>
           {display != null && (
             <div className="lp-live"><span className="lp-live-dot"/>지금까지 <b>{display.toLocaleString()}명</b>이 무료 프로그램을 신청했어요</div>
           )}
@@ -182,7 +182,7 @@ export default function LandingPage() {
       <section className="lp-offer">
         <div className="lp-wrap">
           <Reveal><h2 className="lp-offer-h2">나의 연애 패턴을 <span className="lp-accent">3단계</span>로 풀어내는 시간</h2></Reveal>
-          <Reveal delay={.08}><p className="lp-offer-lead">이음나루 <b>3코어 매직</b> · 20대만을 위한 프로그램</p></Reveal>
+          <Reveal delay={.08}><p className="lp-offer-lead">이음나루 <b>3코어 매직</b> · 20·30대를 위한 프로그램</p></Reveal>
           {[
             { n:'1', title:'강연', sub:'90분', desc:'내 연애와 관계의 패턴, 그 심리 구조를 이해하는 시간. 왜 늘 같은 지점에서 힘들었는지 그 뿌리를 짚어요.' },
             { n:'2', title:'1:1 심리코칭', sub:'맞춤', desc:'나에게 맞는 관계 방향을 함께 설계해요. 혼자 끙끙대지 않고, 전문가와 같이 길을 찾아요.' },
@@ -221,7 +221,7 @@ export default function LandingPage() {
             <div className="lp-price">
               <div className="lp-old">정가 380,000원</div>
               <div className="lp-free">0원</div>
-              <div className="lp-pnote"><b>취업창업지원금</b>으로 전액 지원돼요</div>
+              <div className="lp-pnote"><b>20·30대 대상 취업창업지원금</b>으로 전액 지원돼요</div>
             </div>
           </Reveal>
           <Reveal>

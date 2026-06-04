@@ -35,7 +35,7 @@ export default function ApplyPage() {
     age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'', source:'',
   })
 
-  const ageOk = Number(fd.age) >= 15 && Number(fd.age) <= 50
+  const ageOk = Number(fd.age) > 0   // 나이 제한 없음 — 입력만 하면 통과
   const canNext = {
     1: fd.name.trim() && fd.gender && ageOk && fd.job.trim(),
     2: fd.phone.replace(/[^0-9]/g, '').length >= 10,
@@ -187,7 +187,7 @@ export default function ApplyPage() {
               </div>
               <div>
                 <label style={labelSt}>나이</label>
-                <input style={inputSt} type="number" inputMode="numeric" placeholder="예) 24" min={15} max={50}
+                <input style={inputSt} type="number" inputMode="numeric" placeholder="예) 24" min={1}
                   value={fd.age} onChange={e => setFd({ ...fd, age: e.target.value })}/>
               </div>
               <div>
