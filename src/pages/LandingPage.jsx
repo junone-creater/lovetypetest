@@ -18,6 +18,9 @@ function getDDay() {
 const COUNT_FROM_SHEET = true     // Apps Script에서 실제 누적 신청수 받아오기 (doGet에 action===count 분기 추가 필요)
 const APPLICANT_BASE   = 893      // 실제 누적 수에 더해 보여줄 값 (표출 = 실제 + 893)
 const COUNT_CACHE_KEY  = 'lp_applicant_count'  // 마지막으로 받아온 실제 count 캐시 (재방문 시 즉시 표시)
+// 빌드(배포) 시점에 시트에서 미리 받아와 vite가 주입한 값 → 접속 첫 화면부터 숫자 보유 (없으면 0)
+// eslint-disable-next-line no-undef
+const BUILD_COUNT = typeof __BUILD_APPLICANT_COUNT__ === 'number' ? __BUILD_APPLICANT_COUNT__ : 0
 
 function useReveal() {
   const ref = useRef(null)
@@ -48,14 +51,15 @@ export default function LandingPage() {
   const urlGender = decodeURIComponent(params.get('gender') || '')
   const urlType   = decodeURIComponent(params.get('type')   || '')
 
-  // 누적 신청수: 시트에서 실제값을 받기 전엔 null(숨김).
-  // 재방문 시엔 캐시된 직전 값으로 즉시 표시해 깜빡임/지연 방지.
+  // 누적 신청수 초기값: 1) 직전 방문 캐시 → 2) 빌드 시점 박제값 → 둘 다 없으면 null(숨김).
+  // 빌드 박제값 덕분에 첫 방문이라도 접속 즉시 숫자가 자리에 있음 (늦게 등장/레이아웃 점프 없음).
+  // 이후 아래 useEffect가 런타임 실시간 값으로 갱신.
   const [applicants, setApplicants] = useState(() => {
     try {
       const c = Number(localStorage.getItem(COUNT_CACHE_KEY))
       if (Number.isFinite(c) && c > 0) return c + APPLICANT_BASE
     } catch {}
-    return null
+    return BUILD_COUNT > 0 ? BUILD_COUNT + APPLICANT_BASE : null
   })
   useEffect(() => {
     if (!COUNT_FROM_SHEET) return
