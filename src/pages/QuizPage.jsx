@@ -1,20 +1,42 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { QUESTIONS } from '../constants/questions'
-import { TYPES } from '../constants/types'
-import { T, FONT } from '../constants/tokens'
+import { FONT } from '../constants/tokens'
+import { UNAIT } from '../constants/character'
 import { store, INIT_SCORES } from '../store'
 
 const TOTAL = QUESTIONS.length
+const PURPLE = '#9B5DE5'
+const LILAC = '#C084FC'
+const HERO = `${import.meta.env.BASE_URL}images/intro-hero.png`
 
-const ANALYZE_MSGS = [
-  '너의 답변을 가만히 들여다보는 중',
-  '어떤 사랑을 하는 사람인지…',
-  '거의 다 왔어요',
+// 리액션 뒤 다음 질문으로 자연스럽게 이어주는 연결 멘트(진짜 톡하는 느낌)
+const BRIDGES = [
+  '그럼 이건 어때?',
+  '이것도 궁금해.',
+  '다음 거 볼게.',
+  '그럼 이런 상황은?',
+  '이것도 물어볼게.',
+  '계속 가볼게.',
+  '그럼 이런 적은 없어?',
+  '그럼 이건?',
+  '이번엔 이거.',
+  '하나만 더 물어볼게.',
+  '이것도 골라봐.',
 ]
-const MSG_TIMES = [0, 900, 1800]   // 각 메시지 등장 시각(ms) — 마지막 '거의 다 왔어요'는 1.8s에
-const FILL_MS = 3800               // 게이지 완료 = '거의 다 왔어요' 후 약 2초 더 대기
-const HOLD_MS = 1000               // "결과 나왔어요" 머무는 시간 (1s)
+
+// 재마운트/깜박임 방지를 위해 모듈 최상위에 고정 정의
+function Avatar({ size = 30 }) {
+  return (
+    <div style={{ width: size, height: size, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
+      background: `linear-gradient(135deg, ${PURPLE}, ${LILAC})`, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', color: '#fff', fontSize: size * 0.4, fontWeight: 900,
+      boxShadow: '0 0 14px rgba(192,132,252,.4)' }}>
+      <img src={HERO} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 25%' }}
+        onError={e => { e.target.style.display = 'none' }} />
+    </div>
+  )
+}
 
 // answers(선택한 보기 인덱스 배열) → 점수 합산 → 1·2·3위
 function computeResult(answers) {
@@ -34,159 +56,286 @@ export default function QuizPage() {
 
   const [qIndex, setQIndex] = useState(store.getQIndex())
   const [answers, setAnswers] = useState(store.getAnswers())
-  const [selected, setSelected] = useState(null)   // 탭 직후 강조용
-  const [locked, setLocked] = useState(false)       // 전환 중 중복 입력 방지
-  const [analyzing, setAnalyzing] = useState(false) // 마지막 답변 후 "분석 중" 연출
-  const [phase, setPhase] = useState(0)             // 분석 메시지 단계
-  const [ready, setReady] = useState(false)         // 게이지 다 차면 "결과 나왔어요!"
+  const [messages, setMessages] = useState(() => store.getChat())  // 인트로부터 이어진 대화
+  const [typing, setTyping] = useState(false)
+  const [phase, setPhase] = useState(null)          // 'answering' | null(전환/대기 중)
+  const [selected, setSelected] = useState(null)    // 탭 직후 강조용
 
-  useEffect(() => { if (!user) navigate('/') }, [])
+  const scrollRef = useRef(null)
+  const timers = useRef([])
+  const started = useRef(false)
+  const initialCount = useRef(store.getChat().length)  // 불러온 과거 메시지 수 (얘들은 재진입 시 애니메이션 안 함)
+  const didFirstScroll = useRef(false)
+  const after = (ms, fn) => { const id = setTimeout(fn, ms); timers.current.push(id); return id }
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
-  // 질문이 바뀌면 이전에 고른 답을 표시(뒤로 왔을 때)
-  useEffect(() => { setSelected(answers[qIndex] ?? null); setLocked(false) }, [qIndex])
+  // 대화 로그를 세션에 계속 저장 → 결과 페이지에서 같은 채팅으로 이어짐
+  useEffect(() => { store.setChat(messages) }, [messages])
 
-  // 분석 중 연출: 게이지 채우며 메시지 순환 → 다 차면 "결과 나왔어요!" → 잠깐 뒤 이동
+  // 유라 메시지 여러 줄을 타이핑 연출과 함께 차례로 보낸 뒤 done 콜백
+  const streamYura = (lines, done) => {
+    let idx = 0
+    const step = () => {
+      if (idx >= lines.length) { done && done(); return }
+      setTyping(true)
+      const text = lines[idx]
+      after(Math.min(1300, 360 + text.length * 18), () => {
+        setTyping(false)
+        setMessages(m => [...m, { from: 'yura', text }])
+        idx += 1
+        after(300, step)
+      })
+    }
+    step()
+  }
+
+  // 연결 멘트(있으면) + 질문을 타이핑 연출과 함께 차례로 보낸 뒤 보기를 연다
+  const askQuestion = useCallback((i, animate, bridge) => {
+    const q = QUESTIONS[i]
+    if (!q) return
+    const lines = bridge ? [bridge, q.q] : [q.q]
+    if (!animate) {
+      setMessages(m => [...m, ...lines.map(text => ({ from: 'yura', text }))])
+      setPhase('answering')
+      return
+    }
+    setPhase(null)
+    let idx = 0
+    const step = () => {
+      if (idx >= lines.length) { setPhase('answering'); return }
+      setTyping(true)
+      const text = lines[idx]
+      after(Math.min(1200, 340 + text.length * 18), () => {
+        setTyping(false)
+        setMessages(m => [...m, { from: 'yura', text }])
+        idx += 1
+        after(260, step)
+      })
+    }
+    step()
+  }, [])
+
+  // 최초 진입: 사용자 확인 후, 현재 질문이 아직 안 떴으면 던지기 (새로고침 시 중복 방지)
   useEffect(() => {
-    if (!analyzing) return
-    const timers = ANALYZE_MSGS.map((_, i) => setTimeout(() => setPhase(i), MSG_TIMES[i]))
-    timers.push(setTimeout(() => setReady(true), FILL_MS))            // 게이지 100% → 완료 표시
-    timers.push(setTimeout(() => navigate('/result'), FILL_MS + HOLD_MS))  // 잠깐 머문 뒤 결과로
-    return () => timers.forEach(clearTimeout)
-  }, [analyzing])
+    if (started.current) return
+    started.current = true
+    if (!user) { navigate('/'); return }
+    const loaded = store.getChat()
+    const qi = store.getQIndex()
+    const asked = loaded.filter(m => m.from === 'yura' && QUESTIONS.some(q => q.q === m.text)).length
+    if (asked > qi) setPhase('answering')           // 이미 화면에 질문이 떠 있음
+    else after(450, () => askQuestion(qi, true))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 새 메시지/타이핑 시 맨 아래로 스크롤 (첫 진입은 그리기 전에 즉시 맞춰 깜박임 방지)
+  useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollTo({ top: el.scrollHeight, behavior: didFirstScroll.current ? 'smooth' : 'auto' })
+    didFirstScroll.current = true
+  }, [messages, typing, phase])
+
+  /* ─────────────────────────────────────────────────────────────
+   * (주석 처리) 기존 "분석 중" 로딩 화면.
+   * 이제는 채팅 안에서 유라가 "잠깐만 기다려봐" 메시지를 보내고
+   * 잠시(약 3초) 입력 중 상태로 대기한 뒤 결과로 이동한다.
+   *
+   * import { ANALYSIS_MESSAGES } from '../constants/character'
+   * const MSG_TIMES = [0, 550, 1100, 1650, 2200]
+   * const FILL_MS = 2900
+   * const HOLD_MS = 450
+   * const [analyzing, setAnalyzing] = useState(false)
+   * const [aPhase, setAPhase] = useState(0)
+   * const [ready, setReady] = useState(false)
+   * useEffect(() => {
+   *   if (!analyzing) return
+   *   const ts = ANALYSIS_MESSAGES.map((_, i) => setTimeout(() => setAPhase(i), MSG_TIMES[i]))
+   *   ts.push(setTimeout(() => setReady(true), FILL_MS))
+   *   ts.push(setTimeout(() => navigate('/result'), FILL_MS + HOLD_MS))
+   *   return () => ts.forEach(clearTimeout)
+   * }, [analyzing])
+   *
+   * if (analyzing) {
+   *   return ( ...게이지 + 스피너 로딩 UI... )
+   * }
+   * ───────────────────────────────────────────────────────────── */
 
   const handleAnswer = (optIdx) => {
-    if (locked) return
-    setLocked(true)
+    if (phase !== 'answering') return
+    setPhase(null)
     setSelected(optIdx)
-    const nextAnswers = [...answers]
-    nextAnswers[qIndex] = optIdx
-    setAnswers(nextAnswers)
-    store.setAnswers(nextAnswers)
+    const opt = QUESTIONS[qIndex].options[optIdx]
+    after(260, () => {
+      setSelected(null)
+      setMessages(m => [...m, { from: 'me', text: opt.label }])
+      const nextAnswers = [...answers]
+      nextAnswers[qIndex] = optIdx
+      setAnswers(nextAnswers)
+      store.setAnswers(nextAnswers)
 
-    setTimeout(() => {
-      if (qIndex + 1 < TOTAL) {
-        const ni = qIndex + 1
-        setQIndex(ni)
-        store.setQIndex(ni)
-      } else {
-        const { scores, result } = computeResult(nextAnswers)
-        store.setScores(scores)
-        store.setResult(result)
-        setAnalyzing(true)   // 바로 이동하지 않고 분석 중 화면 표시
-      }
-    }, 280)
+      const isLast = qIndex + 1 >= TOTAL
+      const reactions = opt.reactions || []
+      // 유라의 리액션(티키타카, 여러 줄) → 다음 질문 또는 분석 대기
+      after(420, () => {
+        streamYura(reactions, () => {
+          if (!isLast) {
+            const ni = qIndex + 1
+            setQIndex(ni)
+            store.setQIndex(ni)
+            // 리액션 읽을 짧은 텀 → 연결 멘트("그럼 이건?") → 다음 질문으로 톡처럼 이어짐
+            const bridge = BRIDGES[qIndex % BRIDGES.length]
+            after(600, () => askQuestion(ni, true, bridge))
+          } else {
+            // 마지막 답변 → 결과 계산 후 "기다려봐" 안내 + 약 3초 대기 → 결과 페이지
+            const { scores, result } = computeResult(nextAnswers)
+            store.setScores(scores)
+            store.setResult(result)
+            after(560, () => {
+              setTyping(true)
+              after(1000, () => {
+                setTyping(false)
+                setMessages(m => [...m, { from: 'yura', text: '잠깐만. 지금까지 네 답을 쭉 따라가 볼게 🔍' }])
+                after(500, () => {
+                  setTyping(true)            // 분석하는 동안 '입력 중' 표시
+                  after(3000, () => { setTyping(false); navigate('/result') })
+                })
+              })
+            })
+          }
+        })
+      })
+    })
   }
 
   const goBack = () => {
     if (qIndex === 0) { navigate('/'); return }
+    timers.current.forEach(clearTimeout); timers.current = []
+    setTyping(false)
+    const arr = [...messages]
+    // 현재 질문 + 연결 멘트 + 직전 리액션 (모두 끝에 연속된 유라 말풍선) 제거
+    while (arr.length && arr[arr.length - 1].from === 'yura') arr.pop()
+    // 직전 내 답장 제거
+    if (arr.length && arr[arr.length - 1].from === 'me') arr.pop()
     const pi = qIndex - 1
-    setQIndex(pi)
-    store.setQIndex(pi)
+    const newAnswers = answers.slice(0, pi)
+    setAnswers(newAnswers); store.setAnswers(newAnswers)
+    setQIndex(pi); store.setQIndex(pi)
+    setMessages(arr)
+    setSelected(null)
+    setPhase('answering')   // 직전 질문은 이미 thread에 있으니 보기만 다시 연다
   }
 
   const q = QUESTIONS[qIndex]
   const pct = Math.round(((qIndex + 1) / TOTAL) * 100)
 
-  // ── 분석 중 화면 ──
-  if (analyzing) {
-    return (
-      <div style={{ background:'#0E0816', height:'100dvh', fontFamily:FONT, position:'relative', overflow:'hidden',
-        display:'flex', alignItems:'center', justifyContent:'center', padding:'0 36px' }}>
-        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'140%', height:'45%',
-          background:`radial-gradient(50% 50% at 50% 50%, rgba(155,93,229,${ready ? .4 : .28}), transparent 70%)`, pointerEvents:'none', transition:'all .4s' }}/>
-
-        <div style={{ position:'relative', zIndex:1, textAlign:'center', width:'100%', maxWidth:340 }}>
-          {/* 분석 중: 회전 링 + 하트 / 완료: 체크가 톡 */}
-          <div style={{ position:'relative', width:100, height:100, margin:'0 auto 34px' }}>
-            <div style={{ position:'absolute', inset:0, borderRadius:'50%',
-              background:'radial-gradient(circle, rgba(155,93,229,.35), transparent 70%)', animation:'azPulse 1.6s ease-in-out infinite' }}/>
-            {ready ? (
-              <div style={{ position:'absolute', inset:6, borderRadius:'50%', background:'linear-gradient(135deg,#9B5DE5,#C084FC)',
-                display:'flex', alignItems:'center', justifyContent:'center', fontSize:42, color:'#fff', fontWeight:800,
-                boxShadow:'0 10px 30px rgba(155,93,229,.55)', animation:'azPop .45s ease-out both' }}>✓</div>
-            ) : (
-              <>
-                <div style={{ position:'absolute', inset:6, borderRadius:'50%', border:'3px solid rgba(192,132,252,.18)',
-                  borderTopColor:'#C084FC', animation:'azSpin .9s linear infinite' }}/>
-                <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:36 }}>💜</div>
-              </>
-            )}
-          </div>
-
-          <h2 style={{ fontSize:22, fontWeight:800, color:'#fff', marginBottom:12, letterSpacing:'-.01em' }}>
-            {ready ? '너의 연애 유형이 나왔어요' : '마음을 들여다보는 중이에요'}
-          </h2>
-          <p key={ready ? 'done' : phase} className="fade-in" style={{ fontSize:14.5, color:'#C084FC', fontWeight:600, minHeight:22, marginBottom:30 }}>
-            {ready ? '잠시만요, 살며시 보여줄게요' : ANALYZE_MSGS[phase]}
-          </p>
-
-          <div style={{ width:'100%', height:6, background:'rgba(255,255,255,.1)', borderRadius:6, overflow:'hidden' }}>
-            <div style={{ height:'100%', borderRadius:6, background:'linear-gradient(90deg,#9B5DE5,#C084FC)',
-              width: ready ? '100%' : undefined,
-              animation: ready ? 'none' : `azFill ${FILL_MS}ms ease-out forwards` }}/>
-          </div>
-          <p style={{ fontSize:12, color:'rgba(255,255,255,.3)', marginTop:14 }}>
-            {ready ? '💜 준비됐어요' : `${user?.name ? `${user.name}님의 ` : ''}연애 유형을 찾는 중...`}
-          </p>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div style={{ background:'#0E0816', height:'100dvh', fontFamily:FONT, position:'relative', overflow:'hidden',
-      display:'flex', flexDirection:'column' }}>
-      {/* 은은한 보라 배경광 — 인트로와 톤 통일 */}
-      <div style={{ position:'absolute', top:'-12%', left:'50%', transform:'translateX(-50%)', width:'120%', height:'45%',
-        background:'radial-gradient(60% 60% at 50% 40%, rgba(155,93,229,.20), transparent 70%)', pointerEvents:'none' }}/>
-
-      {/* 상단 바: 뒤로 + 진행 바 (고정) */}
-      <div style={{ position:'relative', zIndex:1, padding:'22px 22px 0' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+    <div style={{ background: '#0E0816', height: '100dvh', fontFamily: FONT, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* 채팅 헤더 + 진행바 */}
+      <div style={{ flexShrink: 0, padding: '14px 16px 12px', borderBottom: '1px solid rgba(192,132,252,.14)',
+        background: 'rgba(14,8,22,.92)', backdropFilter: 'blur(8px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
           <button onClick={goBack} aria-label="이전"
-            style={{ width:34, height:34, borderRadius:'50%', flexShrink:0, border:'1px solid rgba(255,255,255,.12)',
-              background:'rgba(255,255,255,.06)', color:'rgba(255,255,255,.7)', fontSize:18, cursor:'pointer',
-              display:'flex', alignItems:'center', justifyContent:'center', fontFamily:FONT }}>←</button>
-          <div style={{ flex:1, height:6, background:'rgba(255,255,255,.1)', borderRadius:6, overflow:'hidden' }}>
-            <div style={{ height:'100%', background:'linear-gradient(90deg,#9B5DE5,#C084FC)',
-              borderRadius:6, transition:'width .4s ease', width:`${pct}%` }}/>
+            style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, border: '1px solid rgba(255,255,255,.12)',
+              background: 'rgba(255,255,255,.06)', color: 'rgba(255,255,255,.7)', fontSize: 17, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT }}>←</button>
+          <Avatar size={38} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14.5, color: '#fff', fontWeight: 800 }}>{UNAIT.name}</div>
+            <div style={{ fontSize: 11, color: LILAC, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 8px #4ADE80' }} />
+              {UNAIT.title} · 분석 중
+            </div>
           </div>
-          <span style={{ fontSize:13, fontWeight:700, color:'#C084FC', whiteSpace:'nowrap' }}>
-            {qIndex + 1}<span style={{ color:'rgba(255,255,255,.4)' }}> / {TOTAL}</span>
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: LILAC, whiteSpace: 'nowrap' }}>
+            {qIndex + 1}<span style={{ color: 'rgba(255,255,255,.4)' }}> / {TOTAL}</span>
           </span>
         </div>
+        <div style={{ marginTop: 10, height: 4, background: 'rgba(255,255,255,.1)', borderRadius: 4, overflow: 'hidden' }}>
+          <div style={{ height: '100%', background: `linear-gradient(90deg,${PURPLE},${LILAC})`, borderRadius: 4,
+            transition: 'width .4s ease', width: `${pct}%` }} />
+        </div>
       </div>
 
-      {/* 질문 + 보기 (헤더 아래 공간 중앙 정렬, 질문마다 페이드인) */}
-      <div key={qIndex} className="fade-in"
-        style={{ position:'relative', zIndex:1, flex:1, display:'flex', flexDirection:'column', justifyContent:'center', padding:'0 22px 48px' }}>
-        <h2 style={{ fontSize:21, fontWeight:700, color:'#F3E8FF', lineHeight:1.55, margin:'0 0 24px' }}>{q.q}</h2>
+      {/* 메시지 영역 */}
+      <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+        padding: '18px 16px 12px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+        {messages.map((m, i) => (
+          m.from === 'yura' ? (
+            <div key={i} className={i >= initialCount.current ? 'fade-in' : undefined} style={{ display: 'flex', alignItems: 'flex-end', gap: 8, maxWidth: '88%' }}>
+              <Avatar />
+              <div style={{ padding: m.soft ? '10px 14px' : '12px 15px', borderRadius: '4px 16px 16px 16px',
+                background: m.soft ? 'rgba(192,132,252,.1)' : 'rgba(255,255,255,.08)',
+                border: '1px solid rgba(192,132,252,.22)',
+                color: m.soft ? 'rgba(255,255,255,.72)' : '#F3E8FF',
+                fontSize: m.soft ? 13.5 : 15.5, lineHeight: 1.6, fontWeight: 600 }}>
+                {m.soft ? `"${m.text}"` : m.text}
+              </div>
+            </div>
+          ) : (
+            <div key={i} className={i >= initialCount.current ? 'fade-in' : undefined} style={{ alignSelf: 'flex-end', maxWidth: '82%' }}>
+              <div style={{ padding: '12px 16px', borderRadius: '16px 4px 16px 16px',
+                background: `linear-gradient(135deg, ${PURPLE}, ${LILAC})`, color: '#fff',
+                fontSize: 15, lineHeight: 1.6, fontWeight: 600, boxShadow: '0 6px 18px rgba(155,93,229,.3)' }}>
+                {m.text}
+              </div>
+            </div>
+          )
+        ))}
 
-        <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            {q.options.map((op, i) => {
-              const on = selected === i
-              return (
-                <button key={i} onClick={() => handleAnswer(i)} className="option-btn" disabled={locked}
-                  style={{ display:'flex', alignItems:'center', gap:13, width:'100%', textAlign:'left',
-                    padding:'16px 16px', fontSize:14.5,
-                    color: on ? '#fff' : 'rgba(255,255,255,.85)',
-                    background: on ? 'rgba(155,93,229,.22)' : 'rgba(255,255,255,.06)',
-                    border:`1.5px solid ${on ? '#C084FC' : 'rgba(255,255,255,.1)'}`,
-                    borderRadius:14, cursor: locked ? 'default' : 'pointer', fontFamily:FONT, fontWeight:500,
-                    boxShadow: on ? '0 6px 20px rgba(155,93,229,.3)' : 'none',
-                    transition:'background .2s, border-color .2s, box-shadow .2s' }}>
-                  <span style={{ width:26, height:26, borderRadius:8, flexShrink:0,
-                    background: on ? 'linear-gradient(135deg,#9B5DE5,#C084FC)' : 'rgba(192,132,252,.15)',
-                    border:`1px solid ${on ? 'transparent' : 'rgba(192,132,252,.3)'}`,
-                    display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700,
-                    color: on ? '#fff' : '#C084FC', transition:'all .2s' }}>
-                    {on ? '✓' : String.fromCharCode(65 + i)}
-                  </span>
-                  <span>{op.label}</span>
-                </button>
-              )
-            })}
-        </div>
+        {typing && (
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+            <Avatar />
+            <div style={{ padding: '14px 16px', borderRadius: '4px 16px 16px 16px',
+              background: 'rgba(255,255,255,.08)', border: '1px solid rgba(192,132,252,.22)', display: 'flex', gap: 5 }}>
+              {[0, 1, 2].map(d => (
+                <span key={d} style={{ width: 7, height: 7, borderRadius: '50%', background: LILAC,
+                  animation: 'azPulse 1.2s ease-in-out infinite', animationDelay: `${d * 0.18}s` }} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 답장(보기) 선택 영역 */}
+      <div style={{ flexShrink: 0, padding: '12px 16px 20px', borderTop: '1px solid rgba(255,255,255,.07)', background: '#0E0816' }}>
+        {phase === 'answering' ? (
+          <div key={qIndex} className="fade-in">
+            <div style={{ fontSize: 11, color: LILAC, fontWeight: 900, letterSpacing: '1.3px', margin: '0 2px 9px' }}>
+              내 답장 선택
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {q.options.map((op, i) => {
+                const on = selected === i
+                return (
+                  <button key={i} onClick={() => handleAnswer(i)} className="option-btn"
+                    style={{ display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left',
+                      padding: '14px 15px', fontSize: 14.5,
+                      color: on ? '#fff' : 'rgba(255,255,255,.88)',
+                      background: on ? 'rgba(155,93,229,.25)' : 'rgba(255,255,255,.06)',
+                      border: `1.5px solid ${on ? LILAC : 'rgba(255,255,255,.1)'}`,
+                      borderRadius: 14, cursor: 'pointer', fontFamily: FONT, fontWeight: 500,
+                      boxShadow: on ? '0 6px 20px rgba(155,93,229,.3)' : 'none',
+                      transition: 'background .15s, border-color .15s' }}>
+                    <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0,
+                      background: on ? `linear-gradient(135deg,${PURPLE},${LILAC})` : 'rgba(192,132,252,.15)',
+                      border: `1px solid ${on ? 'transparent' : 'rgba(192,132,252,.3)'}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11.5, fontWeight: 700,
+                      color: on ? '#fff' : LILAC }}>
+                      {on ? '✓' : String.fromCharCode(65 + i)}
+                    </span>
+                    <span>{op.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: .5,
+            padding: '14px 16px', borderRadius: 22, border: '1.5px solid rgba(192,132,252,.2)',
+            background: 'rgba(255,255,255,.05)', color: 'rgba(255,255,255,.35)', fontSize: 14 }}>
+            유라가 입력 중…
+          </div>
+        )}
       </div>
     </div>
   )

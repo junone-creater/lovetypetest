@@ -1,4 +1,4 @@
-const K = { user: 'ltt_user', scores: 'ltt_scores', result: 'ltt_result', qindex: 'ltt_qi', answers: 'ltt_ans' }
+const K = { user: 'ltt_user', scores: 'ltt_scores', result: 'ltt_result', qindex: 'ltt_qi', answers: 'ltt_ans', chat: 'ltt_chat' }
 
 export const INIT_SCORES = {
   keeper:0, hunter:0, cool:0, grandma:0, romantic:0, analyst:0, mirror:0, rescuer:0, ghost:0
@@ -20,5 +20,7 @@ export const store = {
   setQIndex:  (i) => set(K.qindex, i),
   getAnswers: ()  => get(K.answers, []),
   setAnswers: (a) => set(K.answers, a),
+  getChat:    ()  => get(K.chat, []),    // 인트로~결과까지 이어지는 한 채팅 로그
+  setChat:    (c) => set(K.chat, c),
   clear: () => Object.values(K).forEach(k => sessionStorage.removeItem(k)),
 }
