@@ -75,45 +75,155 @@ function FitCard({ label, value, danger }) {
   )
 }
 
-function RankCard({ rank, type, c, imgSrc }) {
+function RankCard({ type, c, imgSrc }) {
   return (
     <div className="fade-in" style={{ alignSelf: 'stretch', borderRadius: 18, overflow: 'hidden',
       background: 'rgba(255,255,255,.065)', border: '1px solid rgba(255,255,255,.10)', boxShadow: '0 14px 34px rgba(0,0,0,.18)' }}>
-      {/* 이미지 (분석 내용과 분리된 별도 영역) */}
+      {/* 이미지 */}
       <div style={{ position: 'relative', background: '#160C24', lineHeight: 0 }}>
         <img src={imgSrc(type.key)} alt={type.name} style={{ width: '100%', height: 'auto', display: 'block' }}
           onError={e => { const w = e.target.parentElement; if (w) w.style.display = 'none' }} />
         <div style={{ position: 'absolute', top: 12, left: 12, padding: '7px 13px', borderRadius: 999,
           background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)', border: `1px solid ${c.accent}66`,
           color: '#fff', fontSize: 12, fontWeight: 900, letterSpacing: '1px' }}>
-          {rank} 프로파일
+          나의 연애 프로파일
         </div>
       </div>
 
       {/* 분석 내용 */}
-      <div style={{ padding: '18px 17px 17px' }}>
-        <h2 style={{ fontSize: 21, color: '#fff', fontWeight: 900, lineHeight: 1.3, margin: '0 0 5px' }}>{type.name}</h2>
-        <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,.56)', lineHeight: 1.5, margin: '0 0 16px', fontWeight: 700 }}>{type.tagline}</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <div style={{ padding: '20px 18px 20px' }}>
+        <h2 style={{ fontSize: 24, color: '#fff', fontWeight: 900, lineHeight: 1.3, margin: '0 0 5px' }}>{type.name}</h2>
+        <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,.56)', lineHeight: 1.5, margin: '0 0 18px', fontWeight: 700 }}>{type.tagline}</p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* 핵심 성향 */}
           <div>
-            <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.4px', marginBottom: 7 }}>핵심 성향</div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.74)', lineHeight: 1.78, margin: 0 }}>{type.core}</p>
+            <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.4px', marginBottom: 8 }}>핵심 성향</div>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.74)', lineHeight: 1.85, margin: 0 }}>{type.core}</p>
           </div>
           <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
+
+          {/* 치명적인 약점 */}
           <div>
-            <div style={{ fontSize: 11, color: '#F07BB8', fontWeight: 900, letterSpacing: '1.4px', marginBottom: 7 }}>치명적인 약점</div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.72)', lineHeight: 1.78, margin: 0 }}>{type.weakness}</p>
+            <div style={{ fontSize: 11, color: '#F07BB8', fontWeight: 900, letterSpacing: '1.4px', marginBottom: 8 }}>치명적인 약점</div>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.72)', lineHeight: 1.85, margin: 0 }}>{type.weakness}</p>
           </div>
           <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
+
+          {/* 연애 조언 */}
           <div>
-            <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.4px', marginBottom: 7 }}>연애 조언</div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.74)', lineHeight: 1.78, margin: 0 }}>{type.advice}</p>
+            <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.4px', marginBottom: 8 }}>연애 조언</div>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,.74)', lineHeight: 1.85, margin: 0 }}>{type.advice}</p>
           </div>
+          <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
+
+          {/* 연애 패턴 체크 */}
+          {type.traits && type.traits.length > 0 && (
+            <div>
+              <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.4px', marginBottom: 10 }}>이런 적 있지 않아?</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {type.traits.map((t, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                      background: `${c.accent}22`, border: `1px solid ${c.accent}55`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, color: c.accent, fontWeight: 900 }}>✓</span>
+                    <span style={{ fontSize: 13.5, color: 'rgba(255,255,255,.72)', lineHeight: 1.6 }}>{t}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
+
+          {/* 잘 맞는 / 위험한 유형 */}
           <div style={{ display: 'flex', gap: 10 }}>
             <FitCard label="잘 맞는 유형" value={type.match} />
             <FitCard label="위험한 유형" value={type.danger} danger />
           </div>
+
+          {/* 유라의 한 줄 경고 */}
+          {type.trap && (
+            <div style={{ padding: '13px 15px', borderRadius: 13,
+              background: 'rgba(0,0,0,.25)', border: `1px solid ${c.accent}33` }}>
+              <div style={{ fontSize: 10.5, color: c.accent, fontWeight: 900, letterSpacing: '1.3px', marginBottom: 7 }}>유라의 한 줄</div>
+              <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,.68)', lineHeight: 1.75, margin: 0, fontStyle: 'italic' }}>
+                "{type.trap}"
+              </p>
+            </div>
+          )}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function PromoCard({ c }) {
+  return (
+    <div className="fade-in" style={{ alignSelf: 'stretch', borderRadius: 18, overflow: 'hidden',
+      background: `linear-gradient(160deg, rgba(155,93,229,.18), rgba(192,132,252,.08))`,
+      border: `1px solid ${c.accent}44`, boxShadow: '0 14px 34px rgba(0,0,0,.2)' }}>
+      <div style={{ padding: '22px 18px 20px' }}>
+        {/* 배지 */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999,
+          background: `${c.accent}22`, border: `1px solid ${c.accent}55`, marginBottom: 14 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80', boxShadow: '0 0 6px #4ADE80' }} />
+          <span style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.2px' }}>이음나루 무료 프로그램</span>
+        </div>
+
+        <h2 style={{ fontSize: 20, color: '#fff', fontWeight: 900, lineHeight: 1.4, margin: '0 0 10px' }}>
+          연애 패턴, 이제 진짜로 바꿔볼 준비 됐어?
+        </h2>
+        <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,.65)', lineHeight: 1.75, margin: '0 0 18px' }}>
+          테스트 결과는 시작일 뿐이야. 이음나루에서는 네 패턴이 왜 반복되는지 뿌리부터 짚어주고, 실제 관계에서 어떻게 달라질 수 있는지 함께 설계해줘.
+        </p>
+
+        {/* 프로그램 3단계 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
+          {[
+            { step: '01', title: '토크쇼', desc: '같은 패턴이 반복되는 이유, 뿌리부터 짚어줘' },
+            { step: '02', title: '1:1 연애코치', desc: '너한테 맞는 관계 방향을 코치와 직접 설계' },
+            { step: '03', title: 'IDT 검사지', desc: '내 마음이 연애에서 어떻게 작동하는지 데이터로 확인' },
+          ].map(({ step, title, desc }) => (
+            <div key={step} style={{ display: 'flex', gap: 12, alignItems: 'flex-start',
+              padding: '12px 13px', borderRadius: 12, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)' }}>
+              <span style={{ fontSize: 10, fontWeight: 900, color: c.accent, letterSpacing: '1px',
+                padding: '3px 7px', borderRadius: 6, background: `${c.accent}22`, flexShrink: 0, marginTop: 1 }}>{step}</span>
+              <div>
+                <div style={{ fontSize: 13.5, color: '#fff', fontWeight: 800, marginBottom: 3 }}>{title}</div>
+                <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,.55)', lineHeight: 1.5 }}>{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 추가 혜택 */}
+        <div style={{ padding: '12px 14px', borderRadius: 12, background: 'rgba(0,0,0,.2)', marginBottom: 18,
+          border: '1px solid rgba(255,255,255,.07)' }}>
+          <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,.45)', fontWeight: 900, letterSpacing: '1.2px', marginBottom: 8 }}>신청하면 같이 줘</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {['애착 유형 심화 분석', '연애 회피 패턴 체크', '이상형 vs 실제 끌리는 유형', '연애 준비도 점수'].map(item => (
+              <span key={item} style={{ fontSize: 11.5, color: 'rgba(255,255,255,.65)', padding: '4px 9px',
+                borderRadius: 99, background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.1)' }}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* 선착순 안내 */}
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', textAlign: 'center', margin: '0 0 14px', lineHeight: 1.6 }}>
+          20·30대 한정 · <span style={{ color: c.accent, fontWeight: 900 }}>선착순 30명</span> · 무료
+        </p>
+
+        {/* CTA 버튼 */}
+        <a href="https://ieumnaru.co.kr/ieumnaru-detail" target="_blank" rel="noopener noreferrer"
+          style={{ display: 'block', width: '100%', padding: '16px 0', borderRadius: 14, textAlign: 'center',
+            background: `linear-gradient(135deg, ${PURPLE}, ${LILAC})`, color: '#fff',
+            fontSize: 16, fontWeight: 900, textDecoration: 'none', boxShadow: `0 10px 28px rgba(155,93,229,.4)`,
+            fontFamily: 'inherit' }}>
+          이음나루 무료 프로그램 자세히 보기 →
+        </a>
       </div>
     </div>
   )
@@ -329,28 +439,17 @@ export default function ResultPage() {
       after(700, () => {
         setTyping(false)
         setItems(m => [...m, { from: 'yura', text: `${d.name}, 신청 접수됐어. 1영업일 안에 담당 코치가 연락 줄 거야.` }])
-        after(300, () => streamYura(['약속대로, 네 결과 지금 바로 다 보여줄게 🔓'], () => {
+        after(300, () => streamYura(['약속대로, 네 결과 지금 바로 보여줄게 🔓'], () => {
           after(300, () => {
             setTyping(true)
             after(600, () => {
               setTyping(false)
               setItems(m => [...m, { kind: 'card1' }])
-              after(250, () => {
-                setTyping(true)
-                after(500, () => {
-                  setTyping(false)
-                  setItems(m => [...m, { kind: 'card2' }])
-                  after(250, () => {
-                    setTyping(true)
-                    after(500, () => {
-                      setTyping(false)
-                      setItems(m => [...m, { kind: 'card3' }])
-                      after(300, () => {
-                        setItems(m => [...m, { from: 'yura', text: '이게 네 연애 패턴이야. 더 깊은 건 코치랑 직접 풀어보자.' }])
-                        after(250, () => setPhase('done'))
-                      })
-                    })
-                  })
+              after(400, () => {
+                setItems(m => [...m, { from: 'yura', text: '이게 네 연애 핵심 패턴이야. 더 자세한 분석이 궁금하면 아래 프로그램 확인해봐.' }])
+                after(300, () => {
+                  setItems(m => [...m, { kind: 'promo' }])
+                  after(250, () => setPhase('done'))
                 })
               })
             })
@@ -434,10 +533,8 @@ export default function ResultPage() {
   if (!resultKeys || !user) return null
 
   const renderNode = (kind) => {
-    if (kind === 'card3') return <RankCard rank="3위" type={third} c={c} imgSrc={imgSrc} />
-    if (kind === 'card2') return <RankCard rank="2위" type={second} c={c} imgSrc={imgSrc} />
-    if (kind === 'card1') return <RankCard rank="1위" type={first} c={c} imgSrc={imgSrc} />
-    if (kind === 'lock') return <LockedFirst first={first} user={user} c={c} imgSrc={imgSrc} />
+    if (kind === 'card1') return <RankCard type={first} c={c} imgSrc={imgSrc} />
+    if (kind === 'promo') return <PromoCard c={c} />
     return null
   }
 
