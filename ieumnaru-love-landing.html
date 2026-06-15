@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>이음나루 — 연애만 하면 작아지던 내가, 편해진 이유</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+  :root{
+    --bg:#0E0816;
+    --bg-deep:#080410;
+    --bg-soft:#1A1130;
+    --purple:#9B5DE5;
+    --lilac:#C084FC;
+    --deep:#6B3FA0;
+    --text:#F3E8FF;
+    --cream:#EAE3D8;
+    --muted:#A99BC4;
+    --beige:#B8AE9F;
+    --line:rgba(243,232,255,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Pretendard',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:0 24px;}
+  section{position:relative;}
+
+  /* 배경 질감 */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ───────────── HOOK ───────────── */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:88px 0 64px;position:relative;overflow:hidden;
+    background:radial-gradient(120% 80% at 70% 0%, #25164d 0%, var(--bg) 48%, var(--bg-deep) 100%);
+  }
+  .hero::before{
+    content:"";position:absolute;width:440px;height:440px;border-radius:50%;
+    top:-150px;right:-170px;
+    background:radial-gradient(circle, rgba(155,93,229,.40), transparent 65%);
+    filter:blur(10px);
+  }
+  .hero::after{
+    content:"";position:absolute;width:320px;height:320px;border-radius:50%;
+    bottom:-110px;left:-130px;
+    background:radial-gradient(circle, rgba(192,132,252,.22), transparent 70%);
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
+    font-size:12.5px;letter-spacing:.04em;color:var(--lilac);
+    border:1px solid rgba(192,132,252,.4);border-radius:999px;
+    padding:7px 14px;margin-bottom:28px;backdrop-filter:blur(4px);
+    opacity:0;animation:rise .8s .1s forwards;
+  }
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--purple);box-shadow:0 0 8px var(--purple);}
+  .hook-h1{
+    font-size:clamp(34px,9vw,46px);font-weight:800;line-height:1.22;
+    letter-spacing:-.02em;margin-bottom:22px;
+  }
+  .hook-h1 .em{color:var(--lilac);position:relative;display:inline-block;}
+  .hook-h1 .em::after{
+    content:"";position:absolute;left:0;bottom:4px;width:100%;height:10px;
+    background:rgba(155,93,229,.30);z-index:-1;border-radius:2px;
+  }
+  .hook-line{opacity:0;animation:rise .9s forwards;}
+  .l1{animation-delay:.22s;}
+  .l2{animation-delay:.36s;}
+  .hook-sub{
+    font-size:16.5px;color:var(--muted);margin-bottom:40px;max-width:440px;
+    opacity:0;animation:rise .9s .5s forwards;
+  }
+  .hook-sub b{color:var(--cream);font-weight:600;}
+  .scroll-cue{
+    opacity:0;animation:rise .9s .7s forwards;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    align-self:center;margin-top:8px;color:var(--beige);font-size:12px;letter-spacing:.1em;
+  }
+  .scroll-cue .arrow{width:1px;height:34px;background:linear-gradient(var(--lilac),transparent);animation:pulse 1.8s infinite;}
+
+  @keyframes rise{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+  /* ───────────── STORY ───────────── */
+  .story{padding:96px 0;}
+  .eyebrow{
+    font-size:13px;letter-spacing:.16em;color:var(--lilac);font-weight:700;
+    text-transform:uppercase;margin-bottom:18px;
+  }
+  .story-h2{
+    font-size:clamp(25px,6.5vw,31px);font-weight:800;line-height:1.36;
+    letter-spacing:-.02em;margin-bottom:36px;
+  }
+  .story-h2 .accent{color:var(--lilac);font-weight:800;}
+
+  /* 공감 카드 — 말풍선형 radius */
+  .pains{display:flex;flex-direction:column;gap:14px;margin-bottom:18px;}
+  .pain{
+    background:rgba(192,132,252,.06);border:1px solid var(--line);
+    border-left:3px solid var(--purple);border-radius:0 14px 14px 14px;
+    padding:18px 20px;font-size:15.5px;color:var(--cream);
+    display:flex;gap:13px;align-items:flex-start;
+  }
+  .pain .q{font-size:19px;line-height:1;color:var(--lilac);flex-shrink:0;}
+  .pain b{color:#fff;font-weight:600;}
+  .reveal{opacity:0;transform:translateY(28px);transition:.7s cubic-bezier(.2,.7,.3,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  .pivot{
+    margin:48px 0;padding:30px 26px;border-radius:18px;
+    background:linear-gradient(135deg, rgba(107,63,160,.30), rgba(26,17,48,.85));
+    border:1px solid rgba(192,132,252,.28);position:relative;overflow:hidden;
+  }
+  .pivot::before{
+    content:"";position:absolute;top:-40px;right:-40px;width:170px;height:170px;border-radius:50%;
+    background:radial-gradient(circle,rgba(155,93,229,.30),transparent 70%);
+  }
+  .pivot .tag{font-size:13px;color:var(--lilac);font-weight:700;letter-spacing:.04em;margin-bottom:12px;}
+  .pivot p{font-size:18px;line-height:1.6;color:var(--cream);font-weight:500;}
+  .pivot p .hl{color:var(--lilac);font-weight:800;}
+
+  /* 변화 후기 */
+  .voices{display:flex;flex-direction:column;gap:16px;margin-top:18px;}
+  .voice{
+    background:rgba(192,132,252,.05);border:1px solid var(--line);border-radius:0 16px 16px 16px;
+    padding:22px;position:relative;
+  }
+  .voice .quote{font-size:34px;color:var(--purple);line-height:.5;opacity:.6;font-weight:800;}
+  .voice p{font-size:15px;color:var(--cream);margin:6px 0 14px;line-height:1.7;}
+  .voice .who{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+  .voice .av{
+    width:30px;height:30px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;
+  }
+
+  /* ───────────── OFFER ───────────── */
+  .offer{
+    padding:96px 0 110px;
+    background:radial-gradient(120% 70% at 30% 100%, #25164d 0%, var(--bg) 52%);
+    position:relative;border-top:1px solid var(--line);
+  }
+  .offer-h2{
+    font-size:clamp(26px,7vw,33px);font-weight:800;line-height:1.32;
+    letter-spacing:-.02em;margin-bottom:14px;text-align:center;
+  }
+  .offer-h2 .accent{color:var(--lilac);}
+  .offer-lead{text-align:center;color:var(--muted);font-size:15.5px;margin-bottom:42px;}
+  .offer-lead b{color:var(--cream);}
+
+  .cores{display:flex;flex-direction:column;gap:16px;margin-bottom:40px;}
+  .core{
+    display:flex;gap:16px;align-items:flex-start;
+    background:rgba(192,132,252,.05);border:1px solid var(--line);border-radius:18px;
+    padding:22px 20px;transition:.4s;
+  }
+  .core:hover{border-color:rgba(192,132,252,.45);background:rgba(155,93,229,.10);transform:translateY(-3px);}
+  .core .num{
+    width:42px;height:42px;border-radius:13px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:800;color:#fff;
+  }
+  .core h4{font-size:17px;font-weight:700;color:#fff;margin-bottom:5px;}
+  .core h4 span{font-size:12.5px;font-weight:600;color:var(--lilac);margin-left:7px;}
+  .core p{font-size:14px;color:var(--muted);line-height:1.6;}
+
+  .price{
+    text-align:center;margin-bottom:34px;padding:26px;border-radius:18px;
+    background:linear-gradient(135deg,rgba(155,93,229,.16),rgba(192,132,252,.08));
+    border:1px solid rgba(192,132,252,.32);
+  }
+  .price .old{color:var(--muted);text-decoration:line-through;font-size:16px;}
+  .price .free{font-size:38px;font-weight:800;color:var(--lilac);letter-spacing:-.02em;margin:4px 0;}
+  .price .note{font-size:13.5px;color:var(--beige);}
+  .price .note b{color:var(--lilac);}
+
+  .trust{display:flex;justify-content:center;gap:24px;margin-bottom:38px;flex-wrap:wrap;}
+  .trust .item{text-align:center;}
+  .trust .big{font-size:24px;font-weight:800;color:var(--lilac);}
+  .trust .lbl{font-size:12px;color:var(--muted);}
+
+  .cta-area{position:sticky;bottom:0;}
+  .cta{
+    display:block;width:100%;text-align:center;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    color:#fff;font-size:18px;font-weight:800;letter-spacing:.01em;
+    padding:20px;border-radius:16px;border:none;cursor:pointer;
+    box-shadow:0 10px 24px rgba(155,93,229,.42), 0 2px 8px rgba(0,0,0,.3);
+    transition:.3s;text-decoration:none;
+  }
+  .cta:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(155,93,229,.52);}
+  .cta:active{transform:translateY(0);}
+  .cta-sub{text-align:center;font-size:12.5px;color:var(--muted);margin-top:14px;}
+  .cta-sub b{color:var(--lilac);}
+
+  footer{
+    text-align:center;padding:40px 24px;color:var(--muted);font-size:12px;
+    border-top:1px solid var(--line);background:var(--bg-deep);
+  }
+  footer b{color:var(--beige);}
+
+  /* ───────────── FORM ───────────── */
+  #form{
+    padding:80px 0 100px;
+    background:radial-gradient(100% 60% at 60% 0%, rgba(107,63,160,.22) 0%, var(--bg) 60%);
+    border-top:1px solid var(--line);
+  }
+  .form-title{font-size:26px;font-weight:800;line-height:1.35;margin-bottom:8px;letter-spacing:-.02em;}
+  .form-title .accent{color:var(--lilac);}
+  .form-sub{font-size:14.5px;color:var(--muted);margin-bottom:32px;line-height:1.7;}
+  .form-sub b{color:var(--cream);}
+
+  .form-progress{display:flex;gap:6px;margin-bottom:32px;align-items:center;}
+  .f-dot{height:5px;border-radius:3px;background:rgba(255,255,255,.15);transition:all .3s ease;width:6px;}
+  .f-dot.active{background:var(--lilac);width:22px;}
+  .f-dot.done{background:var(--purple);width:6px;}
+
+  .form-step{display:none;animation:rise .35s ease both;}
+  .form-step.active{display:block;}
+
+  .field-label{font-size:12.5px;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:9px;display:block;text-transform:uppercase;}
+  .field-note{font-size:12px;color:rgba(192,132,252,.65);margin-top:8px;display:flex;align-items:center;gap:5px;}
+  .field-input{
+    width:100%;padding:17px 18px;font-size:16px;font-family:'Pretendard',sans-serif;
+    background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);
+    border-radius:14px;color:var(--text);outline:none;
+    transition:.2s;-webkit-appearance:none;appearance:none;
+  }
+  .field-input:focus{border-color:var(--lilac);}
+  .field-input::placeholder{color:rgba(255,255,255,.25);}
+  .field-input.textarea{min-height:150px;resize:none;line-height:1.75;}
+  .field-group{display:flex;flex-direction:column;gap:18px;}
+
+  .time-options{display:flex;flex-direction:column;gap:10px;}
+  .time-opt{
+    display:flex;align-items:center;gap:14px;padding:16px 18px;
+    background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);
+    border-radius:14px;cursor:pointer;transition:.2s;-webkit-tap-highlight-color:transparent;
+  }
+  .time-opt:active{transform:scale(.98);}
+  .time-opt.sel{border-color:var(--lilac);background:rgba(155,93,229,.18);}
+  .t-radio{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.3);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.2s;}
+  .time-opt.sel .t-radio{border-color:var(--lilac);}
+  .t-inner{width:10px;height:10px;border-radius:50%;background:var(--lilac);display:none;}
+  .time-opt.sel .t-inner{display:block;}
+  .t-label{font-size:15.5px;color:var(--cream);font-weight:500;}
+  .time-opt.sel .t-label{color:#fff;font-weight:600;}
+
+  .form-btn{
+    width:100%;margin-top:28px;padding:18px;border-radius:14px;border:none;
+    background:linear-gradient(135deg,var(--purple),var(--lilac));
+    color:#fff;font-size:17px;font-weight:800;cursor:pointer;
+    font-family:'Pretendard',sans-serif;
+    box-shadow:0 8px 24px rgba(155,93,229,.38);transition:.2s;
+  }
+  .form-btn:disabled{background:rgba(255,255,255,.1);color:rgba(255,255,255,.3);box-shadow:none;cursor:not-allowed;}
+  .form-btn:not(:disabled):active{transform:scale(.98);}
+
+  .form-success{display:none;text-align:center;padding:40px 0 20px;}
+  .f-check{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--lilac));margin:0 auto 24px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 12px 28px rgba(155,93,229,.4);}
+  .form-success h3{font-size:24px;font-weight:800;margin-bottom:14px;}
+  .form-success p{font-size:15px;color:var(--muted);line-height:1.8;}
+  .form-success p b{color:var(--cream);}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<!-- ════════ HOOK ════════ -->
+<section class="hero">
+  <div class="wrap">
+    <span class="badge"><span class="dot"></span>이음나루 인지심리연구소 · 20대 무료 프로그램</span>
+    <h1 class="hook-h1">
+      <span class="hook-line l1">연애만 하면 작아지던 내가,</span><br/>
+      <span class="hook-line l2"><span class="em">편해진</span> 이유</span>
+    </h1>
+    <p class="hook-sub">
+      연락 한 번에 마음이 흔들리고, 늘 같은 이유로 끝나던 연애 <br/>
+      <b>편해진 건 성격을 바꿔서가 아니었어요.</b>
+    </p>
+    <div class="scroll-cue">
+      <span>그 이유 보기</span>
+      <span class="arrow"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ STORY ════════ -->
+<section class="story">
+  <div class="wrap">
+    <p class="eyebrow reveal">혹시, 이런 적 있나요?</p>
+    <h2 class="story-h2 reveal">
+      문제는 당신의 성격이 아니라,<br/>
+      <span class="accent">아직 모르고 있던 '마음의 패턴'</span>이에요.
+    </h2>
+
+    <div class="pains">
+      <div class="pain reveal"><span class="q">“</span><span>좋아하는 사람 앞에서는 이상하게 <b>말도 행동도 부자연스러워져요.</b></span></div>
+      <div class="pain reveal"><span class="q">“</span><span>연락이 조금만 늦어도 <b>'내가 뭘 잘못했나' 하고 곱씹어요.</b></span></div>
+      <div class="pain reveal"><span class="q">“</span><span>사람은 매번 다른데, <b>헤어지는 이유는 늘 비슷하게 반복돼요.</b></span></div>
+    </div>
+
+    <div class="pivot reveal">
+      <p class="tag">◆ 우리가 발견한 것</p>
+      <p>
+        같은 연애여도 누구는 편하고 누구는 힘든 이유.<br/>
+        그건 의지가 아니라 <span class="hl">내 안의 심리 구조</span> 때문이에요.
+        구조를 알면, 관계는 <span class="hl">노력 없이도</span> 편해져요.
+      </p>
+    </div>
+
+    <p class="eyebrow reveal" style="margin-top:8px;">먼저 경험한 사람들</p>
+    <div class="voices">
+      <div class="voice reveal">
+        <div class="quote">”</div>
+        <p>내가 왜 연애만 하면 불안해지는지 처음 알았어요. 이유를 아니까 신기하게 덜 흔들려요.</p>
+        <div class="who"><div class="av">지</div>대학교 3학년 · 지윤님</div>
+      </div>
+      <div class="voice reveal">
+        <div class="quote">”</div>
+        <p>"내가 예민한 게 아니었구나" 하고 나니까, 관계에서 오던 피로가 확 줄었어요.</p>
+        <div class="who"><div class="av">현</div>대학교 4학년 · 현우님</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ OFFER ════════ -->
+<section class="offer">
+  <div class="wrap">
+    <h2 class="offer-h2 reveal">
+      나의 연애 패턴을 <span class="accent">3단계</span>로<br/>풀어내는 시간
+    </h2>
+    <p class="offer-lead reveal">이음나루 <b>3코어 매직</b> · 20대만을 위한 프로그램</p>
+
+    <div class="cores">
+      <div class="core reveal">
+        <div class="num">1</div>
+        <div><h4>강연 <span>90분</span></h4><p>내 연애와 관계의 패턴, 그 심리 구조를 이해하는 시간. 왜 늘 같은 지점에서 힘들었는지 그 뿌리를 짚어요.</p></div>
+      </div>
+      <div class="core reveal">
+        <div class="num">2</div>
+        <div><h4>1:1 심리코칭 <span>맞춤</span></h4><p>나에게 맞는 관계 방향을 함께 설계해요. 혼자 끙끙대지 않고, 전문가와 같이 길을 찾아요.</p></div>
+      </div>
+      <div class="core reveal">
+        <div class="num">3</div>
+        <div><h4>IDT 검사 체험 <span>10분</span></h4><p>이음나루가 직접 개발한 인지구조 패턴 검사. 내 마음이 관계에서 어떻게 작동하는지 데이터로 확인해요.</p></div>
+      </div>
+    </div>
+
+    <div class="trust reveal">
+      <div class="item"><div class="big">9유형</div><div class="lbl">정밀 심리 분석</div></div>
+      <div class="item"><div class="big">1:1</div><div class="lbl">맞춤 코칭</div></div>
+      <div class="item"><div class="big">100%</div><div class="lbl">무료 참여</div></div>
+    </div>
+
+    <div class="price reveal">
+      <div class="old">정가 380,000원</div>
+      <div class="free">0원</div>
+      <div class="note"><b>취업창업지원금</b>으로 전액 지원돼요</div>
+    </div>
+
+    <div class="cta-area">
+      <a href="#form" class="cta" id="apply-btn">무료 신청하기 →</a>
+      <p class="cta-sub">이번 기수 <b>30명 한정</b> · 신청 후 1영업일 내 연락드려요</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FORM ════════ -->
+<section id="form">
+  <div class="wrap">
+    <p class="eyebrow reveal">무료 신청</p>
+    <div class="form-title reveal">딱 <span class="accent">5가지</span>만 알려주세요</div>
+    <p class="form-sub reveal">이름과 성별은 이미 받았어요.<br/><b>순서대로 입력하면 바로 신청돼요.</b></p>
+
+    <div class="form-progress" id="fp"></div>
+
+    <!-- Step 1: 연락처 -->
+    <div class="form-step active" data-step="1">
+      <label class="field-label">연락처</label>
+      <input class="field-input" id="f-phone" type="tel" inputmode="numeric" maxlength="13" placeholder="010-0000-0000"/>
+      <button class="form-btn" id="n1" disabled>다음</button>
+    </div>
+
+    <!-- Step 2: 나이 + 직업 -->
+    <div class="form-step" data-step="2">
+      <div class="field-group">
+        <div>
+          <label class="field-label">나이</label>
+          <input class="field-input" id="f-age" type="number" inputmode="numeric" placeholder="예) 24" min="15" max="50"/>
+        </div>
+        <div>
+          <label class="field-label">직업</label>
+          <input class="field-input" id="f-job" type="text" placeholder="예) 대학생, 직장인, 취준생"/>
+        </div>
+      </div>
+      <button class="form-btn" id="n2" disabled>다음</button>
+    </div>
+
+    <!-- Step 3: 거주지 -->
+    <div class="form-step" data-step="3">
+      <label class="field-label">거주지</label>
+      <input class="field-input" id="f-loc" type="text" placeholder="예) 서울 마포구 합정동"/>
+      <p class="field-note">📍 지점별 정확한 안내를 도와드려요</p>
+      <button class="form-btn" id="n3" disabled>다음</button>
+    </div>
+
+    <!-- Step 4: 희망시간 -->
+    <div class="form-step" data-step="4">
+      <label class="field-label">안내 전화 희망시간</label>
+      <div class="time-options">
+        <div class="time-opt" data-v="평일 오전 (10:00~12:00)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">평일 오전 (10:00~12:00)</span></div>
+        <div class="time-opt" data-v="평일 오후 (13:00~18:00)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">평일 오후 (13:00~18:00)</span></div>
+        <div class="time-opt" data-v="평일 저녁 (18:00~19:00)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">평일 저녁 (18:00~19:00)</span></div>
+        <div class="time-opt" data-v="주말 (예약제)"><div class="t-radio"><div class="t-inner"></div></div><span class="t-label">주말 (예약제)</span></div>
+      </div>
+      <button class="form-btn" id="n4" disabled>다음</button>
+    </div>
+
+    <!-- Step 5: 상담 내용 -->
+    <div class="form-step" data-step="5">
+      <label class="field-label">상담하고 싶은 내용</label>
+      <textarea class="field-input textarea" id="f-concern" placeholder="상담하시고 싶은 내용을 입력하세요"></textarea>
+      <button class="form-btn" id="n5" disabled>신청 완료</button>
+    </div>
+
+    <!-- 완료 화면 -->
+    <div class="form-success" id="f-success">
+      <div class="f-check">✓</div>
+      <h3>신청 완료!</h3>
+      <p>입력하신 <b>연락처로 담당자가 직접 연락</b>드려요.<br/>보통 <b>1영업일 이내</b>에 연락드려요.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  이음나루 인지심리연구소<br/>
+  <b>사람과 사람을 잇는 마음의 나루터</b>
+</footer>
+
+<script>
+  // ── 스크롤 애니메이션 ──
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('in'), i*60); io.unobserve(e.target); }
+    });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // ── CTA 스무스 스크롤 ──
+  document.getElementById('apply-btn').addEventListener('click',function(e){
+    e.preventDefault();
+    document.getElementById('form').scrollIntoView({behavior:'smooth'});
+  });
+
+  // ── 신청 폼 ──
+  (function(){
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec";
+    const STEPS = 5;
+
+    const p = new URLSearchParams(window.location.search);
+    const urlName   = decodeURIComponent(p.get('name')   || '');
+    const urlGender = decodeURIComponent(p.get('gender') || '');
+    const urlType   = decodeURIComponent(p.get('type')   || '');
+
+    let cur = 1;
+    const fd = {};
+
+    // 진행 바
+    const fp = document.getElementById('fp');
+    for(let i=1;i<=STEPS;i++){
+      const d=document.createElement('div');
+      d.className='f-dot'+(i===1?' active':'');
+      if(i===1) d.style.width='22px';
+      fp.appendChild(d);
+    }
+    function updateBar(step){
+      fp.querySelectorAll('.f-dot').forEach((d,i)=>{
+        d.classList.remove('active','done'); d.style.width='6px';
+        if(i+1<step){d.classList.add('done');}
+        if(i+1===step){d.classList.add('active');d.style.width='22px';}
+      });
+    }
+    function goStep(step){
+      document.querySelectorAll('.form-step').forEach(s=>s.classList.remove('active'));
+      const el=document.querySelector('[data-step="'+step+'"]');
+      if(el){el.classList.add('active'); el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+      updateBar(step); cur=step;
+    }
+
+    // 전화번호 포맷
+    function fmtPhone(v){
+      const n=v.replace(/[^0-9]/g,'').slice(0,11);
+      if(n.length<4)return n;
+      if(n.length<8)return n.slice(0,3)+'-'+n.slice(3);
+      return n.slice(0,3)+'-'+n.slice(3,7)+'-'+n.slice(7);
+    }
+
+    // Step 1: 연락처
+    const ph=document.getElementById('f-phone'), n1=document.getElementById('n1');
+    ph.addEventListener('input',function(){ this.value=fmtPhone(this.value); n1.disabled=this.value.replace(/[^0-9]/g,'').length<10; });
+    n1.addEventListener('click',function(){ fd.phone=ph.value; goStep(2); });
+
+    // Step 2: 나이 + 직업
+    const ag=document.getElementById('f-age'), jb=document.getElementById('f-job'), n2=document.getElementById('n2');
+    function chk2(){ n2.disabled=!(ag.value.trim()&&jb.value.trim()); }
+    ag.addEventListener('input',chk2); jb.addEventListener('input',chk2);
+    n2.addEventListener('click',function(){ fd.age=ag.value.trim(); fd.job=jb.value.trim(); goStep(3); });
+
+    // Step 3: 거주지
+    const lc=document.getElementById('f-loc'), n3=document.getElementById('n3');
+    lc.addEventListener('input',function(){ n3.disabled=this.value.trim().length<2; });
+    n3.addEventListener('click',function(){ fd.location=lc.value.trim(); goStep(4); });
+
+    // Step 4: 희망시간
+    const n4=document.getElementById('n4');
+    document.querySelectorAll('.time-opt').forEach(function(opt){
+      opt.addEventListener('click',function(){
+        document.querySelectorAll('.time-opt').forEach(o=>o.classList.remove('sel'));
+        this.classList.add('sel');
+        fd.calltime=this.dataset.v;
+        n4.disabled=false;
+      });
+    });
+    n4.addEventListener('click',function(){ goStep(5); });
+
+    // Step 5: 상담 내용
+    const cn=document.getElementById('f-concern'), n5=document.getElementById('n5');
+    cn.addEventListener('input',function(){ n5.disabled=this.value.trim().length<5; });
+    n5.addEventListener('click',function(){
+      fd.concern=cn.value.trim();
+      submitAll();
+    });
+
+    function submitAll(){
+      const data={ name:urlName, gender:urlGender, type:urlType, ...fd };
+      try{ fetch(SHEET_URL,{method:'POST',body:new URLSearchParams(data)}).catch(()=>{}); }catch(e){}
+      try{
+        const s=document.createElement('script');
+        s.src=SHEET_URL+'?'+new URLSearchParams(data).toString();
+        document.head.appendChild(s);
+        setTimeout(()=>{ try{s.parentNode&&s.parentNode.removeChild(s);}catch(e){} },8000);
+      }catch(e){}
+      // 완료 화면
+      document.querySelectorAll('.form-step').forEach(s=>s.style.display='none');
+      fp.style.display='none';
+      document.querySelector('#form .form-title').innerHTML='🎉 신청 완료!';
+      document.querySelector('#form .form-sub').style.display='none';
+      document.getElementById('f-success').style.display='block';
+    }
+  })();
+</script>
+</body>
+</html>
