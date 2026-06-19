@@ -48,6 +48,12 @@ const APPLY_STEPS = [
     options: ['인스타', '카카오톡', '친구·지인', '블로그'] },
 ]
 
+const REVIEWS = [
+  { name: '김지수 (26)', text: '솔직히 테스트 믿을까 싶었는데 결과 보고 소름 돋았어요. 제 패턴이 이렇게 정확하게 나올 줄 몰랐어요.' },
+  { name: '이민준 (29)', text: '친구한테 보내줬더니 "이거 나 완전 맞다"고 난리났어요 ㅋㅋ 연애 얘기하다가 자연스럽게 알게 됐어요.' },
+  { name: '박하은 (24)', text: '가볍게 했는데 생각보다 깊이 있어서 놀랐어요. 제가 왜 매번 같은 상황에서 힘들었는지 조금 이해됐어요.' },
+]
+
 /* ── 재마운트/깜박임 방지를 위해 컴포넌트는 모듈 최상위에 고정 정의 ── */
 
 function Avatar({ size = 30 }) {
@@ -152,6 +158,31 @@ function RankCard({ type, c, imgSrc }) {
               </p>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ReviewCard({ c }) {
+  return (
+    <div className="fade-in" style={{ alignSelf: 'stretch', borderRadius: 16, overflow: 'hidden',
+      background: 'rgba(255,255,255,.055)', border: '1px solid rgba(255,255,255,.10)' }}>
+      <div style={{ padding: '16px 16px 14px' }}>
+        <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.3px', marginBottom: 13 }}>
+          실제 후기
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {REVIEWS.map((r, i) => (
+            <div key={i} style={{ padding: '12px 13px', borderRadius: 12,
+              background: 'rgba(0,0,0,.2)', border: '1px solid rgba(255,255,255,.07)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,.9)', fontWeight: 800 }}>{r.name}</span>
+                <span style={{ fontSize: 12, color: '#FBBF24', letterSpacing: 1 }}>★★★★★</span>
+              </div>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,.6)', lineHeight: 1.65, margin: 0 }}>{r.text}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -332,9 +363,9 @@ export default function ResultPage() {
   // 결과는 신청 후에만 공개하는 대본
   const BEATS = first ? [
     { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: [], end: 'continue', cont: '오, 결과 보여줘!' },
-    { msgs: ['잠깐, 결과 보여주기 전에 한마디만 해도 돼?', '이거 그냥 읽고 넘기기엔 좀 아깝다고 생각해서.'], cards: [], end: 'continue', cont: '응, 얘기해봐' },
-    { msgs: ['사실 이음나루에서 무료로 진행하는 프로그램이 있어.', '20·30대만 신청할 수 있는 건데, 테스트보다 훨씬 깊이 들여다볼 수 있어.'], cards: [], end: 'continue', cont: '더 들어볼게' },
-    { msgs: ['내용이 꽤 알차. 크게 세 가지인데,', '① 토크쇼 — 왜 같은 패턴이 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '오 근데 나도 신청할 수 있어?' },
+    { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 것이 있어.'], cards: [], end: 'continue', cont: '오 뭔데?' },
+    { msgs: ['요즘 내가 직접 개발한 테스트지가 있는데,'], cards: ['review'], end: 'continue', cont: 'ㅋㅋ 진짜 핫하다' },
+    { msgs: ['크게 세 가지인데,', '① 토크쇼 — 왜 같은 패턴이 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '나도 신청할 수 있어?' },
     { msgs: ['이번 기수는 자리가 많지 않아서 선착순 30명만 받고 있거든.', '신청하면 지금 바로 결과 다 볼 수 있어.'], cards: [], end: 'cta' },
   ] : []
 
@@ -344,7 +375,15 @@ export default function ResultPage() {
     setPhase(null)
     let idx = 0
     const pushCards = () => {
-      after(150, () => setPhase(beat.end))
+      if (!beat.cards || !beat.cards.length) { after(150, () => setPhase(beat.end)); return }
+      after(400, () => {
+        setTyping(true)
+        after(500, () => {
+          setTyping(false)
+          beat.cards.forEach(k => setItems(m => [...m, { kind: k }]))
+          after(300, () => setPhase(beat.end))
+        })
+      })
     }
     const step = () => {
       if (idx >= beat.msgs.length) { pushCards(); return }
@@ -535,6 +574,7 @@ export default function ResultPage() {
   const renderNode = (kind) => {
     if (kind === 'card1') return <RankCard type={first} c={c} imgSrc={imgSrc} />
     if (kind === 'promo') return <PromoCard c={c} />
+    if (kind === 'review') return <ReviewCard c={c} />
     return null
   }
 
