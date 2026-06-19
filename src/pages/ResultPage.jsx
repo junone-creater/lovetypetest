@@ -833,12 +833,6 @@ export default function ResultPage() {
             }}>
               응, 나 신청할래
             </button>
-            <button onClick={onApplyNo} style={{
-              width: '100%', border: `1.5px solid ${c.accent}66`, background: 'rgba(192,132,252,.08)', color: 'rgba(255,255,255,.7)',
-              borderRadius: 16, padding: '14px', fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: FONT,
-            }}>
-              아니, 다음에 할게
-            </button>
           </div>
         )}
 
