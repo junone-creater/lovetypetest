@@ -298,8 +298,28 @@ export default function QuizPage() {
       <div style={{ flexShrink: 0, padding: '12px 16px 20px', borderTop: '1px solid rgba(255,255,255,.07)', background: '#0E0816' }}>
         {phase === 'answering' ? (
           <div key={qIndex} className="fade-in">
-            <div style={{ fontSize: 11, color: LILAC, fontWeight: 900, letterSpacing: '1.3px', margin: '0 2px 10px' }}>
-              내 답장 선택
+            {/* 진행 상태 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 2px 10px' }}>
+              <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                {Array.from({ length: TOTAL }).map((_, i) => (
+                  <span key={i} style={{
+                    display: 'inline-block', borderRadius: 99,
+                    width: i < qIndex ? 12 : i === qIndex ? 16 : 6,
+                    height: 6,
+                    background: i < qIndex
+                      ? `linear-gradient(90deg,${PURPLE},${LILAC})`
+                      : i === qIndex
+                        ? LILAC
+                        : 'rgba(255,255,255,.18)',
+                    transition: 'all .3s ease',
+                  }} />
+                ))}
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,.5)', whiteSpace: 'nowrap', marginLeft: 10 }}>
+                {TOTAL - qIndex - 1 > 0
+                  ? <><span style={{ color: LILAC }}>{TOTAL - qIndex - 1}개</span> 남았어</>
+                  : <span style={{ color: LILAC }}>마지막 질문이야</span>}
+              </span>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               {[0, 1].map(i => {
