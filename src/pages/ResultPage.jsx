@@ -152,6 +152,9 @@ const REVIEWS = [
   { name: '최재원 (23)', text: '10개 문항인데 결과가 꽤 길게 나와서 놀랐어요. 핵심 성향부터 조언까지 다 담겨있어서 읽는 재미가 있었어요.' },
 ]
 
+// 후기 카드 별점 패턴 (3·4·5 혼합, 30개 주기)
+const STAR_PATTERN = [5,5,4,5,5,4,5,3,5,4,5,5,4,5,5,3,5,4,5,5,4,5,5,3,5,4,5,5,4,3]
+
 /* ── 재마운트/깜박임 방지를 위해 컴포넌트는 모듈 최상위에 고정 정의 ── */
 
 function Avatar({ size = 30 }) {
@@ -314,7 +317,9 @@ function ReviewCard({ c }) {
             background: 'rgba(0,0,0,.2)', border: '1px solid rgba(255,255,255,.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7 }}>
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,.9)', fontWeight: 800 }}>{r.name}</span>
-              <span style={{ fontSize: 11, color: '#FBBF24', letterSpacing: 1 }}>★★★★★</span>
+              <span style={{ fontSize: 11, color: '#FBBF24', letterSpacing: 1 }}>
+                {'★'.repeat(STAR_PATTERN[i % STAR_PATTERN.length])}{'☆'.repeat(5 - STAR_PATTERN[i % STAR_PATTERN.length])}
+              </span>
             </div>
             <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.6)', lineHeight: 1.65, margin: 0 }}>{r.text}</p>
           </div>
@@ -390,6 +395,36 @@ function PromoCard({ c }) {
             fontFamily: 'inherit' }}>
           이음나루 무료 프로그램 자세히 보기 →
         </a>
+      </div>
+    </div>
+  )
+}
+
+function LockedImgCard({ type, imgSrc, c }) {
+  return (
+    <div className="fade-in" style={{ alignSelf: 'stretch', borderRadius: 18, overflow: 'hidden',
+      background: 'rgba(255,255,255,.065)', border: `1px solid ${c.accent}44`,
+      boxShadow: '0 14px 34px rgba(0,0,0,.22)' }}>
+      <div style={{ position: 'relative', background: '#160C24', lineHeight: 0 }}>
+        <img src={imgSrc(type.key)} alt="" style={{ width: '100%', height: 'auto', display: 'block',
+          filter: 'blur(18px)', transform: 'scale(1.1)', opacity: .65 }}
+          onError={e => { const w = e.target.parentElement; if (w) w.style.minHeight = '180px' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', gap: 10, background: 'rgba(14,8,22,.38)' }}>
+          <div style={{ fontSize: 28 }}>🔒</div>
+          <div style={{ fontSize: 14, color: '#fff', fontWeight: 900, padding: '10px 20px', borderRadius: 999,
+            background: 'rgba(0,0,0,.65)', border: `1px solid ${c.accent}88`, textAlign: 'center' }}>
+            신청 후 바로 공개돼
+          </div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,.5)', fontWeight: 600 }}>네 연애 프로파일 이미지</div>
+        </div>
+      </div>
+      <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 8, height: 8, borderRadius: '50%', background: c.accent, flexShrink: 0,
+          boxShadow: `0 0 8px ${c.accent}` }} />
+        <span style={{ fontSize: 13, color: 'rgba(255,255,255,.65)', fontWeight: 700 }}>
+          분석 완료 · 결과 이미지가 준비됐어
+        </span>
       </div>
     </div>
   )
@@ -497,7 +532,7 @@ export default function ResultPage() {
 
   // 결과는 신청 후에만 공개하는 대본
   const BEATS = first ? [
-    { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: [], end: 'continue', cont: '오, 결과 보여줘!' },
+    { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: ['lockedimg'], end: 'continue', cont: '오, 결과 보여줘!' },
     { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 것이 있어.'], cards: [], end: 'continue', cont: '오 뭔데?' },
     { msgs: ['요즘 내가 직접 개발한 테스트지가 있는데,'], cards: ['review'], end: 'continue', cont: 'ㅋㅋ 진짜 핫하다' },
     { msgs: ['크게 세 가지인데,', '① 토크쇼 — 왜 같은 패턴이 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '나도 신청할 수 있어?' },
@@ -710,6 +745,7 @@ export default function ResultPage() {
     if (kind === 'card1') return <RankCard type={first} c={c} imgSrc={imgSrc} />
     if (kind === 'promo') return <PromoCard c={c} />
     if (kind === 'review') return <ReviewCard c={c} />
+    if (kind === 'lockedimg') return <LockedImgCard type={first} imgSrc={imgSrc} c={c} />
     return null
   }
 
