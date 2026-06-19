@@ -21,30 +21,30 @@ function fmtPhone(v) {
 
 // 재확인 시 정보를 다시 받는 단계 (이름·나이·성별)
 const EDIT_STEPS = [
-  { key: 'name', target: 'user', type: 'text', ask: ['그래, 다시 정확히 받을게. 이름이 어떻게 돼?'], placeholder: '이름' },
+  { key: 'name', target: 'user', type: 'text', ask: ['그럼 다시 알려줘. 이름이 어떻게 돼?'], placeholder: '이름' },
   { key: 'age', target: 'user', type: 'tel', ask: ['나이는 몇 살이야?'], placeholder: '예) 24' },
-  { key: 'gender', target: 'user', type: 'chips', ask: ['성별도 알려줘.'], options: ['여자', '남자'] },
+  { key: 'gender', target: 'user', type: 'chips', ask: ['성별도 알려줄 수 있어?'], options: ['여자', '남자'] },
 ]
 
-// 대화로 받는 신청 단계 (기존 신청 폼을 채팅으로 옮긴 것)
+// 대화로 받는 신청 단계
 const APPLY_STEPS = [
   { key: 'phone', type: 'tel',
-    ask: ['먼저 연락받을 번호 하나만 남겨줘.'],
+    ask: ['연락받을 번호 하나만 남겨줄 수 있어?'],
     placeholder: '010-0000-0000' },
   { key: 'job', type: 'chips',
-    ask: ['고마워. 너 지금은 뭐 하고 지내?'],
+    ask: ['고마워 :) 지금 어떻게 지내고 있어?'],
     options: ['대학생', '직장인', '취준생', '프리랜서', '기타'] },
   { key: 'location', type: 'text',
-    ask: ['어디 사는지도 알려줄래? 지점 안내 때문에 필요하거든.'],
+    ask: ['어디 살아? 지점 안내할 때 필요하거든.'],
     placeholder: '예) 서울 마포구' },
   { key: 'calltime', type: 'chips',
-    ask: ['언제 연락하면 편해?'],
+    ask: ['연락받기 편한 시간대가 언제야?'],
     options: ['평일 오전 (10~12시)', '평일 오후 (13~18시)', '평일 저녁 (18~19시)', '주말 (예약제)'] },
   { key: 'concern', type: 'text',
-    ask: ['마지막으로, 연애에서 제일 고민인 게 뭐야?', '편하게 적어줘. 그것까지 봐야 제대로 도와줄 수 있어.'],
-    placeholder: '고민을 편하게 적어줘' },
+    ask: ['마지막으로 하나만 더.', '연애에서 요즘 제일 고민인 게 뭐야? 편하게 적어줘.'],
+    placeholder: '편하게 적어줘' },
   { key: 'source', type: 'chips',
-    ask: ['아 맞다. 나 어떻게 알고 왔어?'],
+    ask: ['참, 나 어떻게 알고 왔어?'],
     options: ['인스타', '카카오톡', '친구·지인', '블로그'] },
 ]
 
@@ -331,11 +331,11 @@ export default function ResultPage() {
 
   // 결과는 신청 후에만 공개하는 대본
   const BEATS = first ? [
-    { msgs: [`${user.name}, 분석 끝났어.`, RESULT_STORY.yura], cards: [], end: 'continue', cont: '오 결과 보여줘!' },
-    { msgs: ['잠깐. 결과 바로 보여주기엔 좀 아깝거든.', '이 결과, 그냥 텍스트로 보고 끝낼 게 아니야.'], cards: [], end: 'continue', cont: '무슨 말이야?' },
-    { msgs: ['우리 이음나루에서 하는 무료 프로그램이 있어.', '20·30대만 신청할 수 있는 건데, 네 연애 유형을 제대로 짚어줄 수 있어.'], cards: [], end: 'continue', cont: '더 들어볼게' },
-    { msgs: ['크게 3단계야.', '① 토크쇼 — 연애 패턴의 뿌리부터 짚어줘', '② 1:1 연애코치 — 너한테 맞는 방향 같이 설계해줘', '③ IDT 검사지 — 네 마음이 어떻게 작동하는지 데이터로 확인'], cards: [], end: 'continue', cont: '오 근데 나도 신청돼?' },
-    { msgs: ['이번 기수는 선착순 30명까지야.', '신청하면 지금 바로 네 결과 다 보여줄게.'], cards: [], end: 'cta' },
+    { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: [], end: 'continue', cont: '오, 결과 보여줘!' },
+    { msgs: ['잠깐, 결과 보여주기 전에 한마디만 해도 돼?', '이거 그냥 읽고 넘기기엔 좀 아깝다고 생각해서.'], cards: [], end: 'continue', cont: '응, 얘기해봐' },
+    { msgs: ['사실 이음나루에서 무료로 진행하는 프로그램이 있어.', '20·30대만 신청할 수 있는 건데, 테스트보다 훨씬 깊이 들여다볼 수 있어.'], cards: [], end: 'continue', cont: '더 들어볼게' },
+    { msgs: ['내용이 꽤 알차. 크게 세 가지인데,', '① 토크쇼 — 왜 같은 패턴이 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '오 근데 나도 신청할 수 있어?' },
+    { msgs: ['이번 기수는 자리가 많지 않아서 선착순 30명만 받고 있거든.', '신청하면 지금 바로 결과 다 볼 수 있어.'], cards: [], end: 'cta' },
   ] : []
 
   const playBeat = useCallback((i) => {
@@ -438,15 +438,15 @@ export default function ResultPage() {
       setTyping(true)
       after(700, () => {
         setTyping(false)
-        setItems(m => [...m, { from: 'yura', text: `${d.name}, 신청 접수됐어. 1영업일 안에 담당 코치가 연락 줄 거야.` }])
-        after(300, () => streamYura(['약속대로, 네 결과 지금 바로 보여줄게 🔓'], () => {
+        setItems(m => [...m, { from: 'yura', text: `${d.name}, 신청 잘 받았어 :) 1영업일 안에 담당 코치가 연락드릴 거야.` }])
+        after(300, () => streamYura(['약속대로 결과 바로 보여줄게 🔓'], () => {
           after(300, () => {
             setTyping(true)
             after(600, () => {
               setTyping(false)
               setItems(m => [...m, { kind: 'card1' }])
               after(400, () => {
-                setItems(m => [...m, { from: 'yura', text: '이게 네 연애 핵심 패턴이야. 더 자세한 분석이 궁금하면 아래 프로그램 확인해봐.' }])
+                setItems(m => [...m, { from: 'yura', text: '지금 가장 강하게 나온 연애 패턴이야. 더 깊은 분석은 아래 프로그램에서 확인해봐.' }])
                 after(300, () => {
                   setItems(m => [...m, { kind: 'promo' }])
                   after(250, () => setPhase('done'))
@@ -495,8 +495,8 @@ export default function ResultPage() {
     setItems(m => [...m, { from: 'me', text: '응, 나 신청할래' }])
     setPhase(null)
     after(220, () => streamYura([
-      '좋아. 신청 전에 네 정보부터 한 번만 확인할게.',
-      `이름은 ${user.name}, ${user.age}살, ${user.gender} — 이거 맞아?`,
+      '좋아 :) 신청 전에 정보 한 번만 확인할게.',
+      `이름은 ${user.name}, ${user.age}살, ${user.gender} — 맞지?`,
     ], () => setPhase('confirm')))
   }
 
@@ -506,7 +506,7 @@ export default function ResultPage() {
     setItems(m => [...m, { from: 'me', text: '응, 맞아' }])
     stepsRef.current = APPLY_STEPS
     setPhase(null)
-    after(220, () => streamYura(['확인했어. 그럼 바로 신청 받을게.'], () => askApplyStep(0)))
+    after(220, () => streamYura(['확인했어, 그럼 바로 시작할게!'], () => askApplyStep(0)))
   }
 
   // 정보 확인 ─ "아니, 수정할게": 이름·나이·성별부터 다시 받고 이어서 신청
@@ -524,9 +524,9 @@ export default function ResultPage() {
     setItems(m => [...m, { from: 'me', text: '아니, 다음에 할게' }])
     setPhase(null)
     after(420, () => streamYura([
-      '음… 알겠어. 억지로 권하진 않을게.',
-      '근데 선착순 30명이라, 마감되면 다음 기수까진 기다려야 해.',
-      '마음 바뀌면 언제든 다시 와. 결과는 내가 잡아두고 있을게.',
+      '알겠어, 억지로 권하진 않을게.',
+      '근데 선착순 30명이라 자리 없어지면 다음 기수까지 기다려야 할 수 있어.',
+      '마음 바뀌면 언제든 다시 와. 결과는 여기 남아 있을게.',
     ], () => setPhase('declined')))
   }
 
