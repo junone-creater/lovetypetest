@@ -175,15 +175,17 @@ export default function QuizPage() {
 
       const isLast = qIndex + 1 >= TOTAL
       const reactions = opt.reactions || []
+      const hasReaction = reactions.length > 0
       // 유라의 리액션 → 다음 질문 또는 분석 대기
-      after(200, () => {
+      after(hasReaction ? 200 : 120, () => {
         streamYura(reactions, () => {
           if (!isLast) {
             const ni = qIndex + 1
             setQIndex(ni)
             store.setQIndex(ni)
-            const bridge = BRIDGES[qIndex % BRIDGES.length]
-            after(280, () => askQuestion(ni, true, bridge))
+            // 반응이 있으면 브릿지 멘트 추가, 없으면 바로 다음 질문
+            const bridge = hasReaction ? BRIDGES[qIndex % BRIDGES.length] : null
+            after(hasReaction ? 260 : 150, () => askQuestion(ni, true, bridge))
           } else {
             const { scores, result } = computeResult(nextAnswers)
             store.setScores(scores)
