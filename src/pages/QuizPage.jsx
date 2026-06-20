@@ -325,17 +325,20 @@ export default function QuizPage() {
               {[0, 1].map(i => {
                 const op = q.options[i]
                 const on = selected === i
-                const isYes = i === 0
+                const isLeft = i === 0
+                const isShort = op.label.length <= 4
                 return (
                   <button key={i} onClick={() => handleAnswer(i)} className="option-btn"
-                    style={{ flex: 1, padding: '20px 0', fontSize: 18, fontWeight: 900,
-                      color: on ? '#fff' : isYes ? '#fff' : 'rgba(255,255,255,.75)',
+                    style={{ flex: 1, padding: isShort ? '20px 0' : '16px 10px',
+                      fontSize: isShort ? 18 : op.label.length <= 9 ? 16 : 14,
+                      fontWeight: 900, lineHeight: 1.35, textAlign: 'center',
+                      color: on ? '#fff' : isLeft ? '#fff' : 'rgba(255,255,255,.75)',
                       background: on
-                        ? (isYes ? `linear-gradient(135deg,${PURPLE},${LILAC})` : 'rgba(255,255,255,.15)')
-                        : (isYes ? `linear-gradient(135deg,${PURPLE},${LILAC})` : 'rgba(255,255,255,.06)'),
-                      border: `1.5px solid ${on ? LILAC : isYes ? 'transparent' : 'rgba(255,255,255,.15)'}`,
+                        ? (isLeft ? `linear-gradient(135deg,${PURPLE},${LILAC})` : 'rgba(255,255,255,.15)')
+                        : (isLeft ? `linear-gradient(135deg,${PURPLE},${LILAC})` : 'rgba(255,255,255,.06)'),
+                      border: `1.5px solid ${on ? LILAC : isLeft ? 'transparent' : 'rgba(255,255,255,.15)'}`,
                       borderRadius: 16, cursor: 'pointer', fontFamily: FONT,
-                      boxShadow: isYes ? `0 6px 22px rgba(155,93,229,.35)` : 'none',
+                      boxShadow: isLeft ? `0 6px 22px rgba(155,93,229,.35)` : 'none',
                       transition: 'opacity .12s' }}>
                     {op.label}
                   </button>

@@ -1,11 +1,11 @@
-// 예/아니오 형식 — options[0]=예, options[1]=아니오
+// options[0]=왼쪽 버튼, options[1]=오른쪽 버튼
 export const QUESTIONS = [
   {
-    q: '썸 탈 때 답장이 평소보다 조금 늦으면, 이유가 머릿속에서 먼저 돌아가?',
+    q: '썸 탈 때 답장이 평소보다 조금 늦으면?',
     options: [
-      { label: '예', score: 'keeper',
+      { label: '이유가 먼저 생각나', score: 'keeper',
         reactions: ['답장 늦으면 머릿속이 바빠지는 편이구나.', '그 마음 이해해. 근데 너무 지치지 않게 조심해.'] },
-      { label: '아니오', score: 'grandma',
+      { label: '기다릴 수 있어', score: 'grandma',
         reactions: ['일단 기다릴 수 있는 편이구나.', '그 여유 생각보다 쉽지 않은 거거든.'] },
     ],
   },
@@ -19,12 +19,12 @@ export const QUESTIONS = [
     ],
   },
   {
-    q: '썸 탈 때 상대 말투나 이모티콘이 달라지면 바로 알아채?',
+    q: '썸 탈 때 상대 말투나 이모티콘이 달라지면?',
     options: [
-      { label: '예', score: 'analyst',
+      { label: '바로 알아채', score: 'analyst',
         reactions: ['작은 변화도 놓치지 않는 편이구나. 촉이 예리하네.', '근데 답 없는 분석은 더 지칠 수 있거든.'] },
-      { label: '아니오', score: 'romantic',
-        reactions: ['분석보다 전체적인 느낌으로 받아들이는 편이구나.', '그 감성 예쁜데, 그래서 더 속상할 때도 있지 않아?'] },
+      { label: '크게 신경 안 써', score: 'romantic',
+        reactions: ['분석보다 전체 분위기로 받아들이는 편이구나.', '그 감성 예쁜데, 그래서 더 속상할 때도 있지 않아?'] },
     ],
   },
   {
@@ -37,12 +37,12 @@ export const QUESTIONS = [
     ],
   },
   {
-    q: '썸 상대가 힘든 상황일 때, 어떻게든 내가 해결해줘야 한다는 생각이 들어?',
+    q: '썸 상대가 힘든 상황일 때, 어떻게 하고 싶어?',
     options: [
-      { label: '예', score: 'rescuer',
+      { label: '어떻게든 해결해줘야 해', score: 'rescuer',
         reactions: ['책임감이 강한 편이구나.', '근데 혼자 다 짊어지려 하지 않아도 괜찮아.'] },
-      { label: '아니오', score: 'keeper',
-        reactions: ['옆에서 다 알아주고 싶어지는 편이구나.', '그런 마음, 상대한테 생각보다 크게 닿거든.'] },
+      { label: '그냥 옆에 있어줄래', score: 'keeper',
+        reactions: ['곁에 있어주는 것만으로도 충분하다고 생각하는 편이구나.', '그런 마음, 상대한테 생각보다 크게 닿거든.'] },
     ],
   },
   {
@@ -55,21 +55,21 @@ export const QUESTIONS = [
     ],
   },
   {
-    q: '좋아하는 티를 내기보다 상대가 먼저 다가오길 기다리는 편이야?',
+    q: '좋아하는 사람한테 티를 낼 때 더 가까운 쪽은?',
     options: [
-      { label: '예', score: 'cool',
-        reactions: ['상대 먼저 움직이길 기다리는 편이구나.', '안 그런 척하면서도 신경 많이 쓰이지 않아?'] },
-      { label: '아니오', score: 'analyst',
-        reactions: ['어떻게 다가갈지 미리 생각하는 편이구나.', '신중한 건 좋은데, 너무 오래 재다 보면 타이밍 놓칠 수 있어.'] },
+      { label: '상대 먼저 움직이길 기다려', score: 'cool',
+        reactions: ['상대 반응을 먼저 확인하는 편이구나.', '안 그런 척하면서도 신경 많이 쓰이지 않아?'] },
+      { label: '내가 어떻게 할지 먼저 생각해', score: 'analyst',
+        reactions: ['어떻게 다가갈지 미리 계산하는 편이구나.', '신중한 건 좋은데, 너무 오래 재다 보면 타이밍 놓칠 수 있어.'] },
     ],
   },
   {
-    q: '썸 상대랑 어색해지면, 먼저 풀기보다 혼자 정리할 시간이 필요한 편이야?',
+    q: '썸 상대랑 어색해지면, 어떻게 돼?',
     options: [
-      { label: '예', score: 'ghost',
+      { label: '혼자 정리할 시간 필요해', score: 'ghost',
         reactions: ['혼자 생각 정리하는 시간이 필요한 편이구나.', '근데 그 시간이 길어지면 상대가 많이 불안해할 수 있어.'] },
-      { label: '아니오', score: 'mirror',
-        reactions: ['빨리 풀고 싶어지는 편이구나.', '먼저 다가가는 게 편한 마음, 이해해.'] },
+      { label: '내가 먼저 말 걸어서 풀어', score: 'mirror',
+        reactions: ['빨리 풀고 싶어서 먼저 나서는 편이구나.', '먼저 다가가는 게 편한 마음, 이해해.'] },
     ],
   },
   {
@@ -82,11 +82,11 @@ export const QUESTIONS = [
     ],
   },
   {
-    q: '마음이 생기면 그냥 표현하는 편이야, 아니면 혼자 담아두는 편이야?',
+    q: '마음이 생기면 어떻게 해?',
     options: [
-      { label: '표현해', score: 'hunter',
+      { label: '그냥 표현해', score: 'hunter',
         reactions: ['망설임 없이 표현할 수 있는 편이구나.', '그런 사람이 나중에 후회도 덜 하더라.'] },
-      { label: '담아둬', score: 'keeper',
+      { label: '혼자 담아둬', score: 'keeper',
         reactions: ['마음을 잘 표현 못 하는 편이구나.', '말은 못 해도 마음속으론 다 느끼고 있지?'] },
     ],
   },

@@ -407,10 +407,10 @@ function LockedImgCard({ type, imgSrc, c }) {
       boxShadow: '0 14px 34px rgba(0,0,0,.22)' }}>
       <div style={{ position: 'relative', background: '#160C24', lineHeight: 0 }}>
         <img src={imgSrc(type.key)} alt="" style={{ width: '100%', height: 'auto', display: 'block',
-          filter: 'blur(18px)', transform: 'scale(1.1)', opacity: .65 }}
+          filter: 'blur(8px)', transform: 'scale(1.04)', opacity: .88 }}
           onError={e => { const w = e.target.parentElement; if (w) w.style.minHeight = '180px' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', gap: 10, background: 'rgba(14,8,22,.38)' }}>
+          alignItems: 'center', justifyContent: 'center', gap: 10, background: 'rgba(14,8,22,.10)' }}>
           <div style={{ fontSize: 28 }}>🔒</div>
           <div style={{ fontSize: 14, color: '#fff', fontWeight: 900, padding: '10px 20px', borderRadius: 999,
             background: 'rgba(0,0,0,.65)', border: `1px solid ${c.accent}88`, textAlign: 'center' }}>
@@ -533,9 +533,9 @@ export default function ResultPage() {
   // 결과는 신청 후에만 공개하는 대본
   const BEATS = first ? [
     { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: ['lockedimg'], end: 'continue', cont: '오, 결과 보여줘!' },
-    { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 것이 있어.'], cards: [], end: 'continue', cont: '오 뭔데?' },
-    { msgs: ['요즘 내가 직접 개발한 테스트지가 있는데,'], cards: ['review'], end: 'continue', cont: 'ㅋㅋ 진짜 핫하다' },
-    { msgs: ['크게 세 가지인데,', '① 토크쇼 — 왜 같은 패턴이 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '나도 신청할 수 있어?' },
+    { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 게 있어.', '처음엔 생소할 수 있는데, 20·30대 사이에서 빠르게 퍼지고 있거든.'], cards: [], end: 'continue', cont: '오 뭔데?' },
+    { msgs: ['내가 직접 개발한 연애 진단 프로그램이야.', '혼자 보기엔 아까울 것 같아서 실제 반응 좀 보여줄게.'], cards: ['review'], end: 'continue', cont: '반응 진짜 좋네' },
+    { msgs: ['크게 세 가지인데,', '① 토크쇼 — 같은 패턴이 왜 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '나도 신청할 수 있어?' },
     { msgs: ['이번 기수는 자리가 많지 않아서 선착순 30명만 받고 있거든.', '신청하면 지금 바로 결과 다 볼 수 있어.'], cards: [], end: 'cta' },
   ] : []
 
