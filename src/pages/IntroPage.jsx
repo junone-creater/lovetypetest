@@ -128,6 +128,19 @@ export default function IntroPage() {
           </div>
 
           <div style={{ position: 'absolute', bottom: 16, left: 20, right: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10, flexWrap: 'wrap' }}>
+              {[['⚡', '1분 완성'], ['📋', '10문항'], ['🆓', '무료']].map(([icon, text]) => (
+                <span key={text} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  fontSize: 11.5, fontWeight: 800, color: '#EAD9FF', fontFamily: FONT,
+                  padding: '5px 11px', borderRadius: 99,
+                  background: 'rgba(155,93,229,.5)', border: '1px solid rgba(192,132,252,.55)',
+                  backdropFilter: 'blur(6px)', letterSpacing: '.2px',
+                }}>
+                  <span>{icon}</span><span>{text}</span>
+                </span>
+              ))}
+            </div>
             <div style={{ fontSize: 11, fontWeight: 700, color: LILAC, letterSpacing: '2px', fontFamily: FONT, marginBottom: 6 }}>
               DM 프로파일링 : 연애해독
             </div>
@@ -137,7 +150,22 @@ export default function IntroPage() {
           </div>
         </div>
 
-        <div style={{ flexShrink: 0, padding: '18px 22px 28px' }}>
+        <div style={{ flexShrink: 0, padding: '16px 22px 28px' }}>
+          {/* MZ 속도 강조 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14,
+            padding: '11px 14px', borderRadius: 14,
+            background: 'linear-gradient(135deg, rgba(155,93,229,.18), rgba(192,132,252,.10))',
+            border: '1px solid rgba(192,132,252,.28)' }}>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>⚡</span>
+            <div>
+              <div style={{ fontSize: 14.5, fontWeight: 900, color: '#EAD9FF', fontFamily: FONT, lineHeight: 1.3 }}>
+                1분 안에 알아보는 나의 썸 심리
+              </div>
+              <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,.45)', fontFamily: FONT, marginTop: 3 }}>
+                짧은 질문 10개 · 길게 생각할 거 없어
+              </div>
+            </div>
+          </div>
           <p style={{ fontSize: 14.5, color: 'rgba(255,255,255,.82)', lineHeight: 1.7, marginBottom: 20, fontFamily: FONT }}>
             {MAIN_COPY.body.map((line, i) => (
               <React.Fragment key={line}>
