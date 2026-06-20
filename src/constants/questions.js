@@ -86,8 +86,8 @@ export const QUESTIONS = [
     options: [
       { label: '그냥 표현해', score: 'hunter',
         reactions: ['망설임 없이 표현하는 편이구나.'] },
-      { label: '혼자 담아둬', score: 'keeper',
-        reactions: ['말은 못 해도 마음속으론 다 느끼고 있지?'] },
+      { label: '티 안 내고 기다려', score: 'cool',
+        reactions: ['상대 반응 먼저 확인하고 싶은 편이구나.'] },
     ],
   },
 ]

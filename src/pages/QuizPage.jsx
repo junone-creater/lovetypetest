@@ -41,12 +41,23 @@ function Avatar({ size = 30 }) {
 // answers(선택한 보기 인덱스 배열) → 점수 합산 → 1·2·3위
 function computeResult(answers) {
   const scores = { ...INIT_SCORES }
+  // 각 타입이 처음 점수를 얻은 질문 인덱스 (동점 시 후순위 결정용)
+  const firstSeen = {}
   answers.forEach((optIdx, qi) => {
     if (optIdx == null) return
     const key = QUESTIONS[qi].options[optIdx].score
     scores[key] += 1
+    if (!(key in firstSeen)) firstSeen[key] = qi
   })
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]).map(([k]) => k)
+  const sorted = Object.entries(scores)
+    .sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1]
+      // 동점 시 먼저 등장한 타입 우선
+      const fa = firstSeen[a[0]] ?? 99
+      const fb = firstSeen[b[0]] ?? 99
+      return fa - fb
+    })
+    .map(([k]) => k)
   return { scores, result: { first: sorted[0], second: sorted[1], third: sorted[2] } }
 }
 

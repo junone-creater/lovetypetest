@@ -352,9 +352,9 @@ function PromoCard({ c }) {
         {/* 프로그램 3단계 */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
           {[
-            { step: '01', title: '토크쇼', desc: '같은 패턴이 반복되는 이유, 뿌리부터 짚어줘' },
-            { step: '02', title: '1:1 연애코치', desc: '너한테 맞는 관계 방향을 코치와 직접 설계' },
-            { step: '03', title: 'IDT 검사지', desc: '내 마음이 연애에서 어떻게 작동하는지 데이터로 확인' },
+            { step: '01', title: '테스트 결과지 전부 공개', desc: '신청하는 순간 지금 이 테스트 전체 분석이 바로 열려' },
+            { step: '02', title: 'IDT 정밀 검사지 제공', desc: '이 테스트보다 훨씬 깊이 파고드는 인지구조 진단이야' },
+            { step: '03', title: '전문가 1:1 만남', desc: '강매 없어. 그냥 내 얘기 들어주고 방향 잡아주는 시간' },
           ].map(({ step, title, desc }) => (
             <div key={step} style={{ display: 'flex', gap: 12, alignItems: 'flex-start',
               padding: '12px 13px', borderRadius: 12, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)' }}>
@@ -393,7 +393,7 @@ function PromoCard({ c }) {
             background: `linear-gradient(135deg, ${PURPLE}, ${LILAC})`, color: '#fff',
             fontSize: 16, fontWeight: 900, textDecoration: 'none', boxShadow: `0 10px 28px rgba(155,93,229,.4)`,
             fontFamily: 'inherit' }}>
-          이음나루 무료 프로그램 자세히 보기 →
+          무료 신청하고 내 결과지 바로 보기 →
         </a>
       </div>
     </div>
@@ -535,7 +535,7 @@ export default function ResultPage() {
     { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: ['lockedimg'], end: 'continue', cont: '오, 결과 보여줘!' },
     { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 게 있어.', '처음엔 생소할 수 있는데, 20·30대 사이에서 빠르게 퍼지고 있거든.'], cards: [], end: 'continue', cont: '오 뭔데?' },
     { msgs: ['내가 직접 개발한 연애 진단 프로그램이야.', '혼자 보기엔 아까울 것 같아서 실제 반응 좀 보여줄게.'], cards: ['review'], end: 'continue', cont: '반응 진짜 좋네' },
-    { msgs: ['크게 세 가지인데,', '① 토크쇼 — 같은 패턴이 왜 반복되는지 뿌리부터 같이 봐줘', '② 1:1 연애코치 — 나한테 맞는 연애 방향을 코치가 직접 설계해줘', '③ IDT 검사지 — 내 마음이 연애에서 어떻게 움직이는지 데이터로 확인할 수 있어'], cards: [], end: 'continue', cont: '나도 신청할 수 있어?' },
+    { msgs: ['신청하면 딱 세 가지 줄게.', '① 지금 이 테스트 결과지 전부 공개 — 유형 분석 다 볼 수 있어', '② IDT 정밀 검사지 제공 — 이 테스트보다 훨씬 깊이 들어가', '③ 전문가 1:1 만남 — 억지로 뭔가 권유하는 게 아니라, 그냥 내 얘기 들어주는 시간이야'], cards: [], end: 'continue', cont: '오 그거 좋다' },
     { msgs: ['이번 기수는 자리가 많지 않아서 선착순 30명만 받고 있거든.', '신청하면 지금 바로 결과 다 볼 수 있어.'], cards: [], end: 'cta' },
   ] : []
 
