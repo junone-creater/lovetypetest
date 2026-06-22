@@ -12,9 +12,9 @@ export const QUESTIONS = [
   {
     q: '좋아하는 사람이 생기면 내가 먼저 연락할 수 있어?',
     options: [
-      { label: '예', score: 'hunter',
+      { label: '먼저 연락해', score: 'hunter',
         reactions: [] },
-      { label: '아니오', score: 'cool',
+      { label: '먼저는 잘 안 해', score: 'cool',
         reactions: [] },
     ],
   },
@@ -30,9 +30,9 @@ export const QUESTIONS = [
   {
     q: '썸 상대가 힘들다고 하면, 나도 같이 힘들어지는 편이야?',
     options: [
-      { label: '예', score: 'mirror',
+      { label: '같이 힘들어져', score: 'mirror',
         reactions: [] },
-      { label: '아니오', score: 'ghost',
+      { label: '좀 분리돼', score: 'ghost',
         reactions: [] },
     ],
   },
@@ -48,9 +48,9 @@ export const QUESTIONS = [
   {
     q: '하루 연락이 없어도 그냥 기다릴 수 있는 편이야?',
     options: [
-      { label: '예', score: 'grandma',
+      { label: '기다릴 수 있어', score: 'grandma',
         reactions: [] },
-      { label: '아니오', score: 'hunter',
+      { label: '먼저 연락하게 돼', score: 'hunter',
         reactions: [] },
     ],
   },
@@ -75,9 +75,9 @@ export const QUESTIONS = [
   {
     q: '잘 맞으면 자연스럽게 이어지겠지 하고, 흐름에 맡기는 편이야?',
     options: [
-      { label: '예', score: 'romantic',
+      { label: '흐름에 맡겨', score: 'romantic',
         reactions: [] },
-      { label: '아니오', score: 'rescuer',
+      { label: '내가 만들어가', score: 'rescuer',
         reactions: [] },
     ],
   },
