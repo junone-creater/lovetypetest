@@ -32,7 +32,7 @@ export default function ApplyPage() {
   // 테스트에서 받은 이름·성별·나이를 미리 채워둠 (모두 수정 가능, 그대로 제출됨)
   const [fd, setFd] = useState({
     name: urlName, gender: urlGender, phone:'',
-    age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'', source:'',
+    age: testUser.age ? String(testUser.age) : '', job:'', location:'', calltime:'', concern:'', source:'', referral:'',
   })
 
   const ageOk = Number(fd.age) > 0   // 나이 제한 없음 — 입력만 하면 통과
@@ -42,7 +42,7 @@ export default function ApplyPage() {
     3: fd.location.trim().length >= 2,
     4: fd.calltime !== '',
     5: fd.concern.trim().length >= 5,
-    6: fd.source !== '',
+    6: fd.source !== '' && (fd.source !== '인스타 디엠' || fd.referral.trim() !== ''),
   }
 
   const goStep = (n) => { setStep(n); window.scrollTo({ top: 0, behavior: 'smooth' }) }
@@ -294,11 +294,11 @@ export default function ApplyPage() {
             <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>마지막이에요! 어떻게 알고 오셨어요?</h2>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,.4)', marginBottom: 28, lineHeight: 1.7 }}>더 좋은 안내를 위해 살짝 여쭤봐요</p>
             {[
-              { val: '카카오톡', emoji: '💬' },
-              { val: '친구/지인', emoji: '👥' },
-              { val: '인스타', emoji: '📷' },
-              { val: '블로그', emoji: '📝' },
-            ].map(({ val, emoji }) => {
+              { val: '인스타 디엠' },
+              { val: '온라인 광고' },
+              { val: '지인' },
+              { val: '인터넷 검색' },
+            ].map(({ val }) => {
               const sel = fd.source === val
               return (
                 <div key={val} onClick={() => setFd({ ...fd, source: val })}
@@ -311,11 +311,17 @@ export default function ApplyPage() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {sel && <div style={{ width: 10, height: 10, borderRadius: '50%', background: LILAC }}/>}
                   </div>
-                  <span style={{ fontSize: 16 }}>{emoji}</span>
                   <span style={{ fontSize: 15.5, color: sel ? '#fff' : '#EAE3D8', fontWeight: sel ? 600 : 500 }}>{val}</span>
                 </div>
               )
             })}
+            {fd.source === '인스타 디엠' && (
+              <div className="fade-in" style={{ marginTop: 18 }}>
+                <p style={{ fontSize: 14, color: '#EAE3D8', fontWeight: 600, marginBottom: 10 }}>추천인 코드를 알려주세요</p>
+                <input style={inputSt} placeholder="추천인 코드 입력"
+                  value={fd.referral} onChange={e => setFd({ ...fd, referral: e.target.value })}/>
+              </div>
+            )}
             <button style={btnSt(canNext[6])} disabled={!canNext[6]} onClick={() => canNext[6] && submit()}>신청 완료</button>
             <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,.2)', marginTop: 14 }}>
               입력하신 정보는 결과 안내 외 사용되지 않아요

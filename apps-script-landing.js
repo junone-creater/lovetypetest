@@ -49,7 +49,7 @@
         sheet.appendRow([
           "신청일시", "이름", "성별", "연애유형",
           "연락처", "나이", "직업", "거주지",
-          "희망시간", "상담내용", "유입경로"
+          "희망시간", "상담내용", "유입경로", "추천인코드"
         ]);
       }
 
@@ -64,7 +64,8 @@
         d.location || "",
         d.calltime || "",
         d.concern  || "",
-        d.source   || ""
+        d.source   || "",
+        d.referral || ""
       ]);
 
       return ContentService
