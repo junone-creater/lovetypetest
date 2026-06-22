@@ -45,8 +45,13 @@ const APPLY_STEPS = [
     placeholder: '편하게 적어줘' },
   { key: 'source', type: 'chips',
     ask: ['참, 나 어떻게 알고 왔어?'],
-    options: ['인스타', '카카오톡', '친구·지인', '블로그'] },
+    options: ['인스타 디엠', '온라인 광고', '지인', '인터넷 검색'] },
 ]
+
+// 유입경로가 '인스타 디엠'일 때 추가로 받는 추천인 코드 단계
+const REFERRAL_STEP = { key: 'referral', type: 'text',
+  ask: ['추천인 코드 알려줘!'],
+  placeholder: '추천인 코드 입력' }
 
 const REVIEWS = [
   { name: '박지윤 (25)', text: '진짜 소름 돋았어요…ㅠㅠ 저 원래 이런 거 잘 안 믿는데 결과 딱 보는 순간 "이거 나잖아" 했거든요. 친구한테 바로 보냈더니 친구도 "너 완전 이거다"라고 ㅋㅋㅋ 신기해서 주변에 다 돌렸어요.' },
@@ -514,7 +519,7 @@ export default function ResultPage() {
   const stepsRef = useRef(APPLY_STEPS)   // 현재 진행 중인 신청 단계 목록 (수정 선택 시 EDIT_STEPS가 앞에 붙음)
   const dataRef = useRef({              // 시트로 보낼 누적 답변 (이름·나이·성별은 테스트값으로 시작)
     name: user?.name || '', age: user?.age ? String(user.age) : '', gender: user?.gender || '',
-    phone: '', job: '', location: '', calltime: '', concern: '', source: '',
+    phone: '', job: '', location: '', calltime: '', concern: '', source: '', referral: '',
   })
   const after = (ms, fn) => { const id = setTimeout(fn, ms); timers.current.push(id); return id }
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
@@ -639,7 +644,7 @@ export default function ResultPage() {
     const d = dataRef.current
     const payload = {
       type: first.name, name: d.name, gender: d.gender, age: d.age || '',
-      phone: d.phone, job: d.job, location: d.location, calltime: d.calltime, concern: d.concern, source: d.source,
+      phone: d.phone, job: d.job, location: d.location, calltime: d.calltime, concern: d.concern, source: d.source, referral: d.referral,
     }
     try { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) }).catch(() => {}) } catch {}
     setPhase(null)
@@ -678,6 +683,10 @@ export default function ResultPage() {
     setDraft('')
     setEtcMode(false)
     setPhase(null)
+    // 유입경로가 '인스타 디엠'이면 추천인 코드 단계를 바로 뒤에 끼워넣는다
+    if (s.key === 'source' && value === '인스타 디엠' && !list.some(st => st.key === 'referral')) {
+      list.splice(applyStep + 1, 0, REFERRAL_STEP)
+    }
     const ni = applyStep + 1
     if (ni >= list.length) after(450, () => submitApply())
     else after(450, () => askApplyStep(ni))
