@@ -218,6 +218,30 @@ function RankCard({ type, c, imgSrc }) {
           </div>
           <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
 
+          {/* 연애할 때 이런 장면 */}
+          {type.scenario && (
+            <>
+              <div>
+                <div style={{ fontSize: 11, color: c.accent, fontWeight: 900, letterSpacing: '1.4px', marginBottom: 8 }}>연애할 때 이런 장면</div>
+                <p style={{ padding: '13px 15px', borderRadius: 12, margin: 0,
+                  background: 'rgba(0,0,0,.22)', border: `1px solid ${c.accent}26`,
+                  fontSize: 13.5, color: 'rgba(255,255,255,.74)', lineHeight: 1.8, fontStyle: 'italic' }}>{type.scenario}</p>
+              </div>
+              <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
+            </>
+          )}
+
+          {/* 연애 강점 */}
+          {type.strength && (
+            <>
+              <div>
+                <div style={{ fontSize: 11, color: '#7FD9B8', fontWeight: 900, letterSpacing: '1.4px', marginBottom: 8 }}>연애 강점</div>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,.74)', lineHeight: 1.85, margin: 0 }}>{type.strength}</p>
+              </div>
+              <div style={{ height: 1, background: 'rgba(255,255,255,.08)' }} />
+            </>
+          )}
+
           {/* 치명적인 약점 */}
           <div>
             <div style={{ fontSize: 11, color: '#F07BB8', fontWeight: 900, letterSpacing: '1.4px', marginBottom: 8 }}>치명적인 약점</div>
@@ -543,7 +567,7 @@ export default function ResultPage() {
     { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: ['lockedimg'], end: 'continue', cont: '오, 결과 보여줘!' },
     { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 게 있어.', '처음엔 생소할 수 있는데, 20·30대 사이에서 빠르게 퍼지고 있거든.'], cards: [], end: 'continue', cont: '오 뭔데?' },
     { msgs: ['내가 직접 개발한 연애 진단 프로그램이야.', '혼자 보기엔 아까울 것 같아서 실제 반응 좀 보여줄게.'], cards: ['review'], end: 'continue', cont: '반응 진짜 좋네' },
-    { msgs: ['지금 신청자한테는 세 가지를 같이 드리고 있거든.', '① 지금 이 테스트 결과지 전부 공개, 유형 분석 다 볼 수 있어', '② IDT 정밀 검사지 제공, 이 테스트보다 훨씬 깊이 들어가', '③ 전문가 1:1 만남, 억지로 뭔가 권유하는 게 아니라 그냥 내 얘기 들어주는 시간이야'], cards: [], end: 'continue', cont: '오 그거 좋다' },
+    { msgs: ['지금 신청자한테는 세 가지를 같이 주고 있거든.', '① 지금 이 테스트 결과지 전부 공개, 유형 분석 다 볼 수 있어', '② IDT 정밀 검사지 제공, 이 테스트보다 훨씬 깊이 들어가', '③ 전문가 1:1 만남, 억지로 뭔가 권유하는 게 아니라 그냥 내 얘기 들어주는 시간이야'], cards: [], end: 'continue', cont: '오 그거 좋다' },
     { msgs: ['이번 기수는 자리가 많지 않아서 선착순 30명만 받고 있거든.', '신청하면 지금 바로 결과 다 볼 수 있어.'], cards: [], end: 'cta' },
   ] : []
 
