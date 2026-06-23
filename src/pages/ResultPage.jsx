@@ -12,6 +12,17 @@ const HERO = `${import.meta.env.BASE_URL}images/intro-hero.png`
 // 신청 접수 시트 (ApplyPage와 동일) — 폼 대신 채팅으로 받아 여기로 전송
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjqcPPG9Xh5eIYNng0W29NscxfKR1JzcBsB0mIM9F9vGsH6It3YIHmu0lIGJMS/exec'
 
+// 후기 이름 가운데 글자 가리기 ('홍길동 (25)' → '홍*동 (25)')
+function maskName(full) {
+  const m = full.match(/^(\S+)([\s\S]*)$/)
+  if (!m) return full
+  const name = m[1], rest = m[2]
+  const masked = name.length <= 2
+    ? name[0] + '*'
+    : name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
+  return masked + rest
+}
+
 function fmtPhone(v) {
   const n = v.replace(/[^0-9]/g, '').slice(0, 11)
   if (n.length < 4) return n
@@ -29,7 +40,7 @@ const EDIT_STEPS = [
 // 대화로 받는 신청 단계
 const APPLY_STEPS = [
   { key: 'phone', type: 'tel',
-    ask: ['연락받을 번호 하나만 남겨줄 수 있어?'],
+    ask: ['간단한 질문 딱 5개만 물어볼게. 다 해서 30초면 끝나.', '먼저, 연락받을 번호 알려줘.'],
     placeholder: '010-0000-0000' },
   { key: 'job', type: 'chips',
     ask: ['고마워 :) 지금 어떻게 지내고 있어?'],
@@ -43,15 +54,7 @@ const APPLY_STEPS = [
   { key: 'concern', type: 'text',
     ask: ['마지막으로 하나만 더.', '연애에서 요즘 제일 고민인 게 뭐야? 편하게 적어줘.'],
     placeholder: '편하게 적어줘' },
-  { key: 'source', type: 'chips',
-    ask: ['참, 나 어떻게 알고 왔어?'],
-    options: ['인스타 디엠', '온라인 광고', '지인', '인터넷 검색'] },
 ]
-
-// 유입경로가 '인스타 디엠'일 때 추가로 받는 추천인 코드 단계
-const REFERRAL_STEP = { key: 'referral', type: 'text',
-  ask: ['추천인 코드 알려줘!'],
-  placeholder: '추천인 코드 입력' }
 
 const REVIEWS = [
   { name: '박지윤 (25)', text: '진짜 소름 돋았어요…ㅠㅠ 저 원래 이런 거 잘 안 믿는데 결과 딱 보는 순간 "이거 나잖아" 했거든요. 친구한테 바로 보냈더니 친구도 "너 완전 이거다"라고 ㅋㅋㅋ 신기해서 주변에 다 돌렸어요.' },
@@ -321,7 +324,7 @@ function ReviewCard({ c }) {
           <div key={i} style={{ flexShrink: 0, width: 230, padding: '12px 13px', borderRadius: 12,
             background: 'rgba(0,0,0,.2)', border: '1px solid rgba(255,255,255,.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 7 }}>
-              <span style={{ fontSize: 11, color: 'rgba(255,255,255,.9)', fontWeight: 800 }}>{r.name}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,.9)', fontWeight: 800 }}>{maskName(r.name)}</span>
               <span style={{ fontSize: 11, color: '#FBBF24', letterSpacing: 1 }}>
                 {'★'.repeat(STAR_PATTERN[i % STAR_PATTERN.length])}{'☆'.repeat(5 - STAR_PATTERN[i % STAR_PATTERN.length])}
               </span>
@@ -519,7 +522,7 @@ export default function ResultPage() {
   const stepsRef = useRef(APPLY_STEPS)   // 현재 진행 중인 신청 단계 목록 (수정 선택 시 EDIT_STEPS가 앞에 붙음)
   const dataRef = useRef({              // 시트로 보낼 누적 답변 (이름·나이·성별은 테스트값으로 시작)
     name: user?.name || '', age: user?.age ? String(user.age) : '', gender: user?.gender || '',
-    phone: '', job: '', location: '', calltime: '', concern: '', source: '', referral: '',
+    phone: '', job: '', location: '', calltime: '', concern: '',
   })
   const after = (ms, fn) => { const id = setTimeout(fn, ms); timers.current.push(id); return id }
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
@@ -540,7 +543,7 @@ export default function ResultPage() {
     { msgs: [`${user.name}, 분석 다 됐어 :)`, RESULT_STORY.yura], cards: ['lockedimg'], end: 'continue', cont: '오, 결과 보여줘!' },
     { msgs: ['연애테스트 하러 왔지만,', '사실 연애하기 전에 요즘 필수로 하는 게 있어.', '처음엔 생소할 수 있는데, 20·30대 사이에서 빠르게 퍼지고 있거든.'], cards: [], end: 'continue', cont: '오 뭔데?' },
     { msgs: ['내가 직접 개발한 연애 진단 프로그램이야.', '혼자 보기엔 아까울 것 같아서 실제 반응 좀 보여줄게.'], cards: ['review'], end: 'continue', cont: '반응 진짜 좋네' },
-    { msgs: ['지금 신청자한테는 세 가지를 같이 드리고 있거든.', '① 지금 이 테스트 결과지 전부 공개 — 유형 분석 다 볼 수 있어', '② IDT 정밀 검사지 제공 — 이 테스트보다 훨씬 깊이 들어가', '③ 전문가 1:1 만남 — 억지로 뭔가 권유하는 게 아니라, 그냥 내 얘기 들어주는 시간이야'], cards: [], end: 'continue', cont: '오 그거 좋다' },
+    { msgs: ['지금 신청자한테는 세 가지를 같이 드리고 있거든.', '① 지금 이 테스트 결과지 전부 공개, 유형 분석 다 볼 수 있어', '② IDT 정밀 검사지 제공, 이 테스트보다 훨씬 깊이 들어가', '③ 전문가 1:1 만남, 억지로 뭔가 권유하는 게 아니라 그냥 내 얘기 들어주는 시간이야'], cards: [], end: 'continue', cont: '오 그거 좋다' },
     { msgs: ['이번 기수는 자리가 많지 않아서 선착순 30명만 받고 있거든.', '신청하면 지금 바로 결과 다 볼 수 있어.'], cards: [], end: 'cta' },
   ] : []
 
@@ -644,7 +647,7 @@ export default function ResultPage() {
     const d = dataRef.current
     const payload = {
       type: first.name, name: d.name, gender: d.gender, age: d.age || '',
-      phone: d.phone, job: d.job, location: d.location, calltime: d.calltime, concern: d.concern, source: d.source, referral: d.referral,
+      phone: d.phone, job: d.job, location: d.location, calltime: d.calltime, concern: d.concern,
     }
     try { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) }).catch(() => {}) } catch {}
     setPhase(null)
@@ -683,10 +686,6 @@ export default function ResultPage() {
     setDraft('')
     setEtcMode(false)
     setPhase(null)
-    // 유입경로가 '인스타 디엠'이면 추천인 코드 단계를 바로 뒤에 끼워넣는다
-    if (s.key === 'source' && value === '인스타 디엠' && !list.some(st => st.key === 'referral')) {
-      list.splice(applyStep + 1, 0, REFERRAL_STEP)
-    }
     const ni = applyStep + 1
     if (ni >= list.length) after(450, () => submitApply())
     else after(450, () => askApplyStep(ni))
@@ -703,7 +702,7 @@ export default function ResultPage() {
     const s = stepsRef.current[applyStep]
     const v = draft.trim()
     if (!v) return
-    if (s.key === 'phone' && v.replace(/[^0-9]/g, '').length < 10) return
+    if (s.key === 'phone' && v.replace(/[^0-9]/g, '').length < 11) return
     saveApply(v)
   }
 
@@ -714,7 +713,7 @@ export default function ResultPage() {
     setPhase(null)
     after(220, () => streamYura([
       '좋아 :) 신청 전에 정보 한 번만 확인할게.',
-      `이름은 ${user.name}, ${user.age}살, ${user.gender} — 맞지?`,
+      `이름은 ${user.name}, ${user.age}살, ${user.gender} 맞지?`,
     ], () => setPhase('confirm')))
   }
 
@@ -898,7 +897,7 @@ export default function ResultPage() {
             )
           }
           const isPhone = s.key === 'phone'
-          const ok = isPhone ? draft.replace(/[^0-9]/g, '').length >= 10 : draft.trim().length > 0
+          const ok = isPhone ? draft.replace(/[^0-9]/g, '').length >= 11 : draft.trim().length > 0
           return (
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <input autoFocus value={draft} inputMode={s.type === 'tel' ? 'numeric' : 'text'}
