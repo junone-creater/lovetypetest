@@ -83,7 +83,7 @@ export default function QuizPage() {
   // 대화 로그를 세션에 계속 저장 → 결과 페이지에서 같은 채팅으로 이어짐
   useEffect(() => { store.setChat(messages) }, [messages])
 
-  // 유라 메시지 여러 줄을 타이핑 연출과 함께 차례로 보낸 뒤 done 콜백
+  // 도아 메시지 여러 줄을 타이핑 연출과 함께 차례로 보낸 뒤 done 콜백
   const streamYura = (lines, done) => {
     let idx = 0
     const step = () => {
@@ -148,7 +148,7 @@ export default function QuizPage() {
 
   /* ─────────────────────────────────────────────────────────────
    * (주석 처리) 기존 "분석 중" 로딩 화면.
-   * 이제는 채팅 안에서 유라가 "잠깐만 기다려봐" 메시지를 보내고
+   * 이제는 채팅 안에서 도아가 "잠깐만 기다려봐" 메시지를 보내고
    * 잠시(약 3초) 입력 중 상태로 대기한 뒤 결과로 이동한다.
    *
    * import { ANALYSIS_MESSAGES } from '../constants/character'
@@ -187,7 +187,7 @@ export default function QuizPage() {
       const isLast = qIndex + 1 >= TOTAL
       const reactions = opt.reactions || []
       const hasReaction = reactions.length > 0
-      // 유라의 리액션 → 다음 질문 또는 분석 대기
+      // 도아의 리액션 → 다음 질문 또는 분석 대기
       after(hasReaction ? 200 : 120, () => {
         streamYura(reactions, () => {
           if (!isLast) {
@@ -223,7 +223,7 @@ export default function QuizPage() {
     timers.current.forEach(clearTimeout); timers.current = []
     setTyping(false)
     const arr = [...messages]
-    // 현재 질문 + 연결 멘트 + 직전 리액션 (모두 끝에 연속된 유라 말풍선) 제거
+    // 현재 질문 + 연결 멘트 + 직전 리액션 (모두 끝에 연속된 도아 말풍선) 제거
     while (arr.length && arr[arr.length - 1].from === 'yura') arr.pop()
     // 직전 내 답장 제거
     if (arr.length && arr[arr.length - 1].from === 'me') arr.pop()
@@ -363,7 +363,7 @@ export default function QuizPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, opacity: .5,
             padding: '14px 16px', borderRadius: 22, border: '1.5px solid rgba(192,132,252,.2)',
             background: 'rgba(255,255,255,.05)', color: 'rgba(255,255,255,.35)', fontSize: 14 }}>
-            유라가 입력 중…
+            도아가 입력 중…
           </div>
         )}
       </div>

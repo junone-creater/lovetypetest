@@ -50,7 +50,7 @@ export default function IntroPage() {
 
   const fill = (s) => s.replace(/\{name\}/g, userRef.current.name || '너')
 
-  // 한 턴의 유라 메시지를 타이핑 연출과 함께 차례로 보낸 뒤 입력창을 연다
+  // 한 턴의 도아 메시지를 타이핑 연출과 함께 차례로 보낸 뒤 입력창을 연다
   const playTurn = useCallback((idx) => {
     const t = INTRO_CHAT[idx]
     if (!t) return
@@ -326,13 +326,13 @@ export default function IntroPage() {
             cursor: 'pointer', fontFamily: FONT, color: '#fff',
             background: `linear-gradient(135deg, ${PURPLE}, ${LILAC})`, boxShadow: '0 10px 26px rgba(155,93,229,.45)',
           }}>
-            유라의 분석 시작하기
+            도아의 분석 시작하기
           </button>
         )}
 
         {phase === null && (
           <div style={{ ...inputBar, opacity: .5 }}>
-            <div style={{ ...textInput, color: 'rgba(255,255,255,.35)' }}>유라가 입력 중…</div>
+            <div style={{ ...textInput, color: 'rgba(255,255,255,.35)' }}>도아가 입력 중…</div>
             <div style={sendBtn(false)} />
           </div>
         )}
